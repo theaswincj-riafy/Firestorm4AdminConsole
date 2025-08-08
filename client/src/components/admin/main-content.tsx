@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus } from "lucide-react";
+import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import TabContent from "./tab-content";
