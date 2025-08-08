@@ -73,47 +73,236 @@ class AdminApiService {
 
   async getAppConfig(appId: string): Promise<any> {
     await this.delay(300);
-    // Mock data structure
-    return {
-      page1_referralPromote: {
-        hero: {
-          title: "Share & Earn Rewards",
-          subtitle: "Invite friends and get amazing rewards for each successful referral"
+    
+    // Return data from the provided JSON structure
+    const jsonData = {
+      "appID": 1,
+      "en": {
+        "page1_referralPromote": {
+          "page_id": "referral-promote",
+          "personalization": {
+            "referrer_name": "{{referrer_name}}",
+            "referral_code": "{{referral_code}}",
+            "target_redemptions": 5
+          },
+          "hero": {
+            "title": "Share & Unlock 1 Month Premium",
+            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code.",
+            "badge": "Only {{target_redemptions}} redemptions needed"
+          },
+          "benefits": [
+            {
+              "title": "Premium Access",
+              "desc": "Ad-free experience, pro features, and priority support for 1 month."
+            },
+            {
+              "title": "Win Together",
+              "desc": "Your friends get an exclusive newcomer perk when they join via your link."
+            },
+            {
+              "title": "Fast & Simple",
+              "desc": "Share your link; they download and redeem. You progress instantly."
+            }
+          ],
+          "progress_teaser": {
+            "label": "Your current progress",
+            "value": "{{current_redemptions}}/{{target_redemptions}}",
+            "hint": "Keep sharing—each redemption brings you closer to Premium!"
+          },
+          "share": {
+            "section_title": "Share your invite",
+            "primary_cta": "Share Invite",
+            "copy_code_cta": "Copy Code: {{referral_code}}",
+            "copy_link_cta": "Copy Link",
+            "success_toast": "Copied! Now paste it anywhere.",
+            "messages": {
+              "whatsapp": "Hey! I'm using this app and it's awesome. Use my code {{referral_code}} or link {{referral_link}} to join—helps me unlock 1 month Premium 🎉",
+              "sms": "Join this app with my code {{referral_code}} (link: {{referral_link}}). You'll love it—and you'll help me unlock Premium!",
+              "generic": "{{referrer_name}} invited you to try this app. Redeem code {{referral_code}} via {{referral_link}}."
+            }
+          },
+          "nudges": [
+            "Best results: share with 5–10 close contacts first.",
+            "Add a personal note: tell them why you like the app.",
+            "Post your link in a relevant group or community."
+          ],
+          "social_proof": {
+            "title": "Why people join",
+            "bullets": [
+              "Top-rated features that save time",
+              "Fresh content weekly",
+              "Secure & private by design"
+            ]
+          },
+          "privacy_note": "We never reveal who redeemed your code. Only your totals are shown.",
+          "footer_cta": {
+            "label": "View My Referral Status",
+            "action": "go_to_status"
+          }
         },
-        benefits: [
-          { title: "Cash Rewards", description: "Earn $10 for each friend who joins" },
-          { title: "Bonus Points", description: "Get 500 bonus points per referral" },
-          { title: "Premium Access", description: "Unlock premium features with referrals" }
-        ],
-        milestones: [
-          { count: 5, reward: "Bronze Badge", description: "Refer 5 friends" },
-          { count: 10, reward: "Silver Badge", description: "Refer 10 friends" },
-          { count: 25, reward: "Gold Badge", description: "Refer 25 friends" }
-        ],
-        featureHighlights: [
-          { feature: "Easy Sharing", description: "Share with one click" },
-          { feature: "Real-time Tracking", description: "Track referrals instantly" },
-          { feature: "Multiple Rewards", description: "Various reward options" }
-        ]
-      },
-      page2_referralStatus: {
-        header: {
-          title: "Your Referral Status",
-          description: "Track your referral progress and earnings"
+        "page2_referralStatus": {
+          "page_id": "referral-status",
+          "personalization": {
+            "referrer_name": "{{referrer_name}}",
+            "referral_code": "{{referral_code}}",
+            "target_redemptions": 5
+          },
+          "header": {
+            "title": "Your Referral Progress",
+            "subtitle": "Great work, {{referrer_name}}. Keep it going!"
+          },
+          "status": {
+            "current": "{{current_redemptions}}",
+            "target": "{{target_redemptions}}",
+            "progress_text": "{{current_redemptions}} of {{target_redemptions}} completed"
+          },
+          "notifications": {
+            "recent_event_banner": {
+              "visible": "{{show_recent_event}}",
+              "text": "Nice! Someone redeemed your code. Your progress just moved to {{current_redemptions}}/{{target_redemptions}}."
+            }
+          },
+          "milestones": [
+            {
+              "level": 1,
+              "threshold": 1,
+              "title": "Level 1 – The Kickoff",
+              "message": "Your first referral is in! You've started your Premium journey."
+            },
+            {
+              "level": 2,
+              "threshold": 2,
+              "title": "Level 2 – Building Momentum",
+              "message": "Two friends on board! You're warming up nicely."
+            }
+          ],
+          "tips": [
+            "Reshare your link with a quick personal note.",
+            "Pin your code {{referral_code}} in your bio or group description.",
+            "Remind friends it takes less than a minute to redeem."
+          ],
+          "actions": {
+            "share_cta": "Share Again",
+            "copy_link_cta": "Copy Invite Link",
+            "copy_code_cta": "Copy Code: {{referral_code}}"
+          },
+          "faq": [
+            {
+              "q": "Do I see who redeemed?",
+              "a": "No—only totals. We don't store redeemer identities."
+            },
+            {
+              "q": "When do I get Premium?",
+              "a": "Instantly after {{target_redemptions}} redemptions. You'll get an in-app confirmation."
+            }
+          ],
+          "privacy_note": "We keep your contacts' identities private. Only your aggregate progress is tracked."
+        },
+        "page3_referralDownload": {
+          "page_id": "referral-download",
+          "personalization": {
+            "referrer_name": "{{referrer_name}}",
+            "referral_code": "{{referral_code}}"
+          },
+          "hero": {
+            "title": "{{referrer_name}} invited you",
+            "subtitle": "Download the app to claim your invite and get started."
+          },
+          "feature_highlights": [
+            {
+              "title": "Get Results Fast",
+              "desc": "Smart tools that save you time from day one."
+            },
+            {
+              "title": "Premium-grade Experience",
+              "desc": "Clean design, powerful features, zero clutter."
+            },
+            {
+              "title": "Privacy First",
+              "desc": "We don't expose your identity to others."
+            }
+          ],
+          "store_ctas": {
+            "play_store_button": "Get it on Google Play",
+            "app_store_button": "Download on the App Store",
+            "device_hint": "Choose your store to download the app."
+          },
+          "how_it_works": {
+            "title": "How to claim the invite",
+            "steps": [
+              "Install the app from your store.",
+              "Open the app and go to "Redeem Invite".",
+              "Enter code {{referral_code}} to complete."
+            ]
+          },
+          "footer": {
+            "smallprint": "By continuing you agree to our Terms and Privacy Policy.",
+            "secondary_cta": {
+              "label": "Already installed?",
+              "action": "go_to_redeem"
+            }
+          }
+        },
+        "page4_referralRedeem": {
+          "page_id": "referral-redeem",
+          "personalization": {
+            "referrer_name": "{{referrer_name}}",
+            "prefilled_code": "{{referral_code}}"
+          },
+          "hero": {
+            "title": "Redeem Invite Code",
+            "subtitle": "Enter the invite from {{referrer_name}} to continue."
+          },
+          "form": {
+            "label": "Enter code",
+            "placeholder": "e.g., {{referral_code}}",
+            "prefill": "{{prefilled_code}}",
+            "primary_cta": "Redeem Offer",
+            "secondary_cta": "Paste from Clipboard"
+          },
+          "validation": {
+            "empty": "Please enter a code.",
+            "invalid": "That code doesn't look right. Check and try again.",
+            "expired": "This invite has expired. Ask {{referrer_name}} for a new one.",
+            "success": "Success! Your invite is confirmed."
+          },
+          "post_redeem": {
+            "title": "You're all set",
+            "desc": "Enjoy the app. Your redemption also helps {{referrer_name}} progress toward a reward."
+          },
+          "privacy_note": "We do not store or display your identity to {{referrer_name}}. Only the total redemption count updates.",
+          "help": {
+            "link_text": "Need help?",
+            "items": [
+              "Make sure you downloaded the official app.",
+              "Double-check the code format (no spaces).",
+              "Still stuck? Contact support from Settings > Help."
+            ]
+          }
+        },
+        "notifications": {
+          "referrer": [
+            {
+              "id": "referral_progress_4_left",
+              "title": "🔥 First win!",
+              "body": "Someone just joined using your code. 4 more and you'll unlock a month of Premium!",
+              "cta": "Check your progress"
+            },
+            {
+              "id": "referral_progress_3_left",
+              "title": "🚀 You're gaining momentum",
+              "body": "Another friend joined! Just 3 more redemptions to score your free Premium month.",
+              "cta": "See who's next"
+            }
+          ],
+          "redeemer": []
         }
-      },
-      page3_referralDownload: {
-        title: "Get the Mobile App",
-        subtitle: "Download our app for the best experience"
-      },
-      page4_referralRedeem: {
-        title: "Redeem Your Code",
-        subtitle: "Enter your referral code to claim rewards"
-      },
-      notifications: {
-        enabled: true,
-        types: ["email", "push", "sms"]
-      },
+      }
+    };
+
+    // Return the 'en' object which contains all the tab data
+    return {
+      ...jsonData.en,
       images: {
         logo: {
           url: "https://example.com/logo.png",
@@ -122,7 +311,7 @@ class AdminApiService {
         },
         hero: {
           url: "https://example.com/hero.jpg",
-          alt: "Hero Image",
+          alt: "Hero Image", 
           dimensions: "1200x600"
         },
         promotional: [
@@ -131,9 +320,12 @@ class AdminApiService {
         ]
       },
       appDetails: {
-        name: "Referral Boost",
+        appName: "Demo Referral App",
+        packageName: "com.demo.referral",
+        appDescription: "A sample referral application",
+        playUrl: "https://play.google.com/store/apps/details?id=com.demo.referral",
+        appStoreUrl: "https://apps.apple.com/app/demo-referral-app/id123456789",
         version: "1.0.0",
-        description: "The best referral program app",
         category: "Business",
         platforms: ["iOS", "Android", "Web"],
         minVersion: {
@@ -142,7 +334,7 @@ class AdminApiService {
         },
         features: [
           "Real-time tracking",
-          "Multiple reward types",
+          "Multiple reward types", 
           "Social sharing",
           "Analytics dashboard"
         ]

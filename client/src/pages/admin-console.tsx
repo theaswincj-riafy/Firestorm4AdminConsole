@@ -302,10 +302,21 @@ export default function AdminConsole() {
         
         <div className="flex items-center gap-3">
           <button
-            className="btn btn-secondary"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors"
             onClick={handleCreateApp}
           >
             <span className="text-sm">Create App</span>
+          </button>
+          <button
+            className="btn btn-outline"
+            onClick={() => {
+              if (confirm('Are you sure you want to logout?')) {
+                // Handle logout logic here
+                console.log('Logout clicked');
+              }
+            }}
+          >
+            <span className="text-sm">Logout</span>
           </button>
         </div>
       </header>
