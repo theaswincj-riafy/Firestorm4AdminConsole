@@ -231,7 +231,7 @@ class AdminApiService {
             "title": "How to claim the invite",
             "steps": [
               "Install the app from your store.",
-              "Open the app and go to "Redeem Invite".",
+              "Open the app and go to \"Redeem Invite\".",
               "Enter code {{referral_code}} to complete."
             ]
           },
