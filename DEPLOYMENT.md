@@ -8,6 +8,7 @@ This repository includes comprehensive CI/CD deployment scripts for the Firestor
 
 1. **GitHub Actions CI/CD** - Automatically triggered on push to main branch
 2. **Manual Deployment** - Run deployment scripts manually
+3. **Docker Deployment** - Containerized deployment option
 
 ## 📋 Available Deployment Methods
 
@@ -64,6 +65,7 @@ git push origin main
 ```bash
 export DEPLOY_URL="https://your-deployment-webhook.com"
 export DEPLOY_KEY="your-secret-key"
+export DOCKER_REGISTRY="your-registry.com"
 export CLEAN_BUILD="true"  # Optional: clean build cache
 ```
 
@@ -94,6 +96,28 @@ node scripts/replit-deploy.js --help
 2. Go to the "Deployments" tab in Replit
 3. Click "Deploy" to create a new deployment
 
+### 4. Docker Deployment
+
+**Files:** `Dockerfile`, `.dockerignore`
+
+**Features:**
+- ✅ Multi-stage build for optimization
+- ✅ Security best practices (non-root user)
+- ✅ Health checks
+- ✅ Production-ready configuration
+
+**Usage:**
+```bash
+# Build Docker image
+docker build -t firestorm-referral-console .
+
+# Run locally
+docker run -p 5000:5000 firestorm-referral-console
+
+# Deploy to registry
+docker tag firestorm-referral-console your-registry.com/firestorm-referral-console
+docker push your-registry.com/firestorm-referral-console
+```
 
 ## 🔧 Configuration
 
@@ -105,6 +129,7 @@ The deployment scripts support the following environment variables:
 |----------|-------------|----------|
 | `DEPLOY_URL` | Webhook URL for deployment | Optional |
 | `DEPLOY_KEY` | Authorization key for deployment | Optional |
+| `DOCKER_REGISTRY` | Docker registry URL | Optional |
 | `PROJECT_NAME` | Name of your project | Optional |
 | `NODE_ENV` | Environment (production/development) | Auto-set |
 | `CLEAN_BUILD` | Clean build cache after deployment | Optional |
@@ -115,6 +140,7 @@ You can customize the deployment process by:
 
 1. **Modifying deployment scripts** in the `scripts/` directory
 2. **Updating GitHub Actions workflow** in `.github/workflows/ci-cd.yml`
+3. **Configuring Docker settings** in `Dockerfile`
 
 ## 🔍 Deployment Targets
 
@@ -122,6 +148,7 @@ You can customize the deployment process by:
 
 - ✅ **Replit Deployments** - Native Replit deployment
 - ✅ **Custom Servers** - Via webhook or rsync
+- ✅ **Docker Containers** - Any container platform
 - ✅ **Cloud Platforms** - AWS, GCP, Azure, etc.
 
 ### Platform-Specific Notes
@@ -136,6 +163,10 @@ You can customize the deployment process by:
 - Supports rsync and webhook deployments
 - Includes deployment verification
 
+#### Docker
+- Multi-stage builds for optimization
+- Health checks included
+- Security best practices implemented
 
 ## 🚨 Troubleshooting
 
@@ -158,11 +189,20 @@ chmod +x scripts/deploy.sh
 chmod +x scripts/replit-deploy.js
 ```
 
+**Docker Issues:**
+```bash
+# Check Docker daemon
+docker info
+
+# Clean up Docker cache
+docker system prune -f
+```
 
 ### Logs and Debugging
 
 - **GitHub Actions**: Check the Actions tab in your repository
 - **Local Deployment**: Scripts output detailed logs
+- **Docker**: Use `docker logs <container-id>` for container logs
 
 ## 📞 Support
 

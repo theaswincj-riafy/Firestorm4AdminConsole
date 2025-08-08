@@ -141,6 +141,23 @@ deploy_to_server() {
     fi
 }
 
+# Deploy to Docker (if Dockerfile exists)
+deploy_to_docker() {
+    if [ -f "Dockerfile" ]; then
+        print_status "Building Docker image..."
+        
+        docker build -t "$PROJECT_NAME:latest" .
+        
+        # Tag for deployment
+        if [ -n "$DOCKER_REGISTRY" ]; then
+            docker tag "$PROJECT_NAME:latest" "$DOCKER_REGISTRY/$PROJECT_NAME:latest"
+            docker push "$DOCKER_REGISTRY/$PROJECT_NAME:latest"
+            print_success "Docker image pushed to registry"
+        else
+            print_success "Docker image built locally"
+        fi
+    fi
+}
 
 # Post-deployment tasks
 post_deploy() {
@@ -171,6 +188,7 @@ main() {
     # Deploy to various targets
     deploy_to_replit
     deploy_to_server
+    deploy_to_docker
     
     post_deploy
     
@@ -191,7 +209,7 @@ case "${1:-}" in
         echo "Environment variables:"
         echo "  DEPLOY_URL      URL for deployment webhook"
         echo "  DEPLOY_KEY      Authorization key for deployment"
-        echo ""
+        echo "  DOCKER_REGISTRY Docker registry URL"
         echo "  CLEAN_BUILD     Set to 'true' to clean build cache"
         ;;
     --build-only)
@@ -206,6 +224,7 @@ case "${1:-}" in
         build_application
         deploy_to_replit
         deploy_to_server
+        deploy_to_docker
         post_deploy
         ;;
     *)
