@@ -7,18 +7,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
 interface UIEditorProps {
   data: any;
   isLocked: boolean;
   onUpdate: (data: any) => void;
+  tabKey?: string;
 }
 
-export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
-  const [activeTab, setActiveTab] = useState<string>("promote-sharing");
-
+export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorProps) {
   const updateValue = (path: string, value: any) => {
     const newData = JSON.parse(JSON.stringify(data));
     let current = newData;
@@ -68,7 +66,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Title</Label>
               <Input
                 value={pageData.hero?.title || ''}
-                onChange={(e) => updateValue('page1_referralPromote.hero.title', e.target.value)}
+                onChange={(e) => updateValue('hero.title', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter hero title"
               />
@@ -77,7 +75,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Subtitle</Label>
               <Textarea
                 value={pageData.hero?.subtitle || ''}
-                onChange={(e) => updateValue('page1_referralPromote.hero.subtitle', e.target.value)}
+                onChange={(e) => updateValue('hero.subtitle', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter hero subtitle"
                 className="min-h-[80px]"
@@ -87,7 +85,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Badge Text</Label>
               <Input
                 value={pageData.hero?.badge || ''}
-                onChange={(e) => updateValue('page1_referralPromote.hero.badge', e.target.value)}
+                onChange={(e) => updateValue('hero.badge', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter badge text"
               />
@@ -109,7 +107,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Benefit Title</Label>
                     <Input
                       value={benefit.title || ''}
-                      onChange={(e) => updateValue(`page1_referralPromote.benefits.${index}.title`, e.target.value)}
+                      onChange={(e) => updateValue(`benefits.${index}.title`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter benefit title"
                     />
@@ -118,7 +116,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Description</Label>
                     <Textarea
                       value={benefit.desc || ''}
-                      onChange={(e) => updateValue(`page1_referralPromote.benefits.${index}.desc`, e.target.value)}
+                      onChange={(e) => updateValue(`benefits.${index}.desc`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter benefit description"
                     />
@@ -139,7 +137,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Section Title</Label>
               <Input
                 value={pageData.share?.section_title || ''}
-                onChange={(e) => updateValue('page1_referralPromote.share.section_title', e.target.value)}
+                onChange={(e) => updateValue('share.section_title', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter section title"
               />
@@ -148,10 +146,63 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Primary CTA</Label>
               <Input
                 value={pageData.share?.primary_cta || ''}
-                onChange={(e) => updateValue('page1_referralPromote.share.primary_cta', e.target.value)}
+                onChange={(e) => updateValue('share.primary_cta', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter primary call-to-action"
               />
+            </div>
+            <div>
+              <Label>Copy Code CTA</Label>
+              <Input
+                value={pageData.share?.copy_code_cta || ''}
+                onChange={(e) => updateValue('share.copy_code_cta', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter copy code button text"
+              />
+            </div>
+            <div>
+              <Label>Copy Link CTA</Label>
+              <Input
+                value={pageData.share?.copy_link_cta || ''}
+                onChange={(e) => updateValue('share.copy_link_cta', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter copy link button text"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Social Proof */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Social Proof</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Title</Label>
+              <Input
+                value={pageData.social_proof?.title || ''}
+                onChange={(e) => updateValue('social_proof.title', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter social proof title"
+              />
+            </div>
+            <div>
+              <Label>Bullet Points</Label>
+              {pageData.social_proof?.bullets?.map((bullet: string, index: number) => (
+                <Input
+                  key={index}
+                  value={bullet}
+                  onChange={(e) => {
+                    const newBullets = [...(pageData.social_proof.bullets || [])];
+                    newBullets[index] = e.target.value;
+                    updateValue('social_proof.bullets', newBullets);
+                  }}
+                  disabled={isLocked}
+                  placeholder={`Bullet point ${index + 1}`}
+                  className="mb-2"
+                />
+              )) || <p className="text-muted-foreground text-sm">No bullet points configured</p>}
             </div>
           </CardContent>
         </Card>
@@ -176,7 +227,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Title</Label>
               <Input
                 value={pageData.header?.title || ''}
-                onChange={(e) => updateValue('page2_referralStatus.header.title', e.target.value)}
+                onChange={(e) => updateValue('header.title', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter status title"
               />
@@ -185,7 +236,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Subtitle</Label>
               <Input
                 value={pageData.header?.subtitle || ''}
-                onChange={(e) => updateValue('page2_referralStatus.header.subtitle', e.target.value)}
+                onChange={(e) => updateValue('header.subtitle', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter status subtitle"
               />
@@ -211,7 +262,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Title</Label>
                     <Input
                       value={milestone.title || ''}
-                      onChange={(e) => updateValue(`page2_referralStatus.milestones.${index}.title`, e.target.value)}
+                      onChange={(e) => updateValue(`milestones.${index}.title`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter milestone title"
                     />
@@ -220,7 +271,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Message</Label>
                     <Textarea
                       value={milestone.message || ''}
-                      onChange={(e) => updateValue(`page2_referralStatus.milestones.${index}.message`, e.target.value)}
+                      onChange={(e) => updateValue(`milestones.${index}.message`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter milestone message"
                     />
@@ -228,6 +279,39 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 </div>
               </div>
             )) || <p className="text-muted-foreground">No milestones configured</p>}
+          </CardContent>
+        </Card>
+
+        {/* FAQ */}
+        <Card>
+          <CardHeader>
+            <CardTitle>FAQ</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {pageData.faq?.map((faqItem: any, index: number) => (
+              <div key={index} className="border rounded-lg p-4 mb-4">
+                <div className="space-y-3">
+                  <div>
+                    <Label>Question</Label>
+                    <Input
+                      value={faqItem.q || ''}
+                      onChange={(e) => updateValue(`faq.${index}.q`, e.target.value)}
+                      disabled={isLocked}
+                      placeholder="Enter question"
+                    />
+                  </div>
+                  <div>
+                    <Label>Answer</Label>
+                    <Textarea
+                      value={faqItem.a || ''}
+                      onChange={(e) => updateValue(`faq.${index}.a`, e.target.value)}
+                      disabled={isLocked}
+                      placeholder="Enter answer"
+                    />
+                  </div>
+                </div>
+              </div>
+            )) || <p className="text-muted-foreground">No FAQ items configured</p>}
           </CardContent>
         </Card>
       </div>
@@ -251,7 +335,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Title</Label>
               <Input
                 value={pageData.hero?.title || ''}
-                onChange={(e) => updateValue('page3_referralDownload.hero.title', e.target.value)}
+                onChange={(e) => updateValue('hero.title', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter download title"
               />
@@ -260,7 +344,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Subtitle</Label>
               <Textarea
                 value={pageData.hero?.subtitle || ''}
-                onChange={(e) => updateValue('page3_referralDownload.hero.subtitle', e.target.value)}
+                onChange={(e) => updateValue('hero.subtitle', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter download subtitle"
                 className="min-h-[80px]"
@@ -282,7 +366,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Feature Title</Label>
                     <Input
                       value={feature.title || ''}
-                      onChange={(e) => updateValue(`page3_referralDownload.feature_highlights.${index}.title`, e.target.value)}
+                      onChange={(e) => updateValue(`feature_highlights.${index}.title`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter feature title"
                     />
@@ -291,7 +375,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Description</Label>
                     <Textarea
                       value={feature.desc || ''}
-                      onChange={(e) => updateValue(`page3_referralDownload.feature_highlights.${index}.desc`, e.target.value)}
+                      onChange={(e) => updateValue(`feature_highlights.${index}.desc`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter feature description"
                     />
@@ -299,6 +383,33 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 </div>
               </div>
             )) || <p className="text-muted-foreground">No features configured</p>}
+          </CardContent>
+        </Card>
+
+        {/* Store CTAs */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Store Download Buttons</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Play Store Button Text</Label>
+              <Input
+                value={pageData.store_ctas?.play_store_button || ''}
+                onChange={(e) => updateValue('store_ctas.play_store_button', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter Play Store button text"
+              />
+            </div>
+            <div>
+              <Label>App Store Button Text</Label>
+              <Input
+                value={pageData.store_ctas?.app_store_button || ''}
+                onChange={(e) => updateValue('store_ctas.app_store_button', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter App Store button text"
+              />
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -322,7 +433,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Title</Label>
               <Input
                 value={pageData.hero?.title || ''}
-                onChange={(e) => updateValue('page4_referralRedeem.hero.title', e.target.value)}
+                onChange={(e) => updateValue('hero.title', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter redeem title"
               />
@@ -331,7 +442,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Subtitle</Label>
               <Input
                 value={pageData.hero?.subtitle || ''}
-                onChange={(e) => updateValue('page4_referralRedeem.hero.subtitle', e.target.value)}
+                onChange={(e) => updateValue('hero.subtitle', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter redeem subtitle"
               />
@@ -348,7 +459,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Form Label</Label>
               <Input
                 value={pageData.form?.label || ''}
-                onChange={(e) => updateValue('page4_referralRedeem.form.label', e.target.value)}
+                onChange={(e) => updateValue('form.label', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter form label"
               />
@@ -357,7 +468,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Placeholder</Label>
               <Input
                 value={pageData.form?.placeholder || ''}
-                onChange={(e) => updateValue('page4_referralRedeem.form.placeholder', e.target.value)}
+                onChange={(e) => updateValue('form.placeholder', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter form placeholder"
               />
@@ -366,9 +477,54 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Primary CTA</Label>
               <Input
                 value={pageData.form?.primary_cta || ''}
-                onChange={(e) => updateValue('page4_referralRedeem.form.primary_cta', e.target.value)}
+                onChange={(e) => updateValue('form.primary_cta', e.target.value)}
                 disabled={isLocked}
                 placeholder="Enter primary button text"
+              />
+            </div>
+            <div>
+              <Label>Secondary CTA</Label>
+              <Input
+                value={pageData.form?.secondary_cta || ''}
+                onChange={(e) => updateValue('form.secondary_cta', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter secondary button text"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Validation Messages */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Validation Messages</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Empty Field Message</Label>
+              <Input
+                value={pageData.validation?.empty || ''}
+                onChange={(e) => updateValue('validation.empty', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter empty field message"
+              />
+            </div>
+            <div>
+              <Label>Invalid Code Message</Label>
+              <Input
+                value={pageData.validation?.invalid || ''}
+                onChange={(e) => updateValue('validation.invalid', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter invalid code message"
+              />
+            </div>
+            <div>
+              <Label>Success Message</Label>
+              <Input
+                value={pageData.validation?.success || ''}
+                onChange={(e) => updateValue('validation.success', e.target.value)}
+                disabled={isLocked}
+                placeholder="Enter success message"
               />
             </div>
           </CardContent>
@@ -397,7 +553,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Title</Label>
                     <Input
                       value={notification.title || ''}
-                      onChange={(e) => updateValue(`notifications.referrer.${index}.title`, e.target.value)}
+                      onChange={(e) => updateValue(`referrer.${index}.title`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter notification title"
                     />
@@ -406,7 +562,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>Body</Label>
                     <Textarea
                       value={notification.body || ''}
-                      onChange={(e) => updateValue(`notifications.referrer.${index}.body`, e.target.value)}
+                      onChange={(e) => updateValue(`referrer.${index}.body`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter notification body"
                     />
@@ -415,7 +571,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     <Label>CTA Text</Label>
                     <Input
                       value={notification.cta || ''}
-                      onChange={(e) => updateValue(`notifications.referrer.${index}.cta`, e.target.value)}
+                      onChange={(e) => updateValue(`referrer.${index}.cta`, e.target.value)}
                       disabled={isLocked}
                       placeholder="Enter call-to-action text"
                     />
@@ -423,6 +579,41 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 </div>
               </div>
             )) || <p className="text-muted-foreground">No referrer notifications configured</p>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Redeemer Notifications</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {notificationData.redeemer?.length > 0 ? 
+              notificationData.redeemer.map((notification: any, index: number) => (
+                <div key={index} className="border rounded-lg p-4 mb-4">
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Title</Label>
+                      <Input
+                        value={notification.title || ''}
+                        onChange={(e) => updateValue(`redeemer.${index}.title`, e.target.value)}
+                        disabled={isLocked}
+                        placeholder="Enter notification title"
+                      />
+                    </div>
+                    <div>
+                      <Label>Body</Label>
+                      <Textarea
+                        value={notification.body || ''}
+                        onChange={(e) => updateValue(`redeemer.${index}.body`, e.target.value)}
+                        disabled={isLocked}
+                        placeholder="Enter notification body"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )) : 
+              <p className="text-muted-foreground">No redeemer notifications configured</p>
+            }
           </CardContent>
         </Card>
       </div>
@@ -449,7 +640,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                   <Label>URL</Label>
                   <Input
                     value={imageData.logo?.url || ''}
-                    onChange={(e) => updateValue('images.logo.url', e.target.value)}
+                    onChange={(e) => updateValue('logo.url', e.target.value)}
                     disabled={isLocked}
                     placeholder="Enter logo URL"
                   />
@@ -458,7 +649,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                   <Label>Alt Text</Label>
                   <Input
                     value={imageData.logo?.alt || ''}
-                    onChange={(e) => updateValue('images.logo.alt', e.target.value)}
+                    onChange={(e) => updateValue('logo.alt', e.target.value)}
                     disabled={isLocked}
                     placeholder="Enter alt text"
                   />
@@ -473,7 +664,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                   <Label>URL</Label>
                   <Input
                     value={imageData.hero?.url || ''}
-                    onChange={(e) => updateValue('images.hero.url', e.target.value)}
+                    onChange={(e) => updateValue('hero.url', e.target.value)}
                     disabled={isLocked}
                     placeholder="Enter hero image URL"
                   />
@@ -482,7 +673,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                   <Label>Alt Text</Label>
                   <Input
                     value={imageData.hero?.alt || ''}
-                    onChange={(e) => updateValue('images.hero.alt', e.target.value)}
+                    onChange={(e) => updateValue('hero.alt', e.target.value)}
                     disabled={isLocked}
                     placeholder="Enter alt text"
                   />
@@ -513,7 +704,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 <Label>App Name *</Label>
                 <Input
                   value={appData.appName || ''}
-                  onChange={(e) => updateValue('appDetails.appName', e.target.value)}
+                  onChange={(e) => updateValue('appName', e.target.value)}
                   disabled={isLocked}
                   placeholder="Enter app name"
                 />
@@ -522,7 +713,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 <Label>Package Name *</Label>
                 <Input
                   value={appData.packageName || ''}
-                  onChange={(e) => updateValue('appDetails.packageName', e.target.value)}
+                  onChange={(e) => updateValue('packageName', e.target.value)}
                   disabled={isLocked}
                   placeholder="com.example.app"
                 />
@@ -533,7 +724,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>App Description</Label>
               <Textarea
                 value={appData.appDescription || ''}
-                onChange={(e) => updateValue('appDetails.appDescription', e.target.value)}
+                onChange={(e) => updateValue('appDescription', e.target.value)}
                 disabled={isLocked}
                 placeholder="Describe your app"
                 className="min-h-[100px]"
@@ -545,7 +736,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 <Label>Version</Label>
                 <Input
                   value={appData.version || ''}
-                  onChange={(e) => updateValue('appDetails.version', e.target.value)}
+                  onChange={(e) => updateValue('version', e.target.value)}
                   disabled={isLocked}
                   placeholder="1.0.0"
                 />
@@ -554,7 +745,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                 <Label>Category</Label>
                 <Input
                   value={appData.category || ''}
-                  onChange={(e) => updateValue('appDetails.category', e.target.value)}
+                  onChange={(e) => updateValue('category', e.target.value)}
                   disabled={isLocked}
                   placeholder="Business"
                 />
@@ -565,7 +756,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>Google Play URL</Label>
               <Input
                 value={appData.playUrl || ''}
-                onChange={(e) => updateValue('appDetails.playUrl', e.target.value)}
+                onChange={(e) => updateValue('playUrl', e.target.value)}
                 disabled={isLocked}
                 placeholder="https://play.google.com/store/apps/details?id=..."
               />
@@ -575,7 +766,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <Label>App Store URL</Label>
               <Input
                 value={appData.appStoreUrl || ''}
-                onChange={(e) => updateValue('appDetails.appStoreUrl', e.target.value)}
+                onChange={(e) => updateValue('appStoreUrl', e.target.value)}
                 disabled={isLocked}
                 placeholder="https://apps.apple.com/app/..."
               />
@@ -590,7 +781,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
                     onChange={(e) => {
                       const newFeatures = [...(appData.features || [])];
                       newFeatures[index] = e.target.value;
-                      updateValue('appDetails.features', newFeatures);
+                      updateValue('features', newFeatures);
                     }}
                     disabled={isLocked}
                     placeholder="Enter feature"
@@ -604,47 +795,35 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
     );
   };
 
+  // Render content based on the tab key
+  if (!tabKey) {
+    return <div className="p-8">No tab selected</div>;
+  }
+
+  const renderContent = () => {
+    switch (tabKey) {
+      case 'page1_referralPromote':
+        return renderPromoteSharing(data);
+      case 'page2_referralStatus':
+        return renderReferrerStatus(data);
+      case 'page3_referralDownload':
+        return renderPromoteDownload(data);
+      case 'page4_referralRedeem':
+        return renderRedeemCode(data);
+      case 'notifications':
+        return renderNotifications(data);
+      case 'images':
+        return renderImages(data);
+      case 'appDetails':
+        return renderAppDetails(data);
+      default:
+        return renderEmptyState("Unknown Tab", "This tab content is not recognized.", Package);
+    }
+  };
+
   return (
     <div className="p-8 space-y-6 max-w-5xl mx-auto bg-background">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-7 mb-8">
-          <TabsTrigger value="promote-sharing">Promote Sharing</TabsTrigger>
-          <TabsTrigger value="referrer-status">Referrer Status</TabsTrigger>
-          <TabsTrigger value="promote-download">Promote Download</TabsTrigger>
-          <TabsTrigger value="redeem-code">Redeem Code</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="images">Images</TabsTrigger>
-          <TabsTrigger value="app-details">App Details</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="promote-sharing" className="space-y-6">
-          {renderPromoteSharing(data.page1_referralPromote)}
-        </TabsContent>
-
-        <TabsContent value="referrer-status" className="space-y-6">
-          {renderReferrerStatus(data.page2_referralStatus)}
-        </TabsContent>
-
-        <TabsContent value="promote-download" className="space-y-6">
-          {renderPromoteDownload(data.page3_referralDownload)}
-        </TabsContent>
-
-        <TabsContent value="redeem-code" className="space-y-6">
-          {renderRedeemCode(data.page4_referralRedeem)}
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          {renderNotifications(data.notifications)}
-        </TabsContent>
-
-        <TabsContent value="images" className="space-y-6">
-          {renderImages(data.images)}
-        </TabsContent>
-
-        <TabsContent value="app-details" className="space-y-6">
-          {renderAppDetails(data.appDetails)}
-        </TabsContent>
-      </Tabs>
+      {renderContent()}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+
 import UIEditor from "./ui-editor";
 import JsonEditor from "./json-editor";
 
@@ -25,6 +26,7 @@ export default function TabContent({
           data={tabData}
           isLocked={isLocked}
           onUpdate={onUpdate}
+          tabKey={tabKey}
         />
       ) : (
         <JsonEditor

@@ -180,12 +180,16 @@ export default function MainContent({
       <div className="tabs-container">
         <div className="tabs-list">
           {tabs.map((tabKey) => (
-            <button
+            <div
               key={tabKey}
               className={`tab-item ${activeTab === tabKey ? 'active' : ''}`}
-              onClick={() => onTabChange(tabKey)}
             >
-              {getTabTitle(tabKey)}
+              <span 
+                className="tab-label"
+                onClick={() => onTabChange(tabKey)}
+              >
+                {getTabTitle(tabKey)}
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -199,7 +203,7 @@ export default function MainContent({
               >
                 <RotateCcw className="w-3 h-3" />
               </Button>
-            </button>
+            </div>
           ))}
         </div>
       </div>
