@@ -13,7 +13,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Use ViteExpress to serve both frontend and backend
+// Use ViteExpress to serve both frontend and backend  
 ViteExpress.listen(app, PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
