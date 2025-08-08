@@ -3,8 +3,8 @@ import { exec } from 'child_process';
 // Set environment variable to allow all hosts
 process.env.DANGEROUSLY_DISABLE_HOST_CHECK = 'true';
 
-// Start Vite dev server from root directory to resolve aliases correctly
-const viteProcess = exec('vite --host 0.0.0.0 --port 5000', {
+// Start Vite dev server using custom config that allows all hosts
+const viteProcess = exec('vite --config vite.dev.config.ts --host 0.0.0.0 --port 5000', {
   env: { 
     ...process.env, 
     DANGEROUSLY_DISABLE_HOST_CHECK: 'true'
