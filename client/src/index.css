@@ -126,13 +126,10 @@
   min-height: 64px;
 }
 
-.editor-toggle {
+.editor-mode-toggle {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: var(--muted);
-  padding: 4px;
-  border-radius: 6px;
+  gap: 0;
 }
 
 .toggle-btn {

@@ -67,7 +67,18 @@ export default function MainContent({
     if (!currentConfig || !activeTab) return;
 
     try {
-      const jsonString = JSON.stringify(currentConfig[activeTab]);
+      // Get the raw JSON string from the Monaco editor if it exists
+      const editorElement = document.querySelector('.monaco-editor');
+      const monacoEditor = (window as any).monaco?.editor?.getEditors()?.[0];
+      
+      let jsonString: string;
+      if (monacoEditor) {
+        jsonString = monacoEditor.getValue();
+      } else {
+        jsonString = JSON.stringify(currentConfig[activeTab]);
+      }
+      
+      // Try to parse the JSON
       JSON.parse(jsonString);
       setValidateResult({ valid: true });
       setTimeout(() => setValidateResult(null), 3000);
@@ -172,61 +183,36 @@ export default function MainContent({
     <main className="admin-main">
       {/* Toolbar */}
       <div className="content-toolbar">
-        <div className="toolbar-section">
-          <div className="editor-mode-toggle">
-            <Button
-              variant={editorMode === 'ui' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => onEditorModeChange('ui')}
-              className="rounded-r-none"
-            >
-              <Palette className="w-4 h-4 mr-2" />
-              UI Editor
-            </Button>
-            <Button
-              variant={editorMode === 'json' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => onEditorModeChange('json')}
-              className="rounded-l-none"
-            >
-              <Code className="w-4 h-4 mr-2" />
-              JSON Editor
-            </Button>
-          </div>
-
-          <div className="toolbar-actions">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onLockToggle}
-              className={isLocked ? 'bg-red-50 border-red-200 text-red-700' : ''}
-            >
-              {isLocked ? (
-                <>
-                  <Lock className="w-4 h-4 mr-2" />
-                  Unlock
-                </>
-              ) : (
-                <>
-                  <Unlock className="w-4 h-4 mr-2" />
-                  Lock
-                </>
-              )}
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onRegenerateTab(activeTab)}
-              disabled={isLocked || isRegenerating || !activeTab}
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isRegenerating ? 'animate-spin' : ''}`} />
-              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
-            </Button>
-          </div>
+        <div className="editor-mode-toggle">
+          <Button
+            variant={editorMode === 'ui' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onEditorModeChange('ui')}
+            className="rounded-r-none"
+          >
+            <Palette className="w-4 h-4 mr-2" />
+            UI Editor
+          </Button>
+          <Button
+            variant={editorMode === 'json' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onEditorModeChange('json')}
+            className="rounded-l-none"
+          >
+            <Code className="w-4 h-4 mr-2" />
+            JSON Editor
+          </Button>
         </div>
 
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLockToggle}
+            className={isLocked ? 'bg-red-50 border-red-200 text-red-700' : ''}
+          >
+            {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+          </Button>
 
           {editorMode === 'json' && (
             <Button
@@ -301,19 +287,6 @@ export default function MainContent({
               >
                 {getTabTitle(tabKey)}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-2 p-1 h-6 w-6"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRegenerateTab(tabKey);
-                }}
-                disabled={isLocked || isRegenerating}
-                title="Regenerate Tab"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </Button>
             </div>
           ))}
         </div>
