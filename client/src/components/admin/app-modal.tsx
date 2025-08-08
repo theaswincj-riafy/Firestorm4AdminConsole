@@ -39,7 +39,7 @@ export default function AppModal({
       form.reset({
         packageName: editingApp.packageName,
         appName: editingApp.appName,
-        appDescription: editingApp.meta?.description || '',
+        appDescription: editingApp.meta?.appDescription || '',
         playUrl: editingApp.meta?.playUrl || '',
         appStoreUrl: editingApp.meta?.appStoreUrl || ''
       });
