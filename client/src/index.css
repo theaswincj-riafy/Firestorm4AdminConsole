@@ -190,6 +190,44 @@
 }
 
 .tab-content {
+  padding: 0;
+  background: var(--background);
+}
+
+.global-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes fade-in-50 {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.fade-in-50 {
+  animation-name: fade-in-50;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+}
+
+.tab-content {
   flex: 1;
   overflow-y: auto;
   padding: 24px;

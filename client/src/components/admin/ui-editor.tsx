@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { humanizeKey, hasTemplateVariable } from "@/lib/form-utils";
 
 interface UIEditorProps {
@@ -14,50 +17,85 @@ interface UIEditorProps {
 }
 
 export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
+  const [activeTab, setActiveTab] = useState<string>("promote-sharing");
   const [expandedObjects, setExpandedObjects] = useState<Set<string>>(new Set());
 
-  const updateValue = (path: string[], value: any) => {
+  const updateValue = (path: string, value: any) => {
     const newData = JSON.parse(JSON.stringify(data));
     let current = newData;
+    const pathArray = path.split('.').map(p => p.replace(/\[(\d+)\]/, '.$1'));
 
-    for (let i = 0; i < path.length - 1; i++) {
-      if (current[path[i]] === undefined) {
-        current[path[i]] = {};
+    for (let i = 0; i < pathArray.length - 1; i++) {
+      const segment = pathArray[i];
+      if (segment.includes('.')) {
+        const keys = segment.split('.');
+        if (current[keys[0]] === undefined) current[keys[0]] = {};
+        current = current[keys[0]];
+        for (let j = 1; j < keys.length; j++) {
+          if (current[keys[j]] === undefined) current[keys[j]] = {};
+          current = current[keys[j]];
+        }
+      } else {
+        if (current[segment] === undefined) {
+          current[segment] = {};
+        }
+        current = current[segment];
       }
-      current = current[path[i]];
     }
 
-    current[path[path.length - 1]] = value;
+    const lastSegment = pathArray[pathArray.length - 1];
+    if (lastSegment.includes('.')) {
+      const keys = lastSegment.split('.');
+      current[keys[0]][keys[1]] = value;
+    } else {
+      current[lastSegment] = value;
+    }
     onUpdate(newData);
   };
 
-  const addArrayItem = (path: string[]) => {
+  const handleAddArrayItem = (path: string) => {
     const newData = JSON.parse(JSON.stringify(data));
     let current = newData;
+    const pathArray = path.split('.').map(p => p.replace(/\[(\d+)\]/, '.$1'));
 
-    for (let i = 0; i < path.length - 1; i++) {
-      current = current[path[i]];
+    for (let i = 0; i < pathArray.length - 1; i++) {
+      const segment = pathArray[i];
+      if (segment.includes('.')) {
+        const keys = segment.split('.');
+        current = current[keys[0]][keys[1]];
+      } else {
+        current = current[segment];
+      }
     }
 
-    const array = current[path[path.length - 1]];
+    const arrayKey = pathArray[pathArray.length - 1];
+    const array = current[arrayKey];
     if (Array.isArray(array)) {
-      const template = array.length > 0 ? 
-        (typeof array[0] === 'object' ? JSON.parse(JSON.stringify(array[0])) : array[0]) :
+      const template = array.length > 0 ?
+        (typeof array[0] === 'object' ? JSON.parse(JSON.stringify(array[0])) : '') :
         '';
       array.push(template);
       onUpdate(newData);
     }
   };
 
-  const removeArrayItem = (path: string[], index: number) => {
+  const handleRemoveArrayItem = (path: string, index: number) => {
     const newData = JSON.parse(JSON.stringify(data));
     let current = newData;
+    const pathArray = path.split('.').map(p => p.replace(/\[(\d+)\]/, '.$1'));
 
-    for (let i = 0; i < path.length - 1; i++) {
-      current = current[path[i]];
+    for (let i = 0; i < pathArray.length - 1; i++) {
+      const segment = pathArray[i];
+      if (segment.includes('.')) {
+        const keys = segment.split('.');
+        current = current[keys[0]][keys[1]];
+      } else {
+        current = current[segment];
+      }
     }
 
-    const array = current[path[path.length - 1]];
+    const arrayKey = pathArray[pathArray.length - 1];
+    const array = current[arrayKey];
     if (Array.isArray(array)) {
       array.splice(index, 1);
       onUpdate(newData);
@@ -74,165 +112,196 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
     setExpandedObjects(newExpanded);
   };
 
+  const renderPrimitiveField = (key: string, value: any, path: string) => {
+    const isTextArea = typeof value === 'string' && value.length > 100;
+
+    return (
+      <div className="space-y-3">
+        <Label htmlFor={path} className="text-sm font-semibold text-foreground">
+          {key.replace(/([A-Z])/g, ' $1').trim()}
+        </Label>
+        {isTextArea ? (
+          <Textarea
+            id={path}
+            value={value || ''}
+            onChange={(e) => updateValue(path, e.target.value)}
+            disabled={isLocked}
+            className="min-h-[120px] resize-none border-2 focus:border-primary transition-colors"
+            placeholder="Enter text here..."
+          />
+        ) : (
+          <Input
+            id={path}
+            value={value || ''}
+            onChange={(e) => updateValue(path, e.target.value)}
+            disabled={isLocked}
+            className="border-2 focus:border-primary transition-colors"
+            placeholder="Enter value..."
+          />
+        )}
+      </div>
+    );
+  };
+
+  const renderArrayField = (key: string, value: any[], path: string) => {
+    const isRestrictedSection = ['benefits', 'milestones', 'featureHighlights'].includes(key);
+
+    return (
+      <Card className="mb-6 shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-lg font-semibold text-foreground">
+            {key.replace(/([A-Z])/g, ' $1').trim()}
+          </CardTitle>
+          {!isRestrictedSection && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleAddArrayItem(path)}
+              disabled={isLocked}
+              className="hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add Item
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {value.map((item, index) => (
+            <div key={index} className="group relative p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow">
+              <div className="flex-1">
+                {renderField(`${path}[${index}]`, item, `${path}[${index}]`)}
+              </div>
+              {!isRestrictedSection && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveArrayItem(path, index)}
+                  disabled={isLocked}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderObjectField = (key: string, value: any, path: string) => {
+    return (
+      <Card className="mb-6 shadow-sm border-l-4 border-l-primary/20">
+        <CardHeader className="bg-muted/30">
+          <CardTitle className="text-lg font-semibold text-foreground">
+            {key.replace(/([A-Z])/g, ' $1').trim()}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-6">
+          {Object.entries(value).map(([subKey, subValue]) => (
+            <div key={subKey} className="space-y-2">
+              {renderField(subKey, subValue, `${path}.${subKey}`)}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderField = (key: string, value: any, path: string[] = []): JSX.Element => {
     const currentPath = [...path, key];
     const pathString = currentPath.join('.');
 
     if (value === null || value === undefined) {
-      return (
-        <div key={pathString} className="mb-4">
-          <Label htmlFor={pathString}>{humanizeKey(key)}</Label>
-          <Input
-            id={pathString}
-            value=""
-            onChange={(e) => updateValue(currentPath, e.target.value)}
-            disabled={isLocked}
-          />
-        </div>
-      );
+      return renderPrimitiveField(key, '', currentPath.join('.'));
     }
 
     if (typeof value === 'string') {
-      const isMultiline = value.length > 50 || value.includes('\n');
-      const hasVariable = hasTemplateVariable(value);
-
-      return (
-        <div key={pathString} className="mb-4">
-          <Label htmlFor={pathString} className="flex items-center">
-            {humanizeKey(key)}
-            {hasVariable && (
-              <span className="variable-badge">
-                <Code className="w-3 h-3" />
-                uses variable
-              </span>
-            )}
-          </Label>
-          {isMultiline ? (
-            <Textarea
-              id={pathString}
-              value={value}
-              onChange={(e) => updateValue(currentPath, e.target.value)}
-              disabled={isLocked}
-              className="min-h-[80px]"
-            />
-          ) : (
-            <Input
-              id={pathString}
-              value={value}
-              onChange={(e) => updateValue(currentPath, e.target.value)}
-              disabled={isLocked}
-            />
-          )}
-        </div>
-      );
+      return renderPrimitiveField(key, value, pathString);
     }
 
     if (typeof value === 'number') {
-      return (
-        <div key={pathString} className="mb-4">
-          <Label htmlFor={pathString}>{humanizeKey(key)}</Label>
-          <Input
-            id={pathString}
-            type="number"
-            value={value}
-            onChange={(e) => updateValue(currentPath, parseFloat(e.target.value) || 0)}
-            disabled={isLocked}
-          />
-        </div>
-      );
+      return renderPrimitiveField(key, value, pathString);
     }
 
     if (typeof value === 'boolean') {
       return (
-        <div key={pathString} className="mb-4">
+        <div key={pathString} className="space-y-2">
           <div className="flex items-center space-x-2">
             <Checkbox
               id={pathString}
               checked={value}
-              onCheckedChange={(checked) => updateValue(currentPath, checked)}
+              onCheckedChange={(checked) => updateValue(pathString, checked)}
               disabled={isLocked}
             />
-            <Label htmlFor={pathString}>{humanizeKey(key)}</Label>
+            <Label htmlFor={pathString} className="text-sm font-semibold text-foreground">
+              {key.replace(/([A-Z])/g, ' $1').trim()}
+            </Label>
           </div>
         </div>
       );
     }
 
     if (Array.isArray(value)) {
-      const isObjectArray = value.length > 0 && typeof value[0] === 'object';
-
-      return (
-        <div key={pathString} className="form-fieldset mb-4">
-          <div className="form-fieldset-header">
-            <h4 className="form-fieldset-title">{humanizeKey(key)}</h4>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => addArrayItem(currentPath)}
-              disabled={isLocked}
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Add Item
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            {value.map((item, index) => (
-              <div key={`${pathString}-${index}`} className="repeater-item">
-                <button
-                  className="remove-btn"
-                  onClick={() => removeArrayItem(currentPath, index)}
-                  disabled={isLocked}
-                >
-                  <X className="w-3 h-3" />
-                </button>
-
-                {isObjectArray ? (
-                  Object.keys(item).map((itemKey) =>
-                    renderField(itemKey, item[itemKey], [...currentPath, index.toString()])
-                  )
-                ) : (
-                  renderField('value', item, [...currentPath, index.toString()])
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      );
+      return renderArrayField(key, value, pathString);
     }
 
     if (typeof value === 'object') {
-      const isExpanded = expandedObjects.has(pathString);
-
-      return (
-        <div key={pathString} className="form-fieldset mb-4">
-          <div className="form-fieldset-header">
-            <button
-              className="form-fieldset-title cursor-pointer hover:text-primary flex items-center gap-2"
-              onClick={() => toggleObjectExpanded(pathString)}
-            >
-              <span>{isExpanded ? '▼' : '▶'}</span>
-              {humanizeKey(key)}
-            </button>
-          </div>
-
-          {isExpanded && (
-            <div className="space-y-2">
-              {Object.keys(value).map((objKey) =>
-                renderField(objKey, value[objKey], currentPath)
-              )}
-            </div>
-          )}
-        </div>
-      );
+      return renderObjectField(key, value, pathString);
     }
 
     return <div key={pathString}>Unsupported field type</div>;
   };
 
+  const tabKeys = Object.keys(data);
+  const tabNames = [
+    "Promote Sharing",
+    "Referrer Status",
+    "Promote Download",
+    "Redeem Code",
+    "Notifications",
+    "Images",
+    "App Details"
+  ];
+
+  const tabData = tabKeys.reduce((acc, key) => {
+    const tabName = tabNames.find(name => name.toLowerCase().replace(/\s+/g, '-') === key.toLowerCase().replace(/\s+/g, '-'));
+    if (tabName) {
+      acc[key] = { name: tabName, content: data[key] };
+    }
+    return acc;
+  }, {} as Record<string, { name: string, content: any }>);
+
   return (
-    <div className="space-y-4">
-      {Object.keys(data).map((key) => renderField(key, data[key]))}
+    <div className="p-8 space-y-6 max-w-5xl mx-auto bg-background">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-7">
+          {tabKeys.map((key) => {
+            const tabConfig = tabData[key];
+            if (!tabConfig) return null;
+            return (
+              <TabsTrigger key={key} value={key.toLowerCase().replace(/\s+/g, '-')} className="capitalize">
+                {tabConfig.name}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+        {tabKeys.map((key) => {
+          const tabConfig = tabData[key];
+          if (!tabConfig) return null;
+          return (
+            <TabsContent key={key} value={key.toLowerCase().replace(/\s+/g, '-')} className="p-6 border rounded-md bg-card/50 mt-6">
+              <div className="grid gap-6">
+                {Object.entries(tabConfig.content).map(([sectionKey, sectionValue]) => (
+                  <div key={sectionKey} className="animate-in fade-in-50 duration-200">
+                    {renderField(sectionKey, sectionValue, sectionKey)}
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          );
+        })}
+      </Tabs>
     </div>
   );
 }

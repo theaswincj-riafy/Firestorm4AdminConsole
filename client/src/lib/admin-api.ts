@@ -26,7 +26,7 @@ class AdminApiService {
 
   async createApp(appData: AppFormData): Promise<App> {
     await this.delay(500);
-    
+
     const newApp: App = {
       appId: 'app-' + Date.now(),
       appName: appData.appName,
@@ -37,19 +37,19 @@ class AdminApiService {
         appStoreUrl: appData.appStoreUrl || ''
       }
     };
-    
+
     this.apps.push(newApp);
     return newApp;
   }
 
   async updateApp(appId: string, appData: Partial<AppFormData>): Promise<App> {
     await this.delay(300);
-    
+
     const index = this.apps.findIndex(app => app.appId === appId);
     if (index === -1) {
       throw new Error('App not found');
     }
-    
+
     const updatedApp: App = {
       ...this.apps[index],
       ...(appData.appName && { appName: appData.appName }),
@@ -61,7 +61,7 @@ class AdminApiService {
         ...(appData.appStoreUrl !== undefined && { appStoreUrl: appData.appStoreUrl })
       }
     };
-    
+
     this.apps[index] = updatedApp;
     return updatedApp;
   }
@@ -73,8 +73,81 @@ class AdminApiService {
 
   async getAppConfig(appId: string): Promise<any> {
     await this.delay(300);
-    // Always return the mock data for now
-    return REFERRAL_DATA.en;
+    // Mock data structure
+    return {
+      page1_referralPromote: {
+        hero: {
+          title: "Share & Earn Rewards",
+          subtitle: "Invite friends and get amazing rewards for each successful referral"
+        },
+        benefits: [
+          { title: "Cash Rewards", description: "Earn $10 for each friend who joins" },
+          { title: "Bonus Points", description: "Get 500 bonus points per referral" },
+          { title: "Premium Access", description: "Unlock premium features with referrals" }
+        ],
+        milestones: [
+          { count: 5, reward: "Bronze Badge", description: "Refer 5 friends" },
+          { count: 10, reward: "Silver Badge", description: "Refer 10 friends" },
+          { count: 25, reward: "Gold Badge", description: "Refer 25 friends" }
+        ],
+        featureHighlights: [
+          { feature: "Easy Sharing", description: "Share with one click" },
+          { feature: "Real-time Tracking", description: "Track referrals instantly" },
+          { feature: "Multiple Rewards", description: "Various reward options" }
+        ]
+      },
+      page2_referralStatus: {
+        header: {
+          title: "Your Referral Status",
+          description: "Track your referral progress and earnings"
+        }
+      },
+      page3_referralDownload: {
+        title: "Get the Mobile App",
+        subtitle: "Download our app for the best experience"
+      },
+      page4_referralRedeem: {
+        title: "Redeem Your Code",
+        subtitle: "Enter your referral code to claim rewards"
+      },
+      notifications: {
+        enabled: true,
+        types: ["email", "push", "sms"]
+      },
+      images: {
+        logo: {
+          url: "https://example.com/logo.png",
+          alt: "App Logo",
+          dimensions: "200x200"
+        },
+        hero: {
+          url: "https://example.com/hero.jpg",
+          alt: "Hero Image",
+          dimensions: "1200x600"
+        },
+        promotional: [
+          { url: "https://example.com/promo1.jpg", alt: "Promotion 1" },
+          { url: "https://example.com/promo2.jpg", alt: "Promotion 2" }
+        ]
+      },
+      appDetails: {
+        name: "Referral Boost",
+        version: "1.0.0",
+        description: "The best referral program app",
+        category: "Business",
+        platforms: ["iOS", "Android", "Web"],
+        minVersion: {
+          ios: "14.0",
+          android: "8.0"
+        },
+        features: [
+          "Real-time tracking",
+          "Multiple reward types",
+          "Social sharing",
+          "Analytics dashboard"
+        ]
+      }
+    };
   }
 
   async saveAppConfig(appId: string, config: any): Promise<{ saved: boolean; revisedAt: string }> {
@@ -84,7 +157,7 @@ class AdminApiService {
 
   async regenerateTab(appId: string, tabKey: string, currentSubtree: any): Promise<{ tabKey: string; newSubtree: any }> {
     await this.delay(800);
-    
+
     // Simulate regenerated content
     const regenerated = JSON.parse(JSON.stringify(currentSubtree));
     if (regenerated.title) {
@@ -96,7 +169,7 @@ class AdminApiService {
     if (regenerated.header?.title) {
       regenerated.header.title += ' (Regenerated)';
     }
-    
+
     return { tabKey, newSubtree: regenerated };
   }
 

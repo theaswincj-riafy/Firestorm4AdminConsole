@@ -275,11 +275,13 @@ export default function AdminConsole() {
 
   const getTabTitle = (tabKey: string): string => {
     const TAB_MAPPINGS: Record<string, string> = {
-      'page1_referralPromote': '1. Promote Sharing',
-      'page2_referralStatus': '2. Referrer Status',
-      'page3_referralDownload': '3. Promote Download App',
-      'page4_referralRedeem': '4. Redeem Code',
-      'notifications': '5. Notifications'
+      'page1_referralPromote': 'Promote Sharing',
+      'page2_referralStatus': 'Referrer Status',
+      'page3_referralDownload': 'Promote Download',
+      'page4_referralRedeem': 'Redeem Code',
+      'notifications': 'Notifications',
+      'images': 'Images',
+      'appDetails': 'App Details'
     };
     
     return TAB_MAPPINGS[tabKey] || humanizeKey(tabKey);
