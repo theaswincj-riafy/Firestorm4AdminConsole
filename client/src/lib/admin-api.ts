@@ -73,7 +73,7 @@ class AdminApiService {
 
   async getAppConfig(appId: string): Promise<any> {
     await this.delay(300);
-    
+
     // Return data from the provided JSON structure
     const jsonData = {
       "appID": 1,
@@ -311,7 +311,7 @@ class AdminApiService {
         },
         hero: {
           url: "https://example.com/hero.jpg",
-          alt: "Hero Image", 
+          alt: "Hero Image",
           dimensions: "1200x600"
         },
         promotional: [
@@ -334,7 +334,7 @@ class AdminApiService {
         },
         features: [
           "Real-time tracking",
-          "Multiple reward types", 
+          "Multiple reward types",
           "Social sharing",
           "Analytics dashboard"
         ]
@@ -366,8 +366,12 @@ class AdminApiService {
   }
 
   async translateConfig(appId: string, lang: string, sourceJson: any): Promise<{ lang: string; status: string }> {
-    await this.delay(2000 + Math.random() * 1000);
-    return { lang, status: 'done' };
+    // Simulate API call - replace with actual implementation later
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ lang, status: 'completed' });
+      }, 2000); // 2 second delay to simulate API call
+    });
   }
 }
 

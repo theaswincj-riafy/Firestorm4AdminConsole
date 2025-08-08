@@ -30,6 +30,7 @@ interface MainContentProps {
 }
 
 const LANGUAGES = [
+  { code: 'en', name: 'English' },
   { code: 'es', name: 'Spanish' },
   { code: 'hi', name: 'Hindi' },
   { code: 'bn', name: 'Bengali' },
@@ -215,21 +216,26 @@ export default function MainContent({
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="min-w-48">
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
                   onClick={() => onTranslate(lang.code)}
-                  disabled={translateStatus[lang.code] === 'completed' || isTranslating}
-                  className="flex items-center justify-between"
+                  disabled={translateStatus[lang.code] === 'completed'}
+                  className="flex items-center justify-between cursor-pointer"
                 >
-                  <span>{lang.name}</span>
-                  {translateStatus[lang.code] === 'pending' && (
-                    <div className="spinner ml-2"></div>
-                  )}
-                  {translateStatus[lang.code] === 'completed' && (
-                    <CheckCircle className="w-4 h-4 ml-2 text-green-600" />
-                  )}
+                  <span>{lang.name} ({lang.code})</span>
+                  <div className="flex items-center ml-4">
+                    {translateStatus[lang.code] === 'pending' ? (
+                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    ) : translateStatus[lang.code] === 'completed' ? (
+                      <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4 border-2 border-gray-300 rounded-sm"></div>
+                    )}
+                  </div>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
