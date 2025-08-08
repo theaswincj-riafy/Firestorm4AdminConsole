@@ -1,19 +1,21 @@
-import express from 'express';
-import ViteExpress from 'vite-express';
+import { exec } from 'child_process';
 
-const app = express();
-const PORT = Number(process.env.PORT) || 5000;
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// API routes
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Start Vite dev server from root directory to resolve aliases correctly
+const viteProcess = exec('vite --host 0.0.0.0 --port 5000', (error, stdout, stderr) => {
+  if (error) {
+    console.error(`Error: ${error}`);
+    return;
+  }
+  console.log(stdout);
+  if (stderr) console.error(stderr);
 });
 
-// Use ViteExpress to serve both frontend and backend  
-ViteExpress.listen(app, PORT, () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+viteProcess.stdout?.on('data', (data) => {
+  console.log(data.toString());
 });
+
+viteProcess.stderr?.on('data', (data) => {
+  console.error(data.toString());
+});
+
+console.log('Starting Vite dev server from root directory...');
