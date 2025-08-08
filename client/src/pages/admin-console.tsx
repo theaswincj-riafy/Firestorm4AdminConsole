@@ -274,6 +274,8 @@ export default function AdminConsole() {
   };
 
   const getTabTitle = (tabKey: string): string => {
+    if (!tabKey || typeof tabKey !== 'string') return 'Unknown Tab';
+    
     const TAB_MAPPINGS: Record<string, string> = {
       'page1_referralPromote': 'Promote Sharing',
       'page2_referralStatus': 'Referrer Status',
@@ -288,6 +290,7 @@ export default function AdminConsole() {
   };
 
   const humanizeKey = (key: string): string => {
+    if (!key || typeof key !== 'string') return 'Unknown';
     return key
       .replace(/[_-]/g, ' ')
       .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -311,7 +314,8 @@ export default function AdminConsole() {
             className="btn btn-outline"
             onClick={() => {
               if (confirm('Are you sure you want to logout?')) {
-                logout();
+                // TODO: Implement logout functionality
+                window.location.reload();
               }
             }}
           >
