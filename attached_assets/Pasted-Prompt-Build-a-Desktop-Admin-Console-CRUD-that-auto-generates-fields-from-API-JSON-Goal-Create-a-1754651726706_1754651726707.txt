@@ -1,0 +1,268 @@
+Prompt: Build a Desktop Admin Console (CRUD) that auto-generates fields from API JSON
+Goal: Create a single-page admin console (index.html) that manages “Apps” and their referral config. The console must CRUD app metadata and a JSON config returned by APIs. All fields in the UI editor must be generated dynamically from whatever JSON the API returns (use referral-data.js as the mock for now).
+
+Tech & UI
+Single file: index.html (include inline <style> & <script>; no build step).
+
+File Hierarchy:
+Firestorm-Referral-Console/
+├── index.html                 # Single page app (inline <style> & <script>; all UI, logic, API stubs, Monaco init)
+├── style.css   
+├── script.js  
+├── referral-data.js           # Mock JSON: exposes window.REFERRAL_DATA for ?mock=1 or API fallback
+├── assets/
+│   ├── illustrations/
+│   │   └── empty-state.svg    # Shown when no apps exist in sidebar
+│   └── logo.svg               # Header/brand mark (optional)
+├── docs/
+│   └── ui-reference.png       # Your layout/screenshot reference (optional, for devs)
+└── README.md    
+
+Tech stack:
+
+Only use html,css,js to build this. javascript libraries are ok. no backend is needed. generate only the frontend code for this admin console using the requirements mentioned. do not use react/tailwind etc. don't generate any backend code.
+
+Libraries: javascript libraries are ok.
+
+Lucide icons via CDN.
+
+Use Monacco JSON editor for the json editor view.
+
+Style: Minimal, Apple-like UI; clean typography, subtle shadows, rounded corners. Desktop/laptop only (no mobile-first).
+
+State: Vanilla JS modules or IIFE; no frameworks. Use localStorage only for trivial UI state (selected tab/editor mode), not for app data.
+
+Page Layout (match the screenshot)
+Header (sticky):
+
+Title: “Firestorm Referral Console”
+
+Buttons (right): “Translate” (dropdown), “Create App +”, “Logout”
+
+Body: Two columns
+
+Sidebar (fixed width): “Apps” list. If empty, show an illustration + “Create App” button.
+
+Content area:
+
+Toolbar (top):
+
+Left: “JSON Editor / UI Editor” toggle (UI Editor is default)
+
+Right: “Lock” (disables inputs), “Validate JSON” -> Should only appear in json editor view. should be hidden in ui editor view.
+
+Work area (below toolbar):
+
+When no app selected: empty state “Select an app to view its JSON”
+
+When an app is selected: tabbed editor + global actions.
+
+Sidebar: Apps
+List item layout:
+
+Title: App Name
+
+Sub-title (muted): Package name
+
+Inline edit icon next to the package name.
+
+Click behavior: Loads app by appId, fetches its JSON, and renders tabs + fields dynamically. 
+
+Fetch the data for rendering the UI editor from the mock json. Only take the data inside en jsonObject
+
+Create App Flow
+On “Create App +” open a modal with 5 fields:
+
+Package name (required)
+
+App name (required)
+
+App description
+
+Google Play Link
+
+iOS App Store Link
+
+Create button (primary)
+
+On Create:
+
+Call POST /api/apps with {appName, appDescription, packageName, playUrl, appStoreUrl}.
+
+Wait for completion; the response includes {appId, appName, packageName, meta, configJson}.
+
+Add the app to the sidebar (title = appName, subtitle = packageName).
+
+Auto-select it and render its config.
+
+Edit App (pencil icon): opens a modal prefilled with app metadata. On save, call PATCH /api/apps/:id and update the sidebar labels.
+
+Content: Dynamic Tabbed UI
+Tabs are generated from the top-level keys of the JSON. Use these exact title mappings when they exist:
+
+page1_referralPromote → 1. Promote Sharing
+
+page2_referralStatus → 2. Referrer Status
+
+page3_referralDownload → 3. Promote Download App
+
+page4_referralRedeem → 4. Redeem Code
+
+notifications → 5. Notifications
+
+Any other key → Title-case the key.
+
+Per-tab toolbar (right): “Regenerate Tab” button → calls tab-specific API (see API spec) and replaces only that subtree in the working JSON, then re-renders the tab.
+
+Global actions (visible in every tab):
+
+Save (primary): PUT the entire combined JSON to the Save API.
+
+Translate (dropdown): list of languages (e.g., en, es, hi, bn, ta, te). Each language has an unchecked checkbox. On click:
+
+Replace checkbox with a spinner.
+
+Call async translate API for that language.
+
+On success: spinner → ticked checkbox (cannot be unticked manually).
+
+Editors
+UI Editor (default):
+
+Auto-generate form controls from JSON structure:
+
+string → text input (multi-line if looks like sentence), boolean → toggle, number → numeric input.
+
+object → collapsible fieldset; render children recursively.
+
+array of objects → repeater list with Add / Remove rows; each row renders an object fieldset.
+
+array of primitives → tag-like repeater.
+
+Show inline validation states; dirty tracking; “Reset changes” per tab (revert to last fetched for that tab).
+
+JSON Editor:
+
+Pretty-printed JSON of the entire config.
+
+“Validate JSON” button parses & shows errors with line/column.
+
+Edits here must sync back to the working JSON state and re-render the UI editor when toggled back.
+
+Lock
+When Lock is ON, all inputs/editing controls are disabled, including Save/Regenerate (Translate can remain enabled).
+
+CRUD Requirements
+Create app (modal)
+
+Read: list apps; load selected app config
+
+Update: edit app metadata; edit JSON via UI or JSON editor; per-tab regenerate; translate fields
+
+Delete: from “API Functions” menu → “Delete App” with confirm dialog → calls DELETE, removes from sidebar, clears content.
+
+APIs (define these stubs; wire them to real endpoints later)
+GET /api/apps → [{ appId, appName, packageName }]
+
+POST /api/apps body: { appName, appDescription, packageName, playUrl, appStoreUrl }
+→ 201 { appId, appName, packageName, meta:{playUrl,appStoreUrl,description}, configJson }
+
+PATCH /api/apps/:id body: { appName?, packageName?, playUrl?, appStoreUrl? } → 200 {…updated}
+
+DELETE /api/apps/:id → 204
+
+GET /api/apps/:id/config → { ...arbitrary JSON... } (use window.REFERRAL_DATA from referral-data.js in mock mode)
+
+PUT /api/apps/:id/config body: { configJson } → 200 { saved:true, revisedAt }
+
+Regenerate Tab: POST /api/apps/:id/tabs/:tabKey/regenerate body: { currentSubtree }
+→ 200 { tabKey, newSubtree }
+
+Translate: POST /api/apps/:id/translate/:lang body: { sourceJson }
+→ 202 { lang, status:"done" } (simulate with timeout; per-language spinner → tick)
+
+(Optional) POST /api/apps/:id/lock / unlock or handle lock locally.
+
+Mock Mode
+Include /referral-data.js (provided). When ?mock=1 or when API fails, use window.REFERRAL_DATA as the config for the selected app.
+
+Provide a simple in-memory array for GET /api/apps with a single seeded app (id demo-1) that uses REFERRAL_DATA.
+
+Dynamic Form Rules
+Labels: humanize keys (referrer_name → “Referrer Name”).
+
+Hints: for template strings like {{referral_code}}, show a subtle “uses variable” badge.
+
+Arrays:
+
+of objects: render each object as a card with Remove; Add new uses the first object as a schema template.
+
+of strings/numbers: tag chips with Add/Remove.
+
+Validation:
+
+Required detection: infer from existing values (cannot delete required keys); basic type checks.
+
+“Validate JSON” runs a full parse and highlights the first error.
+
+Edge Cases
+Unknown/tab keys → still render a tab.
+
+Empty arrays/objects → show “Add first item” CTA.
+
+Large JSON → lazy render only the active tab for performance.
+
+Navigation guard: if there are unsaved changes, confirm before switching apps or tabs.
+
+Accessibility & UX
+Keyboard focus states, ARIA roles for tabs and dialogs.
+
+Toasts for: Created, Saved, Deleted, Regenerated, Translated, JSON error.
+
+Subtle skeleton loaders while fetching.
+
+Deliverables
+index.html only, with:
+
+Header, sidebar, content layout and styles.
+
+Modal components for create/edit.
+
+Dynamic tab builder + dynamic form renderer (recursive).
+
+JSON editor + validation.
+
+API service with mock fallbacks wired to the buttons described.
+
+Example language list in Translate dropdown.
+
+Icons from Lucide for: Create (+), Edit (pencil), Save (save), Regenerate (refresh-ccw), Translate (languages), Lock (lock), Delete (trash), Validate (check-circle), Loading (loader).
+
+Acceptance Criteria (must pass)
+Creating an app adds it to the sidebar and auto-opens its config.
+
+Clicking an app in the sidebar fetches its JSON and renders tabs based on the JSON’s top keys, using the mapping above.
+
+Toggling between UI and JSON editors preserves changes.
+
+Per-tab Regenerate replaces only that tab’s subtree and re-renders.
+
+Save sends the combined JSON.
+
+Translate: clicking a language shows a spinner that becomes a checked box only after the async completes.
+
+Edit (metadata) modal updates sidebar labels.
+
+Delete removes the app and resets the work area.
+
+“Validate JSON” surfaces errors with line/col.
+
+Notes for the model generating code:
+
+Keep functions small (e.g., renderSidebar, renderTabs, renderField, serializeUIToJson, diffApply, fetchJson, saveJson, regenerateTab, translateLang).
+
+Use event delegation for dynamic lists.
+
+Provide DATA_MAP for tab title mapping and a humanizeKey() helper.
+
+Include basic CSS variables for spacing, radius, shadow, and use system fonts for the Apple-like look.
