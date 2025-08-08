@@ -334,6 +334,7 @@ export default function AdminConsole() {
 
         <MainContent
           selectedApp={selectedApp}
+          apps={apps}
           currentConfig={currentConfig}
           activeTab={activeTab}
           editorMode={editorMode}
