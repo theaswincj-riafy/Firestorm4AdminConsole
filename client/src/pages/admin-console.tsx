@@ -157,7 +157,7 @@ export default function AdminConsole() {
         newConfig[result.tabKey] = result.newSubtree;
         setCurrentConfig(newConfig);
         setIsDirty(true);
-        
+
         const tabName = getTabTitle(result.tabKey);
         toast({
           title: "Success",
@@ -283,7 +283,7 @@ export default function AdminConsole() {
       'images': 'Images',
       'appDetails': 'App Details'
     };
-    
+
     return TAB_MAPPINGS[tabKey] || humanizeKey(tabKey);
   };
 
@@ -299,8 +299,8 @@ export default function AdminConsole() {
       {/* Header */}
       <header className="admin-header flex items-center justify-between px-6">
         <h1 className="text-xl font-semibold text-foreground">Referral Boost Console</h1>
-        
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-4">
           <button
             className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors"
             onClick={handleCreateApp}
@@ -311,8 +311,7 @@ export default function AdminConsole() {
             className="btn btn-outline"
             onClick={() => {
               if (confirm('Are you sure you want to logout?')) {
-                // Handle logout logic here
-                console.log('Logout clicked');
+                logout();
               }
             }}
           >
