@@ -3,7 +3,7 @@ import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, 
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import TabContent from "./tab-content";
-import type { App } from "@shared/schema";
+import type { App } from "@/types/app";
 
 interface MainContentProps {
   selectedApp: App | null;

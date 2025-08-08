@@ -5,7 +5,7 @@ import Sidebar from "@/components/admin/sidebar";
 import MainContent from "@/components/admin/main-content";
 import AppModal from "@/components/admin/app-modal";
 import { adminApi } from "@/lib/admin-api";
-import type { App, AppFormData } from "@shared/schema";
+import type { App, AppFormData } from "@/types/app";
 
 export default function AdminConsole() {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);

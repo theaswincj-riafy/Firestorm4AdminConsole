@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { appFormSchema, type AppFormData, type App } from "@shared/schema";
+import { appFormSchema, type AppFormData, type App } from "@/types/app";
 
 interface AppModalProps {
   isOpen: boolean;

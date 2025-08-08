@@ -1,5 +1,5 @@
 import { REFERRAL_DATA } from './referral-data';
-import type { App, AppFormData } from '@shared/schema';
+import type { App, AppFormData } from '@/types/app';
 
 class AdminApiService {
   private apps: App[] = [
