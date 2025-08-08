@@ -17,7 +17,7 @@ export default function Sidebar({
   isLoading,
   onSelectApp,
   onCreateApp,
-  onEditApp
+  onEditApp,
 }: SidebarProps) {
   if (isLoading) {
     return (
@@ -26,7 +26,7 @@ export default function Sidebar({
           <div className="animate-pulse">
             <div className="h-4 bg-muted rounded w-16 mb-4"></div>
             <div className="space-y-3">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="h-12 bg-muted rounded"></div>
               ))}
             </div>
@@ -40,11 +40,15 @@ export default function Sidebar({
     return (
       <aside className="admin-sidebar">
         <div className="p-6 border-b border-sidebar-border">
-          <h2 className="text-base font-semibold text-sidebar-foreground">Apps</h2>
+          <h2 className="text-base font-semibold text-sidebar-foreground">
+            Apps
+          </h2>
         </div>
-        
+
         <div className="p-6 text-center">
-          <h3 className="text-base font-medium mb-2 text-sidebar-foreground">No apps yet</h3>
+          <h3 className="text-base font-medium mb-2 text-sidebar-foreground">
+            No apps yet
+          </h3>
           <p className="text-sm text-muted-foreground mb-6">
             Create your first app to get started with referral configuration.
           </p>
@@ -60,14 +64,16 @@ export default function Sidebar({
   return (
     <aside className="admin-sidebar">
       <div className="p-6 border-b border-sidebar-border">
-        <h2 className="text-base font-semibold text-sidebar-foreground">Apps</h2>
+        <h2 className="text-base font-semibold text-sidebar-foreground">
+          Apps
+        </h2>
       </div>
-      
+
       <div className="p-4">
         {apps.map((app) => (
           <div
             key={app.appId}
-            className={`app-item ${selectedApp?.appId === app.appId ? 'active' : ''}`}
+            className={`app-item ${selectedApp?.appId === app.appId ? "active" : ""}`}
             onClick={() => onSelectApp(app)}
           >
             <div className="app-info">
@@ -78,9 +84,8 @@ export default function Sidebar({
               variant="ghost"
               size="sm"
               className="opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditApp(app);
+              onClick={() => {
+                onSelectApp(app);
               }}
             >
               <Edit2 className="w-4 h-4" />
