@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Plus, X, Code } from "lucide-react";
+import { Plus, X, Code, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { humanizeKey, hasTemplateVariable } from "@/lib/form-utils";
 
@@ -169,7 +168,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
           {value.map((item, index) => (
             <div key={index} className="group relative p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow">
               <div className="flex-1">
-                {renderField(`${path}[${index}]`, item, `${path}[${index}]`)}
+                {renderField(`${path}[${index}]`, item, [`${path}[${index}]`])}
               </div>
               {!isRestrictedSection && (
                 <Button
@@ -200,7 +199,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
         <CardContent className="space-y-4 pt-6">
           {Object.entries(value).map(([subKey, subValue]) => (
             <div key={subKey} className="space-y-2">
-              {renderField(subKey, subValue, `${path}.${subKey}`)}
+              {renderField(subKey, subValue, [`${path}.${subKey}`])}
             </div>
           ))}
         </CardContent>
@@ -294,7 +293,7 @@ export default function UIEditor({ data, isLocked, onUpdate }: UIEditorProps) {
               <div className="grid gap-6">
                 {Object.entries(tabConfig.content).map(([sectionKey, sectionValue]) => (
                   <div key={sectionKey} className="animate-in fade-in-50 duration-200">
-                    {renderField(sectionKey, sectionValue, sectionKey)}
+                    {renderField(sectionKey, sectionValue, [sectionKey])}
                   </div>
                 ))}
               </div>
