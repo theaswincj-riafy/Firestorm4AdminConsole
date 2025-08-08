@@ -1,6 +1,6 @@
 import { Plus, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { App } from "@/types/app";
+import type { App } from "@shared/schema";
 
 interface SidebarProps {
   apps: App[];

@@ -1,17 +1,14 @@
 import { REFERRAL_DATA } from './referral-data';
-import type { App, AppFormData } from '@/types/app';
+import type { App, AppFormData } from '@shared/schema';
 
 class AdminApiService {
   private apps: App[] = [
     {
-      id: 'demo-1',
       appId: 'demo-1',
-      name: 'Demo Referral App',
       appName: 'Demo Referral App',
       packageName: 'com.demo.referral',
-      config: {},
       meta: {
-        appDescription: 'A sample referral application',
+        description: 'A sample referral application',
         playUrl: 'https://play.google.com/store/apps/details?id=com.demo.referral',
         appStoreUrl: 'https://apps.apple.com/app/demo-referral-app/id123456789'
       }
@@ -31,14 +28,11 @@ class AdminApiService {
     await this.delay(500);
     
     const newApp: App = {
-      id: 'app-' + Date.now(),
       appId: 'app-' + Date.now(),
-      name: appData.appName || '',
-      appName: appData.appName || '',
-      packageName: appData.packageName || '',
-      config: {},
+      appName: appData.appName,
+      packageName: appData.packageName,
       meta: {
-        appDescription: appData.appDescription || '',
+        description: appData.appDescription || '',
         playUrl: appData.playUrl || '',
         appStoreUrl: appData.appStoreUrl || ''
       }
@@ -62,7 +56,7 @@ class AdminApiService {
       ...(appData.packageName && { packageName: appData.packageName }),
       meta: {
         ...this.apps[index].meta,
-        ...(appData.appDescription !== undefined && { appDescription: appData.appDescription }),
+        ...(appData.appDescription !== undefined && { description: appData.appDescription }),
         ...(appData.playUrl !== undefined && { playUrl: appData.playUrl }),
         ...(appData.appStoreUrl !== undefined && { appStoreUrl: appData.appStoreUrl })
       }

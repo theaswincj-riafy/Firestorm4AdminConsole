@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { appFormSchema, type AppFormData, type App } from "@/types/app";
+import { appFormSchema, type AppFormData, type App } from "@shared/schema";
 
 interface AppModalProps {
   isOpen: boolean;
@@ -39,7 +39,7 @@ export default function AppModal({
       form.reset({
         packageName: editingApp.packageName,
         appName: editingApp.appName,
-        appDescription: editingApp.meta?.appDescription || '',
+        appDescription: editingApp.meta?.description || '',
         playUrl: editingApp.meta?.playUrl || '',
         appStoreUrl: editingApp.meta?.appStoreUrl || ''
       });
