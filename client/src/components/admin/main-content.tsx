@@ -67,14 +67,16 @@ export default function MainContent({
     if (!currentConfig || !activeTab) return;
     
     try {
-      JSON.parse(JSON.stringify(currentConfig[activeTab]));
+      const jsonString = JSON.stringify(currentConfig[activeTab]);
+      JSON.parse(jsonString);
       setValidateResult({ valid: true });
       setTimeout(() => setValidateResult(null), 3000);
     } catch (error) {
       setValidateResult({ 
         valid: false, 
-        error: error instanceof Error ? error.message : 'Invalid JSON' 
+        error: error instanceof Error ? error.message : 'Invalid JSON structure' 
       });
+      setTimeout(() => setValidateResult(null), 5000);
     }
   };
 
@@ -186,25 +188,24 @@ export default function MainContent({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onLockToggle}
-            title={isLocked ? "Unlock" : "Lock"}
-          >
-            {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-          </Button>
 
           {editorMode === 'json' && (
             <Button
               variant="outline"
               size="sm"
               onClick={handleValidateJson}
-              className={validateResult?.valid ? 'border-green-500 text-green-600' : ''}
+              className={
+                validateResult?.valid === true 
+                  ? 'border-green-500 text-green-600 bg-green-50' 
+                  : validateResult?.valid === false 
+                  ? 'border-red-500 text-red-600 bg-red-50'
+                  : ''
+              }
             >
               <CheckCircle className="w-4 h-4 mr-2" />
               Validate JSON
-              {validateResult?.valid && <span className="ml-2 text-green-600">✓</span>}
+              {validateResult?.valid === true && <Check className="w-4 h-4 ml-2 text-green-600" />}
+              {validateResult?.valid === false && <span className="ml-2 text-red-600">✗</span>}
             </Button>
           )}
 
@@ -220,7 +221,11 @@ export default function MainContent({
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
-                  onClick={() => onTranslate(lang.code)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onTranslate(lang.code);
+                  }}
+                  onSelect={(e) => e.preventDefault()}
                   disabled={translateStatus[lang.code] === 'completed'}
                   className="flex items-center justify-between cursor-pointer"
                 >

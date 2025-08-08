@@ -24,6 +24,16 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Logout error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return unsubscribe;
   }, []);
 
-  const logout = async () => {
+  const handleLogout = async () => {
     try {
       await signOut(auth);
       setUser(null);
@@ -56,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, logout: handleLogout }}>
       {children}
     </AuthContext.Provider>
   );

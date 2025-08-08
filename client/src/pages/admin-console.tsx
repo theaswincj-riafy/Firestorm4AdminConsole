@@ -312,10 +312,16 @@ export default function AdminConsole() {
           </button>
           <button
             className="btn btn-outline"
-            onClick={() => {
+            onClick={async () => {
               if (confirm('Are you sure you want to logout?')) {
-                // TODO: Implement logout functionality
-                window.location.reload();
+                try {
+                  const { logout } = await import('@/contexts/auth-context');
+                  await logout();
+                  window.location.href = '/login';
+                } catch (error) {
+                  console.error('Logout error:', error);
+                  window.location.href = '/login';
+                }
               }
             }}
           >
