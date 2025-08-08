@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus, Check } from "lucide-react";
+import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus, Check, RefreshCw, Palette, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import TabContent from "./tab-content";
@@ -65,7 +65,7 @@ export default function MainContent({
 
   const handleValidateJson = () => {
     if (!currentConfig || !activeTab) return;
-    
+
     try {
       const jsonString = JSON.stringify(currentConfig[activeTab]);
       JSON.parse(jsonString);
@@ -105,7 +105,7 @@ export default function MainContent({
                 <h3 className="font-semibold text-foreground mb-2">Multi-Platform</h3>
                 <p className="text-sm text-muted-foreground">Configure referral flows for iOS, Android, and web platforms</p>
               </div>
-              
+
               <div className="bg-card border rounded-lg p-6 text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-green-100 flex items-center justify-center">
                   <Globe className="w-6 h-6 text-green-600" />
@@ -113,7 +113,7 @@ export default function MainContent({
                 <h3 className="font-semibold text-foreground mb-2">Global Reach</h3>
                 <p className="text-sm text-muted-foreground">Support multiple languages and localized content</p>
               </div>
-              
+
               <div className="bg-card border rounded-lg p-6 text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-purple-100 flex items-center justify-center">
                   <FileText className="w-6 h-6 text-purple-600" />
@@ -172,19 +172,58 @@ export default function MainContent({
     <main className="admin-main">
       {/* Toolbar */}
       <div className="content-toolbar">
-        <div className="editor-toggle">
-          <button
-            className={`toggle-btn ${editorMode === 'ui' ? 'active' : ''}`}
-            onClick={() => onEditorModeChange('ui')}
-          >
-            UI Editor
-          </button>
-          <button
-            className={`toggle-btn ${editorMode === 'json' ? 'active' : ''}`}
-            onClick={() => onEditorModeChange('json')}
-          >
-            JSON Editor
-          </button>
+        <div className="toolbar-section">
+          <div className="editor-mode-toggle">
+            <Button
+              variant={editorMode === 'ui' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onEditorModeChange('ui')}
+              className="rounded-r-none"
+            >
+              <Palette className="w-4 h-4 mr-2" />
+              UI Editor
+            </Button>
+            <Button
+              variant={editorMode === 'json' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onEditorModeChange('json')}
+              className="rounded-l-none"
+            >
+              <Code className="w-4 h-4 mr-2" />
+              JSON Editor
+            </Button>
+          </div>
+
+          <div className="toolbar-actions">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onLockToggle}
+              className={isLocked ? 'bg-red-50 border-red-200 text-red-700' : ''}
+            >
+              {isLocked ? (
+                <>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Unlock
+                </>
+              ) : (
+                <>
+                  <Unlock className="w-4 h-4 mr-2" />
+                  Lock
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onRegenerateTab(activeTab)}
+              disabled={isLocked || isRegenerating || !activeTab}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isRegenerating ? 'animate-spin' : ''}`} />
+              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
