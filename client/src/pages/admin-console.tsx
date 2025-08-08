@@ -317,10 +317,10 @@ export default function AdminConsole() {
                 try {
                   const { logout } = await import('@/contexts/auth-context');
                   await logout();
-                  window.location.href = '/login';
+                  window.location.href = '/';
                 } catch (error) {
                   console.error('Logout error:', error);
-                  window.location.href = '/login';
+                  window.location.href = '/';
                 }
               }
             }}

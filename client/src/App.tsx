@@ -27,6 +27,7 @@ function AuthenticatedRouter() {
   return (
     <Switch>
       <Route path="/" component={AdminConsole} />
+      <Route path="/login" component={AdminConsole} />
       <Route component={NotFound} />
     </Switch>
   );
