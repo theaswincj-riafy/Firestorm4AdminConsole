@@ -21,8 +21,29 @@ export default function TabContent({
   onUpdate,
   validateResult
 }: TabContentProps) {
-  // For JSON editor, always show the full config data to maintain the original API structure
-  const jsonEditorData = editorMode === 'json' ? fullConfigData : tabData;
+  // For JSON editor, filter out images and appDetails for first 5 tabs
+  const getJsonEditorData = () => {
+    if (editorMode !== 'json' || !fullConfigData) return tabData;
+    
+    const firstFiveTabs = [
+      'page1_referralPromote',
+      'page2_referralStatus', 
+      'page3_referralDownload',
+      'page4_referralRedeem',
+      'notifications'
+    ];
+
+    if (firstFiveTabs.includes(tabKey)) {
+      // For first 5 tabs, exclude images and appDetails
+      const { images, appDetails, ...filteredData } = fullConfigData;
+      return filteredData;
+    } else {
+      // For images and appDetails tabs, show full config
+      return fullConfigData;
+    }
+  };
+
+  const jsonEditorData = getJsonEditorData();
 
   return (
     <div className="tab-content">

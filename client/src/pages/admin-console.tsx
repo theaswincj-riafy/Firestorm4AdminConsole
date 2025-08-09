@@ -62,9 +62,24 @@ export default function AdminConsole() {
     if (configQuery.data) {
       setCurrentConfig(configQuery.data);
       setIsDirty(false);
-      const firstTab = Object.keys(configQuery.data)[0];
-      if (firstTab) {
-        setActiveTab(firstTab);
+      
+      // Set the first tab in the proper order
+      const tabOrder = [
+        'page1_referralPromote',
+        'page2_referralStatus', 
+        'page3_referralDownload',
+        'page4_referralRedeem',
+        'notifications',
+        'images',
+        'appDetails'
+      ];
+
+      const orderedTabs = tabOrder.filter(tab => configQuery.data[tab]);
+      const additionalTabs = Object.keys(configQuery.data).filter(tab => !tabOrder.includes(tab));
+      const allTabs = [...orderedTabs, ...additionalTabs];
+
+      if (allTabs.length > 0) {
+        setActiveTab(allTabs[0]);
       }
     }
   }, [configQuery.data]);

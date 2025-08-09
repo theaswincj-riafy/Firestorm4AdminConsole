@@ -19,6 +19,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<any>(null);
   const isUpdatingRef = useRef(false);
+  const lastDataRef = useRef<string>('');
 
   const handleEditorChange = useCallback(() => {
     if (!editorRef.current || isUpdatingRef.current) return;
@@ -28,13 +29,15 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
       const parsedData = JSON.parse(editorValue);
       
       // Prevent infinite loops by checking if data actually changed
-      if (JSON.stringify(parsedData) !== JSON.stringify(data)) {
+      const currentDataString = JSON.stringify(parsedData);
+      if (currentDataString !== lastDataRef.current) {
+        lastDataRef.current = currentDataString;
         onUpdate(parsedData);
       }
     } catch (error) {
       // Don't update if JSON is invalid - let the validation handle it
     }
-  }, [data, onUpdate]);
+  }, [onUpdate]);
 
   // Initialize Monaco Editor
   useEffect(() => {
@@ -46,8 +49,11 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
       }
 
       try {
+        const initialValue = JSON.stringify(data, null, 2);
+        lastDataRef.current = JSON.stringify(data);
+
         editorRef.current = window.monaco.editor.create(containerRef.current, {
-          value: JSON.stringify(data, null, 2),
+          value: initialValue,
           language: 'json',
           theme: 'vs',
           readOnly: isLocked,
@@ -64,7 +70,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
         let changeTimeout: NodeJS.Timeout;
         editorRef.current.onDidChangeModelContent(() => {
           clearTimeout(changeTimeout);
-          changeTimeout = setTimeout(handleEditorChange, 500);
+          changeTimeout = setTimeout(handleEditorChange, 300);
         });
       } catch (error) {
         console.error('Error creating Monaco editor:', error);
@@ -103,17 +109,20 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
     if (!editorRef.current || !data) return;
 
     try {
-      const currentValue = editorRef.current.getValue();
-      const newValue = JSON.stringify(data, null, 2);
-      
-      // Only update if the content is actually different
-      if (currentValue !== newValue) {
-        isUpdatingRef.current = true;
-        editorRef.current.setValue(newValue);
-        // Reset flag after a short delay
-        setTimeout(() => {
-          isUpdatingRef.current = false;
-        }, 100);
+      const newDataString = JSON.stringify(data);
+      if (newDataString !== lastDataRef.current) {
+        const newValue = JSON.stringify(data, null, 2);
+        const currentValue = editorRef.current.getValue();
+        
+        if (currentValue !== newValue) {
+          isUpdatingRef.current = true;
+          lastDataRef.current = newDataString;
+          editorRef.current.setValue(newValue);
+          // Reset flag after a short delay
+          setTimeout(() => {
+            isUpdatingRef.current = false;
+          }, 100);
+        }
       }
     } catch (error) {
       console.error('Error updating Monaco editor content:', error);

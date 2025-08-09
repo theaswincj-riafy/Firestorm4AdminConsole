@@ -158,7 +158,7 @@ class AdminApiService {
           Object.assign(cleanResponse, referralData.en);
         }
 
-        // Add additional fields for UI editor compatibility
+        // Only add images and appDetails tabs (not included in first 5 tabs)
         cleanResponse.images = {
           logo: {
             url: "https://example.com/logo.png",
