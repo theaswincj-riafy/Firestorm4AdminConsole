@@ -358,23 +358,23 @@ class AdminApiService {
         ]
       },
       appDetails: {
-        appName: "Demo Referral App",
-        packageName: "com.demo.referral",
-        appDescription: "A sample referral application",
-        playUrl: "https://play.google.com/store/apps/details?id=com.demo.referral",
-        appStoreUrl: "https://apps.apple.com/app/demo-referral-app/id123456789",
+        appName: "BookAI App",
+        packageName: jsonData.app_package_name,
+        appDescription: "AI-powered reading and book recommendation app",
+        playUrl: "https://play.google.com/store/apps/details?id=" + jsonData.app_package_name,
+        appStoreUrl: "https://apps.apple.com/app/bookai-app/id123456789",
         version: "1.0.0",
-        category: "Business",
+        category: "Education",
         platforms: ["iOS", "Android", "Web"],
         minVersion: {
           ios: "14.0",
           android: "8.0"
         },
         features: [
-          "Real-time tracking",
-          "Multiple reward types",
+          "AI-powered recommendations",
+          "Premium referral system",
           "Social sharing",
-          "Analytics dashboard"
+          "Progress tracking"
         ]
       }
     };
