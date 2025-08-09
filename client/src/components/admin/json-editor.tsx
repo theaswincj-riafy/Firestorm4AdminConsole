@@ -11,33 +11,28 @@ interface JsonEditorProps {
 
 export default function JsonEditor({ data, isLocked, onUpdate, validateResult }: JsonEditorProps) {
   const editorRef = useRef<any>(null);
-  const [currentValue, setCurrentValue] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [editorValue, setEditorValue] = useState('{}');
+  const dataRef = useRef<any>(null);
 
   // Initialize editor value only when data prop changes
   useEffect(() => {
-    if (data) {
+    if (data && JSON.stringify(data) !== JSON.stringify(dataRef.current)) {
+      dataRef.current = data;
       try {
         const jsonString = JSON.stringify(data, null, 2);
-        setCurrentValue(jsonString);
+        setEditorValue(jsonString);
+        
+        // Update editor if it's already mounted
+        if (editorRef.current && isInitialized) {
+          editorRef.current.setValue(jsonString);
+        }
       } catch (error) {
         console.error('Error stringifying data:', error);
-        setCurrentValue('{}');
-      }
-    } else {
-      setCurrentValue('{}');
-    }
-  }, [data]);
-
-  // Update editor value when currentValue changes and editor is ready
-  useEffect(() => {
-    if (editorRef.current && isInitialized && currentValue !== undefined) {
-      const currentEditorValue = editorRef.current.getValue();
-      if (currentEditorValue !== currentValue) {
-        editorRef.current.setValue(currentValue);
+        setEditorValue('{}');
       }
     }
-  }, [currentValue, isInitialized]);
+  }, [data, isInitialized]);
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
@@ -47,12 +42,8 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   const handleEditorChange = (value: string | undefined) => {
     if (!value || isLocked) return;
     
-    // Update local state immediately for responsiveness
-    setCurrentValue(value);
-    
     try {
       const parsedData = JSON.parse(value);
-      // Call onUpdate with parsed data
       onUpdate(parsedData);
     } catch (error) {
       // Don't update on invalid JSON, let user fix it
@@ -66,7 +57,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
         <Editor
           height="100%"
           defaultLanguage="json"
-          value={currentValue}
+          value={editorValue}
           onMount={handleEditorDidMount}
           onChange={handleEditorChange}
           options={{

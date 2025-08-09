@@ -150,6 +150,10 @@ export default function AdminConsole() {
       adminApi.saveAppConfig(appId, config),
     onSuccess: () => {
       setIsDirty(false);
+      // Refresh the config data after successful save
+      if (selectedApp) {
+        queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
+      }
       toast({
         title: "Success",
         description: "Configuration saved successfully",

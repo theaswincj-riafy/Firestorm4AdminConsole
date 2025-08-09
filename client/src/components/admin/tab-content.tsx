@@ -25,7 +25,9 @@ export default function TabContent({
 
   const handleUIUpdate = (newTabData: any) => {
     // Update the tab data which will trigger a config update
-    onTabDataUpdate(tabKey, newTabData);
+    if (newTabData && typeof newTabData === 'object') {
+      onTabDataUpdate(tabKey, newTabData);
+    }
   };
 
   const handleJsonUpdate = (newConfigData: any) => {
