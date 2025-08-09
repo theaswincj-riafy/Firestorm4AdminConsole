@@ -1,0 +1,65 @@
+{
+    "response": "Done",
+    "processType": "r10-apps-ftw",
+    "data": {
+        "benefits": [
+            {
+                "desc": "Ad-free access, pro features, and priority support for Book Summaries App.",
+                "title": "Free Premium Month"
+            },
+            {
+                "desc": "Your friends get a week of Premium access when they join.",
+                "title": "Friends Win Too"
+            },
+            {
+                "desc": "Share your code, they redeem, and you both benefit!",
+                "title": "Easy Sharing"
+            }
+        ],
+        "hero": {
+            "hero_title": "*Invite & Unlock 1 Month Premium*",
+            "page_title": "*Invite Friends*",
+            "quickButtonText": "*View my referrals*",
+            "referral_code": "{{referral_code}}",
+            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code."
+        },
+        "how_it_works": [
+            {
+                "desc": "Share your referral code with friends and family.",
+                "step": 1
+            },
+            {
+                "desc": "They redeem your code after installing Book Summaries App.",
+                "step": 2
+            },
+            {
+                "desc": "You level up with each successful redemption!",
+                "step": 3
+            },
+            {
+                "desc": "Your friend gets a week of free Premium too!",
+                "step": 4
+            },
+            {
+                "desc": "Unlock a month of free Premium when you reach level 5!",
+                "step": 5
+            }
+        ],
+        "nudges": [
+            "Share with your closest friends and family first.",
+            "Personalize your invite with why you love Book Summaries App.",
+            "Share your code in relevant book clubs or groups."
+        ],
+        "page_id": "referral-promote",
+        "progress_teaser": {
+            "subtitle": "Each referral gets you closer to free Premium!",
+            "title": "Only {{pending_redemptions}} more redemptions to go!"
+        },
+        "share": {
+            "messages": {
+                "default": "{{referrer_name}} invited you to try Book Summaries App! Get 1 week of Premium features for free using this referral: {{referral_link}}"
+            },
+            "primary_cta": "*Invite Friends & Family*"
+        }
+    }
+}
