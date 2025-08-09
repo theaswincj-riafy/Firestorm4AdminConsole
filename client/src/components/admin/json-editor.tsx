@@ -60,7 +60,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
         window.require.config({ 
           paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } 
         });
-        
+
         window.require(['vs/editor/editor.main'], () => {
           if (editorRef.current) {
             editorRef.current.dispose();
@@ -104,23 +104,20 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
         editorRef.current = null;
       }
     };
-  }, [data, isLocked, onUpdate]);
+  }, []); // Only run once on mount
 
+  // Update editor content when data changes
   useEffect(() => {
     if (editorRef.current && data) {
-      try {
-        const currentValue = editorRef.current.getValue();
-        const newValue = JSON.stringify(data, null, 2);
-        
-        if (currentValue !== newValue) {
-          editorRef.current.setValue(newValue);
-        }
-      } catch (error) {
-        console.error('Error updating Monaco editor value:', error);
+      const currentValue = editorRef.current.getValue();
+      const newValue = JSON.stringify(data, null, 2);
+      if (currentValue !== newValue) {
+        editorRef.current.setValue(newValue);
       }
     }
   }, [data]);
 
+  // Update readonly state when isLocked changes
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current.updateOptions({ readOnly: isLocked });

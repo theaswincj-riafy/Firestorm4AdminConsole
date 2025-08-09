@@ -143,48 +143,63 @@ class AdminApiService {
       const result = await response.json();
 
       if (result.status === 'success' && result.data && result.data.length > 0) {
-        const referralData = result.data[0].referral_json;
-
-        // Transform API response to match the expected format
-        return {
-          ...referralData.en,
-          images: {
-            logo: {
-              url: "https://example.com/logo.png",
-              alt: "App Logo",
-              dimensions: "200x200"
-            },
-            hero: {
-              url: "https://example.com/hero.jpg",
-              alt: "Hero Image",
-              dimensions: "1200x600"
-            },
-            promotional: [
-              { url: "https://example.com/promo1.jpg", alt: "Promotion 1" },
-              { url: "https://example.com/promo2.jpg", alt: "Promotion 2" }
-            ]
-          },
-          appDetails: {
-            appName: app?.appName || "App Name",
-            packageName: packageName,
-            appDescription: app?.meta?.description || "App description",
-            playUrl: app?.meta?.playUrl || "",
-            appStoreUrl: app?.meta?.appStoreUrl || "",
-            version: "1.0.0",
-            category: "Business",
-            platforms: ["iOS", "Android", "Web"],
-            minVersion: {
-              ios: "14.0",
-              android: "8.0"
-            },
-            features: [
-              "Real-time tracking",
-              "Multiple reward types",
-              "Social sharing",
-              "Analytics dashboard"
-            ]
-          }
+        // Return the complete API response structure for JSON editor
+        const completeResponse = {
+          data: [
+            {
+              app_package_name: result.data[0].app_package_name,
+              referral_json: result.data[0].referral_json
+            }
+          ],
+          status: result.status
         };
+
+        // Add UI editor specific fields for tab-based editing
+        const referralData = result.data[0].referral_json;
+        if (referralData.en) {
+          Object.assign(completeResponse, referralData.en);
+        }
+
+        // Add additional fields for UI editor compatibility
+        completeResponse.images = {
+          logo: {
+            url: "https://example.com/logo.png",
+            alt: "App Logo",
+            dimensions: "200x200"
+          },
+          hero: {
+            url: "https://example.com/hero.jpg",
+            alt: "Hero Image",
+            dimensions: "1200x600"
+          },
+          promotional: [
+            { url: "https://example.com/promo1.jpg", alt: "Promotion 1" },
+            { url: "https://example.com/promo2.jpg", alt: "Promotion 2" }
+          ]
+        };
+
+        completeResponse.appDetails = {
+          appName: app?.appName || "App Name",
+          packageName: packageName,
+          appDescription: app?.meta?.description || "App description",
+          playUrl: app?.meta?.playUrl || "",
+          appStoreUrl: app?.meta?.appStoreUrl || "",
+          version: "1.0.0",
+          category: "Business",
+          platforms: ["iOS", "Android", "Web"],
+          minVersion: {
+            ios: "14.0",
+            android: "8.0"
+          },
+          features: [
+            "Real-time tracking",
+            "Multiple reward types",
+            "Social sharing",
+            "Analytics dashboard"
+          ]
+        };
+
+        return completeResponse;
       } else if (result.status === 'error') {
         throw new Error(result.message || 'API returned error status');
       } else {
