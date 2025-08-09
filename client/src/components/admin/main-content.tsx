@@ -70,22 +70,22 @@ export default function MainContent({
       // Get the raw JSON string from the Monaco editor if it exists
       const editorElement = document.querySelector('.monaco-editor');
       const monacoEditor = (window as any).monaco?.editor?.getEditors()?.[0];
-      
+
       let jsonString: string;
       if (monacoEditor) {
         jsonString = monacoEditor.getValue();
       } else {
         jsonString = JSON.stringify(currentConfig[activeTab]);
       }
-      
+
       // Try to parse the JSON
       JSON.parse(jsonString);
       setValidateResult({ valid: true });
       setTimeout(() => setValidateResult(null), 3000);
     } catch (error) {
-      setValidateResult({ 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'Invalid JSON structure' 
+      setValidateResult({
+        valid: false,
+        error: error instanceof Error ? error.message : 'Invalid JSON structure'
       });
       setTimeout(() => setValidateResult(null), 5000);
     }
@@ -101,7 +101,7 @@ export default function MainContent({
                 <Package className="w-12 h-12 text-primary" />
               </div>
               <h2 className="text-2xl font-semibold text-foreground mb-4">
-                Welcome to Referral Boost Console
+                ReferralBoost - {selectedApp?.appName || 'Your App'}
               </h2>
               <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
                 Manage your referral campaigns with ease. Create, configure, and optimize your app's referral system from one central dashboard.
@@ -137,13 +137,13 @@ export default function MainContent({
             <div className="bg-gradient-to-r from-primary/5 to-accent/5 border rounded-lg p-6">
               <h3 className="font-semibold text-foreground mb-3">Get Started</h3>
               <p className="text-muted-foreground mb-4">
-                {apps.length === 0 
+                {apps.length === 0
                   ? "Create your first app to begin configuring your referral program"
                   : "Select an app from the sidebar or create a new one to get started"
                 }
               </p>
               <div className="flex items-center justify-center gap-4">
-                <Button 
+                <Button
                   onClick={() => window.location.href = '#create-app'}
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
@@ -220,9 +220,9 @@ export default function MainContent({
               size="sm"
               onClick={handleValidateJson}
               className={
-                validateResult?.valid === true 
-                  ? 'border-green-500 text-green-600 bg-green-50' 
-                  : validateResult?.valid === false 
+                validateResult?.valid === true
+                  ? 'border-green-500 text-green-600 bg-green-50'
+                  : validateResult?.valid === false
                   ? 'border-red-500 text-red-600 bg-red-50'
                   : ''
               }
@@ -281,7 +281,7 @@ export default function MainContent({
               key={tabKey}
               className={`tab-item ${activeTab === tabKey ? 'active' : ''}`}
             >
-              <span 
+              <span
                 className="tab-label"
                 onClick={() => onTabChange(tabKey)}
               >
@@ -306,13 +306,14 @@ export default function MainContent({
               onConfigUpdate(newConfig);
             }}
             validateResult={validateResult}
+            tabs={tabs}
           />
         )}
 
         {/* Global Actions */}
         <div className="global-actions">
-          <Button 
-            onClick={onSaveConfig} 
+          <Button
+            onClick={onSaveConfig}
             disabled={isLocked || isSaving}
             className="flex items-center gap-2"
           >

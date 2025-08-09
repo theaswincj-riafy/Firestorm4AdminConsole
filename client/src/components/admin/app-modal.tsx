@@ -74,31 +74,31 @@ export default function AppModal({
 
         <form onSubmit={form.handleSubmit(handleSubmit)} className="p-6 space-y-4">
           <div>
-            <Label htmlFor="packageName">Package Name *</Label>
-            <Input
-              id="packageName"
-              placeholder="com.example.app"
-              {...form.register('packageName')}
-              disabled={isSubmitting}
-            />
-            {form.formState.errors.packageName && (
-              <p className="text-sm text-destructive mt-1">
-                {form.formState.errors.packageName.message}
-              </p>
-            )}
-          </div>
-
-          <div>
             <Label htmlFor="appName">App Name *</Label>
             <Input
               id="appName"
-              placeholder="My Awesome App"
+              placeholder="Demo Referral App"
               {...form.register('appName')}
               disabled={isSubmitting}
             />
             {form.formState.errors.appName && (
               <p className="text-sm text-destructive mt-1">
                 {form.formState.errors.appName.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="packageName">Package Name *</Label>
+            <Input
+              id="packageName"
+              placeholder="com.demo.referral"
+              {...form.register('packageName')}
+              disabled={isSubmitting}
+            />
+            {form.formState.errors.packageName && (
+              <p className="text-sm text-destructive mt-1">
+                {form.formState.errors.packageName.message}
               </p>
             )}
           </div>
