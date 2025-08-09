@@ -1,3 +1,4 @@
+
 import { REFERRAL_DATA } from './referral-data';
 import type { App, AppFormData } from '@shared/schema';
 
@@ -143,61 +144,23 @@ class AdminApiService {
       const result = await response.json();
 
       if (result.status === 'success' && result.data && result.data.length > 0) {
-        // Return just the content from the data array
+        // Return the exact structure from the API response
         const dataContent = result.data[0];
         const referralData = dataContent.referral_json;
 
-        // Create a clean structure with just the referral_json content plus metadata
-        const cleanResponse = {
+        // Structure should match exactly what comes from the API
+        const apiResponse = {
           app_package_name: dataContent.app_package_name,
           referral_json: referralData
         };
 
-        // Add UI editor specific fields for tab-based editing if referral_json.en exists
+        // Extract individual tabs from referral_json.en for UI editing
         if (referralData && referralData.en) {
-          Object.assign(cleanResponse, referralData.en);
+          // Add the individual tab data for UI editor
+          Object.assign(apiResponse, referralData.en);
         }
 
-        // Only add images and appDetails tabs (not included in first 5 tabs)
-        cleanResponse.images = {
-          logo: {
-            url: "https://example.com/logo.png",
-            alt: "App Logo",
-            dimensions: "200x200"
-          },
-          hero: {
-            url: "https://example.com/hero.jpg",
-            alt: "Hero Image",
-            dimensions: "1200x600"
-          },
-          promotional: [
-            { url: "https://example.com/promo1.jpg", alt: "Promotion 1" },
-            { url: "https://example.com/promo2.jpg", alt: "Promotion 2" }
-          ]
-        };
-
-        cleanResponse.appDetails = {
-          appName: app?.appName || "App Name",
-          packageName: packageName,
-          appDescription: app?.meta?.description || "App description",
-          playUrl: app?.meta?.playUrl || "",
-          appStoreUrl: app?.meta?.appStoreUrl || "",
-          version: "1.0.0",
-          category: "Business",
-          platforms: ["iOS", "Android", "Web"],
-          minVersion: {
-            ios: "14.0",
-            android: "8.0"
-          },
-          features: [
-            "Real-time tracking",
-            "Multiple reward types",
-            "Social sharing",
-            "Analytics dashboard"
-          ]
-        };
-
-        return cleanResponse;
+        return apiResponse;
       } else if (result.status === 'error') {
         throw new Error(result.message || 'API returned error status');
       } else {
@@ -212,139 +175,6 @@ class AdminApiService {
       } else {
         throw new Error('Unknown error occurred while fetching app config');
       }
-
-      // Fallback to mock data if API fails
-      await this.delay(300);
-      const jsonData = {
-        "page1_referralPromote": {
-          "page_id": "referral-promote",
-          "personalization": {
-            "referrer_name": "{{referrer_name}}",
-            "referral_code": "{{referral_code}}",
-            "target_redemptions": 5
-          },
-          "hero": {
-            "title": "Share & Unlock 1 Month Premium",
-            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code.",
-            "badge": "Only {{target_redemptions}} redemptions needed"
-          },
-          "benefits": [
-            {
-              "title": "Premium Access",
-              "desc": "Ad-free experience, pro features, and priority support for 1 month."
-            },
-            {
-              "title": "Win Together",
-              "desc": "Your friends get an exclusive newcomer perk when they join via your link."
-            },
-            {
-              "title": "Fast & Simple",
-              "desc": "Share your link; they download and redeem. You progress instantly."
-            }
-          ],
-          "share": {
-            "section_title": "Share your invite",
-            "primary_cta": "Share Invite",
-            "copy_code_cta": "Copy Code: {{referral_code}}",
-            "copy_link_cta": "Copy Link",
-            "success_toast": "Copied! Now paste it anywhere."
-          },
-          "social_proof": {
-            "title": "Why people join",
-            "bullets": [
-              "Top-rated features that save time",
-              "Fresh content weekly",
-              "Secure & private by design"
-            ]
-          }
-        },
-        "page2_referralStatus": {
-          "page_id": "referral-status",
-          "header": {
-            "title": "Your Referral Progress",
-            "subtitle": "Great work, {{referrer_name}}. Keep it going!"
-          },
-          "milestones": [
-            {
-              "level": 1,
-              "threshold": 1,
-              "title": "Level 1 – The Kickoff",
-              "message": "Your first referral is in! You've started your Premium journey."
-            }
-          ],
-          "faq": [
-            {
-              "q": "Do I see who redeemed?",
-              "a": "No—only totals. We don't store redeemer identities."
-            }
-          ]
-        },
-        "page3_referralDownload": {
-          "page_id": "referral-download",
-          "hero": {
-            "title": "{{referrer_name}} invited you",
-            "subtitle": "Download the app to claim your invite and get started."
-          },
-          "feature_highlights": [
-            {
-              "title": "Get Results Fast",
-              "desc": "Smart tools that save you time from day one."
-            }
-          ]
-        },
-        "page4_referralRedeem": {
-          "page_id": "referral-redeem",
-          "hero": {
-            "title": "Redeem Invite Code",
-            "subtitle": "Enter the invite from {{referrer_name}} to continue."
-          },
-          "form": {
-            "label": "Enter code",
-            "placeholder": "e.g., {{referral_code}}",
-            "primary_cta": "Redeem Offer"
-          }
-        },
-        "notifications": {
-          "referrer": [],
-          "redeemer": []
-        }
-      };
-
-      return {
-        page1_referralPromote: jsonData.page1_referralPromote,
-        page2_referralStatus: jsonData.page2_referralStatus,
-        page3_referralDownload: jsonData.page3_referralDownload,
-        page4_referralRedeem: jsonData.page4_referralRedeem,
-        notifications: jsonData.notifications,
-        images: {
-          logo: {
-            url: "https://example.com/logo.png",
-            alt: "App Logo",
-            dimensions: "200x200"
-          },
-          hero: {
-            url: "https://example.com/hero.jpg",
-            alt: "Hero Image",
-            dimensions: "1200x600"
-          }
-        },
-        appDetails: {
-          appName: "Demo Referral App",
-          packageName: appId,
-          appDescription: "A sample referral application",
-          playUrl: "",
-          appStoreUrl: "",
-          version: "1.0.0",
-          category: "Business",
-          platforms: ["iOS", "Android", "Web"],
-          features: [
-            "Real-time tracking",
-            "Multiple reward types",
-            "Social sharing",
-            "Analytics dashboard"
-          ]
-        }
-      };
     }
   }
 
@@ -360,14 +190,14 @@ class AdminApiService {
         packageName = app.packageName;
       }
 
-      // Extract referral_json data (exclude appDetails from the referral_json)
-      const { appDetails, ...referralJsonData } = config;
+      // Extract only the referral data, exclude metadata fields
+      const { app_package_name, referral_json, ...tabData } = config;
 
-      // Prepare the request body
+      // Prepare the request body in the exact format expected by the API
       const requestBody = {
         app_package_name: packageName,
         referral_json: {
-          en: referralJsonData
+          en: tabData
         }
       };
 

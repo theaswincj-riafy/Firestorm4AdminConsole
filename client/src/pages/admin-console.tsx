@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -69,20 +70,23 @@ export default function AdminConsole() {
         'page2_referralStatus', 
         'page3_referralDownload',
         'page4_referralRedeem',
-        'notifications',
-        'images',
-        'appDetails'
+        'notifications'
       ];
 
-      const orderedTabs = tabOrder.filter(tab => configQuery.data[tab]);
-      const additionalTabs = Object.keys(configQuery.data).filter(tab => !tabOrder.includes(tab));
+      // Find available tabs from the config
+      const availableTabs = Object.keys(configQuery.data).filter(key => 
+        !['app_package_name', 'referral_json'].includes(key)
+      );
+
+      const orderedTabs = tabOrder.filter(tab => availableTabs.includes(tab));
+      const additionalTabs = availableTabs.filter(tab => !tabOrder.includes(tab));
       const allTabs = [...orderedTabs, ...additionalTabs];
 
-      if (allTabs.length > 0) {
+      if (allTabs.length > 0 && !activeTab) {
         setActiveTab(allTabs[0]);
       }
     }
-  }, [configQuery.data]);
+  }, [configQuery.data, activeTab]);
 
   const createAppMutation = useMutation({
     mutationFn: (data: AppFormData) => adminApi.createApp(data),
@@ -221,6 +225,7 @@ export default function AdminConsole() {
       }
     }
     setSelectedApp(app);
+    setActiveTab(null); // Reset active tab when switching apps
   };
 
   const handleCreateApp = () => {
@@ -248,27 +253,25 @@ export default function AdminConsole() {
   };
 
   const handleConfigUpdate = (newConfig: any) => {
+    if (!newConfig || JSON.stringify(currentConfig) === JSON.stringify(newConfig)) {
+      return; // Prevent unnecessary updates
+    }
+    
     setCurrentConfig(newConfig);
     setIsDirty(true);
   };
 
   // This handler is specifically for updating a tab's data within the currentConfig
-  const handleTabDataUpdate = (tabKey: string, updatedTabData: any) => {
-    setCurrentConfig(prevConfig => {
-      if (!prevConfig) return prevConfig;
-      
-      // Prevent unnecessary updates if data is the same
-      if (JSON.stringify(prevConfig[tabKey]) === JSON.stringify(updatedTabData)) {
-        return prevConfig;
-      }
-      
-      const newConfig = {
-        ...prevConfig,
-        [tabKey]: updatedTabData
-      };
-      setIsDirty(true);
-      return newConfig;
-    });
+  const handleTabDataUpdate = (updatedData: any) => {
+    if (!currentConfig) return;
+    
+    // Prevent unnecessary updates if data is the same
+    if (JSON.stringify(currentConfig) === JSON.stringify(updatedData)) {
+      return;
+    }
+    
+    setCurrentConfig(updatedData);
+    setIsDirty(true);
   };
 
   const handleSaveConfig = () => {
@@ -327,28 +330,8 @@ export default function AdminConsole() {
       'page2_referralStatus': 'Referrer Status',
       'page3_referralDownload': 'Promote Download',
       'page4_referralRedeem': 'Redeem Code',
-      'images': 'Images',
-      'appDetails': 'App Details',
       'notifications': 'Notifications'
     };
-
-    // Determine the correct tab order
-    const tabOrder: string[] = [
-      'page1_referralPromote',
-      'page2_referralStatus',
-      'page3_referralDownload',
-      'page4_referralRedeem',
-      'notifications',
-      'images',
-      'appDetails'
-    ];
-
-    const tabIndex = tabOrder.indexOf(tabKey);
-
-    // If the tabKey is not in the defined order, append it to the end
-    if (tabIndex === -1) {
-      return TAB_MAPPINGS[tabKey] || humanizeKey(tabKey);
-    }
 
     return TAB_MAPPINGS[tabKey] || humanizeKey(tabKey);
   };
