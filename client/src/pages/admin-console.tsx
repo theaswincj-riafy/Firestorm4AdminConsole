@@ -241,6 +241,12 @@ export default function AdminConsole() {
   const handleTabDataUpdate = (tabKey: string, updatedTabData: any) => {
     setCurrentConfig(prevConfig => {
       if (!prevConfig) return prevConfig;
+      
+      // Prevent unnecessary updates if data is the same
+      if (JSON.stringify(prevConfig[tabKey]) === JSON.stringify(updatedTabData)) {
+        return prevConfig;
+      }
+      
       const newConfig = {
         ...prevConfig,
         [tabKey]: updatedTabData

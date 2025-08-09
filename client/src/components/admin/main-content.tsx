@@ -17,6 +17,7 @@ interface MainContentProps {
   translateStatus: Record<string, 'pending' | 'completed'>;
   onTabChange: (tabKey: string) => void;
   onConfigUpdate: (config: any) => void;
+  onTabDataUpdate: (tabKey: string, updatedTabData: any) => void;
   onEditorModeChange: (mode: 'ui' | 'json') => void;
   onLockToggle: () => void;
   onSaveConfig: () => void;
@@ -375,7 +376,10 @@ export default function MainContent({
             fullConfigData={currentConfig}
             editorMode={editorMode}
             isLocked={isLocked}
-            onUpdate={editorMode === 'json' ? onConfigUpdate : (newTabData) => onTabDataUpdate(activeTab, newTabData)}
+            onUpdate={editorMode === 'json' ? onConfigUpdate : (newTabData) => {
+              // For UI editor mode, update only the current tab
+              onTabDataUpdate(activeTab, newTabData);
+            }}
             validateResult={validateResult}
           />
         )}
