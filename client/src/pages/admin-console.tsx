@@ -258,8 +258,20 @@ export default function AdminConsole() {
   };
 
   const handleConfigUpdate = (newConfig: any) => {
-    if (!newConfig || JSON.stringify(currentConfig) === JSON.stringify(newConfig)) {
-      return; // Prevent unnecessary updates
+    if (!newConfig) {
+      return;
+    }
+
+    // More robust comparison to prevent unnecessary updates
+    try {
+      const currentString = JSON.stringify(currentConfig);
+      const newString = JSON.stringify(newConfig);
+      
+      if (currentString === newString) {
+        return;
+      }
+    } catch (error) {
+      console.error('Error comparing configs:', error);
     }
 
     setCurrentConfig(newConfig);

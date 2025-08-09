@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 
 interface JsonEditorProps {
@@ -14,42 +14,81 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   const [isInitialized, setIsInitialized] = useState(false);
   const [editorValue, setEditorValue] = useState('{}');
   const dataRef = useRef<any>(null);
+  const isUpdatingFromProp = useRef(false);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize editor value only when data prop changes
+  // Initialize editor value only when data prop changes from external source
   useEffect(() => {
-    if (data && JSON.stringify(data) !== JSON.stringify(dataRef.current)) {
-      dataRef.current = data;
-      try {
+    if (!data || isUpdatingFromProp.current) {
+      return;
+    }
+
+    try {
+      const currentDataString = JSON.stringify(dataRef.current);
+      const newDataString = JSON.stringify(data);
+      
+      if (currentDataString !== newDataString) {
+        dataRef.current = data;
         const jsonString = JSON.stringify(data, null, 2);
         setEditorValue(jsonString);
         
-        // Update editor if it's already mounted
+        // Update editor if it's already mounted, but preserve cursor position
         if (editorRef.current && isInitialized) {
-          editorRef.current.setValue(jsonString);
+          const position = editorRef.current.getPosition();
+          const model = editorRef.current.getModel();
+          if (model && model.getValue() !== jsonString) {
+            isUpdatingFromProp.current = true;
+            editorRef.current.setValue(jsonString);
+            if (position) {
+              editorRef.current.setPosition(position);
+            }
+            isUpdatingFromProp.current = false;
+          }
         }
-      } catch (error) {
-        console.error('Error stringifying data:', error);
-        setEditorValue('{}');
       }
+    } catch (error) {
+      console.error('Error processing data:', error);
+      setEditorValue('{}');
     }
   }, [data, isInitialized]);
 
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount = useCallback((editor: any) => {
     editorRef.current = editor;
     setIsInitialized(true);
-  };
+  }, []);
 
-  const handleEditorChange = (value: string | undefined) => {
-    if (!value || isLocked) return;
+  const handleEditorChange = useCallback((value: string | undefined) => {
+    if (!value || isLocked || isUpdatingFromProp.current) return;
     
-    try {
-      const parsedData = JSON.parse(value);
-      onUpdate(parsedData);
-    } catch (error) {
-      // Don't update on invalid JSON, let user fix it
-      console.warn('Invalid JSON, not updating:', error);
+    // Clear existing debounce
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
-  };
+    
+    // Debounce the update to prevent excessive re-renders
+    debounceTimeoutRef.current = setTimeout(() => {
+      try {
+        const parsedData = JSON.parse(value);
+        isUpdatingFromProp.current = true;
+        onUpdate(parsedData);
+        setTimeout(() => {
+          isUpdatingFromProp.current = false;
+        }, 100);
+      } catch (error) {
+        // Don't update on invalid JSON, let user fix it
+        console.warn('Invalid JSON, not updating:', error);
+      }
+    }, 300);
+  }, [isLocked, onUpdate]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="h-full flex flex-col">

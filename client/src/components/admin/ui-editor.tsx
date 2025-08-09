@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Plus, X, Code, Trash2, Package, Globe, Smartphone, FileText, Star, Users, Calendar, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,23 +17,39 @@ interface UIEditorProps {
 }
 
 export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorProps) {
-  const updateValue = (path: string, value: any) => {
-    const newData = JSON.parse(JSON.stringify(data));
-    let current = newData;
-    const pathArray = path.split('.');
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    for (let i = 0; i < pathArray.length - 1; i++) {
-      const segment = pathArray[i];
-      if (current[segment] === undefined) {
-        current[segment] = {};
-      }
-      current = current[segment];
+  const updateValue = useCallback((path: string, value: any) => {
+    if (isLocked || !data) return;
+
+    // Clear existing debounce
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
+    
+    // Debounce the update to prevent excessive re-renders
+    debounceTimeoutRef.current = setTimeout(() => {
+      try {
+        const newData = JSON.parse(JSON.stringify(data));
+        let current = newData;
+        const pathArray = path.split('.');
 
-    const lastSegment = pathArray[pathArray.length - 1];
-    current[lastSegment] = value;
-    onUpdate(newData);
-  };
+        for (let i = 0; i < pathArray.length - 1; i++) {
+          const segment = pathArray[i];
+          if (current[segment] === undefined) {
+            current[segment] = {};
+          }
+          current = current[segment];
+        }
+
+        const lastSegment = pathArray[pathArray.length - 1];
+        current[lastSegment] = value;
+        onUpdate(newData);
+      } catch (error) {
+        console.error('Error updating value:', error);
+      }
+    }, 100);
+  }, [data, isLocked, onUpdate]);
 
   const renderEmptyState = (title: string, description: string, icon: any) => {
     const IconComponent = icon;
