@@ -183,6 +183,30 @@ export default function AdminConsole() {
     },
   });
 
+  const editAppMutation = useMutation({
+    mutationFn: ({ appId, playStoreLink, appStoreLink }: { appId: string; playStoreLink?: string; appStoreLink?: string }) =>
+      adminApi.editApp(appId, playStoreLink, appStoreLink),
+    onSuccess: () => {
+      setIsDirty(false);
+      // Refresh the apps list and config data after successful save
+      queryClient.invalidateQueries({ queryKey: ['/api/apps'] });
+      if (selectedApp) {
+        queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
+      }
+      toast({
+        title: "Success",
+        description: "App details updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Error updating app details: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const regenerateTabMutation = useMutation({
     mutationFn: ({ appId, tabKey, currentSubtree, appName, appDescription }: { appId: string; tabKey: string; currentSubtree: any; appName?: string; appDescription?: string }) =>
       adminApi.regenerateTab(appId, tabKey, currentSubtree, appName, appDescription),
@@ -338,7 +362,19 @@ export default function AdminConsole() {
 
   const handleSaveConfig = () => {
     if (selectedApp && currentConfig) {
-      saveConfigMutation.mutate({ appId: selectedApp.appId, config: currentConfig });
+      // If we're on the app-details tab, call the editApp API
+      if (activeTab === 'app-details') {
+        const playStoreLink = currentConfig.meta?.playUrl;
+        const appStoreLink = currentConfig.meta?.appStoreUrl;
+        editAppMutation.mutate({ 
+          appId: selectedApp.appId, 
+          playStoreLink, 
+          appStoreLink 
+        });
+      } else {
+        // For other tabs, save the config as usual
+        saveConfigMutation.mutate({ appId: selectedApp.appId, config: currentConfig });
+      }
     }
   };
 
@@ -492,7 +528,7 @@ export default function AdminConsole() {
           onRefreshTab={handleRefreshTab}
           getTabTitle={getTabTitle}
           isRegenerating={regenerateTabMutation.isPending}
-          isSaving={saveConfigMutation.isPending}
+          isSaving={saveConfigMutation.isPending || editAppMutation.isPending}
           isTranslating={translateMutation.isPending}
           configError={configQuery.error}
           isLoadingConfig={configQuery.isPending}

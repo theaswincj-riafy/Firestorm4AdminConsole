@@ -761,18 +761,18 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
                 <Label>App Name *</Label>
                 <Input
                   value={appData.appName || ''}
-                  onChange={(e) => updateValue('appName', e.target.value)}
-                  disabled={isLocked}
+                  disabled={true}
                   placeholder="Enter app name"
+                  className="bg-muted"
                 />
               </div>
               <div>
                 <Label>Package Name *</Label>
                 <Input
                   value={appData.packageName || ''}
-                  onChange={(e) => updateValue('packageName', e.target.value)}
-                  disabled={isLocked}
+                  disabled={true}
                   placeholder="com.example.app"
+                  className="bg-muted"
                 />
               </div>
             </div>
@@ -781,33 +781,13 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
               <Label>App Description</Label>
               <Textarea
                 value={appData.appDescription || ''}
-                onChange={(e) => updateValue('appDescription', e.target.value)}
-                disabled={isLocked}
+                disabled={true}
                 placeholder="Describe your app"
-                className="min-h-[100px]"
+                className="min-h-[100px] bg-muted"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Version</Label>
-                <Input
-                  value={appData.version || ''}
-                  onChange={(e) => updateValue('version', e.target.value)}
-                  disabled={isLocked}
-                  placeholder="1.0.0"
-                />
-              </div>
-              <div>
-                <Label>Category</Label>
-                <Input
-                  value={appData.category || ''}
-                  onChange={(e) => updateValue('category', e.target.value)}
-                  disabled={isLocked}
-                  placeholder="Business"
-                />
-              </div>
-            </div>
+            
 
             <div>
               <Label>Google Play URL</Label>

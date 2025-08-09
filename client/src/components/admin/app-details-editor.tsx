@@ -73,9 +73,9 @@ export default function AppDetailsEditor({ data, isLocked, onUpdate }: AppDetail
               <Input
                 id="packageName"
                 value={formData.packageName}
-                onChange={(e) => handleChange('packageName', e.target.value)}
                 placeholder="com.example.myapp"
-                disabled={isLocked}
+                disabled={true}
+                className="bg-muted"
               />
             </div>
             
@@ -84,9 +84,9 @@ export default function AppDetailsEditor({ data, isLocked, onUpdate }: AppDetail
               <Input
                 id="appName"
                 value={formData.appName}
-                onChange={(e) => handleChange('appName', e.target.value)}
                 placeholder="My Awesome App"
-                disabled={isLocked}
+                disabled={true}
+                className="bg-muted"
               />
             </div>
           </div>
@@ -96,10 +96,10 @@ export default function AppDetailsEditor({ data, isLocked, onUpdate }: AppDetail
             <Textarea
               id="appDescription"
               value={formData.appDescription}
-              onChange={(e) => handleChange('appDescription', e.target.value)}
               placeholder="A brief description of your app..."
-              disabled={isLocked}
+              disabled={true}
               rows={3}
+              className="bg-muted"
             />
           </div>
         </CardContent>

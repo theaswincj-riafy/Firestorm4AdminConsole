@@ -153,6 +153,91 @@ class AdminApiService {
     return updatedApp;
   }
 
+  async editApp(appId: string, playStoreLink?: string, appStoreLink?: string): Promise<{ message: string; status: string }> {
+    try {
+      // Find the app by appId to get the package name
+      const app = this.apps.find(a => a.appId === appId);
+      let packageName = appId;
+
+      // If appId matches an existing app's package name, use it directly
+      // Otherwise try to find by appId
+      if (app) {
+        packageName = app.packageName;
+      }
+
+      const requestBody: any = {
+        app_package_name: packageName
+      };
+
+      // Only include store links if they are provided
+      if (playStoreLink !== undefined) {
+        requestBody.play_store_link = playStoreLink;
+      }
+      if (appStoreLink !== undefined) {
+        requestBody.app_store_link = appStoreLink;
+      }
+
+      const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/editapp', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.message) {
+            errorMessage = `HTTP ${response.status}: ${errorJson.message}`;
+          }
+        } catch {
+          // If not JSON, keep the default message
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        // Update local app data if we have the app
+        if (app) {
+          const updatedApp = {
+            ...app,
+            meta: {
+              ...app.meta,
+              ...(playStoreLink !== undefined && { playUrl: playStoreLink }),
+              ...(appStoreLink !== undefined && { appStoreUrl: appStoreLink })
+            }
+          };
+          
+          const index = this.apps.findIndex(a => a.appId === appId);
+          if (index !== -1) {
+            this.apps[index] = updatedApp;
+          }
+        }
+
+        return result;
+      } else {
+        throw new Error(result.message || 'Failed to update app');
+      }
+    } catch (error) {
+      console.error('Error updating app:', error);
+      
+      // Re-throw with more specific error information
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Unknown error occurred while updating app');
+      }
+    }
+  }
+
   async deleteApp(appId: string): Promise<void> {
     await this.delay(300);
     this.apps = this.apps.filter(app => app.appId !== appId);
