@@ -21,6 +21,14 @@ export default function Sidebar({
   onCreateApp
 }: SidebarProps) {
   const [isAppsCollapsed, setIsAppsCollapsed] = useState(false);
+  const [lockedApps, setLockedApps] = useState<Record<string, boolean>>({});
+
+  const toggleAppLock = (appId: string) => {
+    setLockedApps(prev => ({
+      ...prev,
+      [appId]: !prev[appId]
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -93,7 +101,7 @@ export default function Sidebar({
         <CollapsibleContent>
           <div className="p-3 md:p-4">
             {apps.map((app) => {
-              const [isLocked, setIsLocked] = useState(false);
+              const isLocked = lockedApps[app.appId] || false;
 
               return (
                 <div
@@ -110,7 +118,7 @@ export default function Sidebar({
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsLocked(!isLocked);
+                      toggleAppLock(app.appId);
                     }}
                     className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                     title={isLocked ? "Unlock app" : "Lock app"}
