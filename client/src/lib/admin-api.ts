@@ -380,6 +380,17 @@ class AdminApiService {
       }
     }
 
+    // Special handling for referrer status tab
+    if (tabKey === 'page2_referralStatus') {
+      try {
+        const newSubtree = await this.getReferrerStatusData();
+        return { tabKey, newSubtree };
+      } catch (error) {
+        console.error('Error refreshing referrer status data:', error);
+        throw new Error('Failed to refresh referrer status data from API');
+      }
+    }
+
     // Fallback to simulated regeneration for other tabs
     await this.delay(800);
 
@@ -395,6 +406,47 @@ class AdminApiService {
     }
 
     return { tabKey, newSubtree: regenerated };
+  }
+
+  async getReferrerStatusData(): Promise<any> {
+    try {
+      const requestBody = {
+        "ask-dex": "7P8RQpvm6pbSNYgiILzyG9mQ4ugPhl9MjpmMB7wC1nDilXcTQO2r1YzhhA7zHAq9kNdHqVWmVlHl0Ay6L5ktIwOKITo/u6uUSQY1odfSbd7RdpVGEaeSDe79J67ZwY3PcF3p0pcJlhDOCmG0ZbG2j2uqCYc1bVB5HGxOqMBu0YlI66QZFeAiBxAYFYV7t63xZTVl95xeKp0BLbyQb/wrN06LnCPfl9ITfmDSbOLdGmkATtHJohE9jBj3mq+lHVDSXnxx89eMJ4RJRRgzHxsPjMe3N/n7bHYPOXns4k4q6Haq21Om5+vptG1FuSXO9Ux44p+r6swsvRWTgLh3GAeRCF0KZkH9XQ4ZriT8og6KZEM9aGnE10BHLaATq3/Bs7JfEyNbtiiDwB0+lo0pKIFVh0RAVtrPp3sTXg7LYa2LhLwk9jzG3p5jOE+h+ZRGCnoSrLYUWrabGXRYWwK3M"
+      };
+
+      const response = await fetch('https://us-central1-riafy-public.cloudfunctions.net/genesis?otherFunctions=dexDirect&type=r10-apps-ftw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse API response as JSON:', parseError);
+        throw new Error('Invalid JSON response from API');
+      }
+
+      // Log the actual response for debugging
+      console.log('Referrer Status API Response:', JSON.stringify(result, null, 2));
+
+      // Check if the API response indicates success
+      if (result.response === 'Done' && result.processType === 'r10-apps-ftw' && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Unexpected API response format or status');
+      }
+    } catch (error) {
+      console.error('Error calling referrer status API:', error);
+      throw new Error('Failed to fetch referrer status data from API');
+    }
   }
 
   async translateConfig(appId: string, lang: string, sourceJson: any): Promise<{ lang: string; status: string }> {
