@@ -11,21 +11,12 @@ import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedRouter() {
-  const [selectedAppId, setSelectedAppId] = useState<number | null>(null);
-
-  const handleAppSelect = (appId: number | null) => {
-    setSelectedAppId(appId);
-  };
-
   return (
     <Router>
       <Switch>
         <Route path="/login" component={Login} />
         <Route path="/" nest>
-          <AdminConsole 
-            selectedAppId={selectedAppId} 
-            onAppSelect={handleAppSelect} 
-          />
+          <AdminConsole />
         </Route>
         <Route component={NotFound} />
       </Switch>

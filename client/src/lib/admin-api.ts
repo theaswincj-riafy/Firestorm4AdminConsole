@@ -20,8 +20,41 @@ class AdminApiService {
   }
 
   async getApps(): Promise<App[]> {
-    await this.delay(300);
-    return [...this.apps];
+    try {
+      const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/listapps', {
+        method: 'GET',
+        headers: {
+          'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        // Transform API response to match our App interface
+        return result.data.map((apiApp: any) => ({
+          appId: apiApp.app_package_name, // Using package name as unique ID
+          appName: apiApp.app_name,
+          packageName: apiApp.app_package_name,
+          meta: {
+            description: apiApp.description || '',
+            playUrl: '',
+            appStoreUrl: ''
+          }
+        }));
+      } else {
+        throw new Error('Failed to fetch apps');
+      }
+    } catch (error) {
+      console.error('Error fetching apps:', error);
+      // Fallback to local apps if API fails
+      return [...this.apps];
+    }
   }
 
   async createApp(appData: AppFormData): Promise<App> {
