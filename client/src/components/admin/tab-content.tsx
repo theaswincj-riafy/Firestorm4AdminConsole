@@ -21,17 +21,8 @@ export default function TabContent({
   onUpdate,
   validateResult
 }: TabContentProps) {
-  // Tabs that should show full JSON response in JSON editor
-  const fullJsonTabs = [
-    'page1_referralPromote',
-    'page2_referralStatus', 
-    'page3_referralDownload',
-    'page4_referralRedeem',
-    'notifications'
-  ];
-
-  const shouldShowFullJson = editorMode === 'json' && fullJsonTabs.includes(tabKey);
-  const jsonEditorData = shouldShowFullJson ? fullConfigData : tabData;
+  // For JSON editor, always show the full config data to maintain the original API structure
+  const jsonEditorData = editorMode === 'json' ? fullConfigData : tabData;
 
   return (
     <div className="tab-content">

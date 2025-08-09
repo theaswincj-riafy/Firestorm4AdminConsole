@@ -109,10 +109,23 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   // Update editor content when data changes
   useEffect(() => {
     if (editorRef.current && data) {
-      const currentValue = editorRef.current.getValue();
-      const newValue = JSON.stringify(data, null, 2);
-      if (currentValue !== newValue) {
-        editorRef.current.setValue(newValue);
+      try {
+        const currentValue = editorRef.current.getValue();
+        const newValue = JSON.stringify(data, null, 2);
+        
+        // Only update if the content is actually different
+        if (currentValue !== newValue) {
+          // Temporarily remove the change listener to prevent infinite loop
+          const currentModel = editorRef.current.getModel();
+          if (currentModel) {
+            currentModel.pushEditOperations([], [{
+              range: currentModel.getFullModelRange(),
+              text: newValue
+            }], () => null);
+          }
+        }
+      } catch (error) {
+        console.error('Error updating Monaco editor content:', error);
       }
     }
   }, [data]);

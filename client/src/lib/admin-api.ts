@@ -143,25 +143,23 @@ class AdminApiService {
       const result = await response.json();
 
       if (result.status === 'success' && result.data && result.data.length > 0) {
-        // Return the complete API response structure for JSON editor
-        const completeResponse = {
-          data: [
-            {
-              app_package_name: result.data[0].app_package_name,
-              referral_json: result.data[0].referral_json
-            }
-          ],
-          status: result.status
+        // Return just the content from the data array
+        const dataContent = result.data[0];
+        const referralData = dataContent.referral_json;
+
+        // Create a clean structure with just the referral_json content plus metadata
+        const cleanResponse = {
+          app_package_name: dataContent.app_package_name,
+          referral_json: referralData
         };
 
-        // Add UI editor specific fields for tab-based editing
-        const referralData = result.data[0].referral_json;
-        if (referralData.en) {
-          Object.assign(completeResponse, referralData.en);
+        // Add UI editor specific fields for tab-based editing if referral_json.en exists
+        if (referralData && referralData.en) {
+          Object.assign(cleanResponse, referralData.en);
         }
 
         // Add additional fields for UI editor compatibility
-        completeResponse.images = {
+        cleanResponse.images = {
           logo: {
             url: "https://example.com/logo.png",
             alt: "App Logo",
@@ -178,7 +176,7 @@ class AdminApiService {
           ]
         };
 
-        completeResponse.appDetails = {
+        cleanResponse.appDetails = {
           appName: app?.appName || "App Name",
           packageName: packageName,
           appDescription: app?.meta?.description || "App description",
@@ -199,7 +197,7 @@ class AdminApiService {
           ]
         };
 
-        return completeResponse;
+        return cleanResponse;
       } else if (result.status === 'error') {
         throw new Error(result.message || 'API returned error status');
       } else {
