@@ -44,8 +44,8 @@ class AdminApiService {
           packageName: apiApp.app_package_name,
           meta: {
             description: apiApp.description || '',
-            playUrl: '',
-            appStoreUrl: ''
+            playUrl: apiApp.play_store_link || '',
+            appStoreUrl: apiApp.app_store_link || ''
           }
         }));
       } else {
@@ -105,8 +105,8 @@ class AdminApiService {
           packageName: apiApp.app_package_name,
           meta: {
             description: apiApp.description || '',
-            playUrl: '', // API doesn't return these, will be empty
-            appStoreUrl: ''
+            playUrl: apiApp.play_store_link || '',
+            appStoreUrl: apiApp.app_store_link || ''
           }
         };
 
