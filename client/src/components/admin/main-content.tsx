@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus, Check, RefreshCw, Palette, Code } from "lucide-react";
+import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus, Check, RefreshCw, Palette, Code, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import TabContent from "./tab-content";
 import type { App } from "@shared/schema";
 
@@ -27,6 +28,9 @@ interface MainContentProps {
   isRegenerating: boolean;
   isSaving: boolean;
   isTranslating: boolean;
+  configError?: Error | null;
+  isLoadingConfig?: boolean;
+  onRetryConfig?: () => void;
 }
 
 const LANGUAGES = [
@@ -59,7 +63,10 @@ export default function MainContent({
   getTabTitle,
   isRegenerating,
   isSaving,
-  isTranslating
+  isTranslating,
+  configError,
+  isLoadingConfig,
+  onRetryConfig
 }: MainContentProps) {
   const [validateResult, setValidateResult] = useState<{ valid: boolean; error?: string } | null>(null);
 
@@ -164,13 +171,51 @@ export default function MainContent({
     );
   }
 
-  if (!currentConfig) {
+  // Handle error state
+  if (configError && selectedApp) {
+    return (
+      <main className="admin-main">
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="max-w-md w-full">
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Failed to Load Configuration</AlertTitle>
+              <AlertDescription className="mt-2">
+                <div className="mb-4">
+                  <strong>Error:</strong> {configError.message}
+                </div>
+                <div className="mb-4 text-sm opacity-90">
+                  <strong>App:</strong> {selectedApp.appName} ({selectedApp.packageName})
+                </div>
+                <Button 
+                  onClick={onRetryConfig}
+                  variant="outline"
+                  size="sm"
+                  className="bg-background text-foreground hover:bg-muted"
+                  disabled={isLoadingConfig}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingConfig ? 'animate-spin' : ''}`} />
+                  {isLoadingConfig ? 'Retrying...' : 'Try Again'}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Handle loading state
+  if (isLoadingConfig || !currentConfig) {
     return (
       <main className="admin-main">
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse text-center">
             <div className="h-4 bg-muted rounded w-48 mx-auto mb-2"></div>
             <div className="h-3 bg-muted rounded w-32 mx-auto"></div>
+            <div className="text-sm text-muted-foreground mt-4">
+              {selectedApp ? `Loading configuration for ${selectedApp.appName}...` : 'Loading...'}
+            </div>
           </div>
         </div>
       </main>

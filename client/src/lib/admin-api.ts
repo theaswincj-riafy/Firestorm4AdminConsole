@@ -125,7 +125,19 @@ class AdminApiService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.message) {
+            errorMessage = `HTTP ${response.status}: ${errorJson.message}`;
+          }
+        } catch {
+          // If not JSON, keep the default message
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -173,11 +185,20 @@ class AdminApiService {
             ]
           }
         };
+      } else if (result.status === 'error') {
+        throw new Error(result.message || 'API returned error status');
       } else {
         throw new Error('No referral data found for this app');
       }
     } catch (error) {
       console.error('Error fetching app config:', error);
+      
+      // Re-throw with more specific error information
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Unknown error occurred while fetching app config');
+      }
       
       // Fallback to mock data if API fails
       await this.delay(300);

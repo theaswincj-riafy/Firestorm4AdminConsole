@@ -47,7 +47,12 @@ export default function AdminConsole() {
     queryFn: () => adminApi.getApps(),
   });
 
-  const { data: appConfig } = useQuery({
+  const {
+    data: appConfig,
+    isLoading: appConfigLoading,
+    error: appConfigError,
+    refetch: refetchAppConfig
+  } = useQuery({
     queryKey: ['/api/apps', selectedApp?.appId, 'config'],
     queryFn: () => selectedApp ? adminApi.getAppConfig(selectedApp.appId) : null,
     enabled: !!selectedApp,
@@ -86,7 +91,7 @@ export default function AdminConsole() {
   });
 
   const updateAppMutation = useMutation({
-    mutationFn: ({ appId, data }: { appId: string; data: Partial<AppFormData> }) => 
+    mutationFn: ({ appId, data }: { appId: string; data: Partial<AppFormData> }) =>
       adminApi.updateApp(appId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/apps'] });
@@ -130,7 +135,7 @@ export default function AdminConsole() {
   });
 
   const saveConfigMutation = useMutation({
-    mutationFn: ({ appId, config }: { appId: string; config: any }) => 
+    mutationFn: ({ appId, config }: { appId: string; config: any }) =>
       adminApi.saveAppConfig(appId, config),
     onSuccess: () => {
       setIsDirty(false);
@@ -149,7 +154,7 @@ export default function AdminConsole() {
   });
 
   const regenerateTabMutation = useMutation({
-    mutationFn: ({ appId, tabKey, currentSubtree }: { appId: string; tabKey: string; currentSubtree: any }) => 
+    mutationFn: ({ appId, tabKey, currentSubtree }: { appId: string; tabKey: string; currentSubtree: any }) =>
       adminApi.regenerateTab(appId, tabKey, currentSubtree),
     onSuccess: (result) => {
       if (currentConfig && result) {
@@ -175,7 +180,7 @@ export default function AdminConsole() {
   });
 
   const translateMutation = useMutation({
-    mutationFn: ({ appId, lang, sourceJson }: { appId: string; lang: string; sourceJson: any }) => 
+    mutationFn: ({ appId, lang, sourceJson }: { appId: string; lang: string; sourceJson: any }) =>
       adminApi.translateConfig(appId, lang, sourceJson),
     onSuccess: (result) => {
       if (result) {
@@ -275,7 +280,7 @@ export default function AdminConsole() {
 
   const getTabTitle = (tabKey: string): string => {
     if (!tabKey || typeof tabKey !== 'string') return 'Unknown Tab';
-    
+
     const TAB_MAPPINGS: Record<string, string> = {
       'page1_referralPromote': 'Promote Sharing',
       'page2_referralStatus': 'Referrer Status',
@@ -350,10 +355,10 @@ export default function AdminConsole() {
           isLocked={isLocked}
           isDirty={isDirty}
           translateStatus={translateStatus}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           onConfigUpdate={handleConfigUpdate}
           onEditorModeChange={handleEditorModeChange}
-          onLockToggle={() => setIsLocked(!isLocked)}
+          onLockToggle={handleLockToggle}
           onSaveConfig={handleSaveConfig}
           onResetChanges={handleResetChanges}
           onRegenerateTab={handleRegenerateTab}
@@ -363,6 +368,9 @@ export default function AdminConsole() {
           isRegenerating={regenerateTabMutation.isPending}
           isSaving={saveConfigMutation.isPending}
           isTranslating={translateMutation.isPending}
+          configError={appConfigError}
+          isLoadingConfig={appConfigLoading}
+          onRetryConfig={() => refetchAppConfig()}
         />
       </div>
 
