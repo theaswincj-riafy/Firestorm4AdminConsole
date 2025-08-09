@@ -278,13 +278,13 @@ export default function MainContent({
 
   // Define the desired tab order, including the special tabs
   const tabOrder = [
-    'app-details',
-    'image',
     'page1_referralPromote',
     'page2_referralStatus', 
     'page3_referralDownload',
     'page4_referralRedeem',
-    'notifications'
+    'notifications',
+    'image',
+    'app-details'
   ];
 
   // Always include special tabs that don't come from referral_json.en
@@ -293,7 +293,7 @@ export default function MainContent({
   // Get tabs from referral_json.en
   const configTabs = Object.keys(currentConfig.referral_json?.en || {});
   
-  // Get tabs in the desired order, including config tabs and special tabs
+  // Get tabs in the desired order, including config tabs and special tabs, avoiding duplicates
   const orderedTabs = tabOrder.filter(tab => {
     if (specialTabs.includes(tab)) {
       return true; // Always include special tabs
@@ -302,7 +302,7 @@ export default function MainContent({
   });
   
   const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
-  const allTabs = [...orderedTabs, ...additionalTabs];
+  const allTabs = [...new Set([...orderedTabs, ...additionalTabs])];
 
   return (
     <main className="admin-main">

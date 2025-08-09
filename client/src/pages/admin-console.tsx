@@ -63,13 +63,13 @@ export default function AdminConsole() {
 
       // Set the first tab in the proper order
       const tabOrder = [
-        'app-details',
-        'image',
         'page1_referralPromote',
         'page2_referralStatus',
         'page3_referralDownload',
         'page4_referralRedeem',
-        'notifications'
+        'notifications',
+        'image',
+        'app-details'
       ];
 
       // Always include special tabs that don't come from referral_json.en
@@ -79,12 +79,12 @@ export default function AdminConsole() {
       const configTabs = configQuery.data.referral_json?.en ?
         Object.keys(configQuery.data.referral_json.en) : [];
 
-      // Combine special tabs with config tabs in the desired order
+      // Combine special tabs with config tabs in the desired order, avoiding duplicates
       const orderedTabs = tabOrder.filter(tab => 
         specialTabs.includes(tab) || configTabs.includes(tab)
       );
       const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
-      const allTabs = [...orderedTabs, ...additionalTabs];
+      const allTabs = [...new Set([...orderedTabs, ...additionalTabs])];
 
       if (allTabs.length > 0 && !activeTab) {
         setActiveTab(allTabs[0]);
