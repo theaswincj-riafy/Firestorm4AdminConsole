@@ -3,6 +3,7 @@ import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, 
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import TabContent from "./tab-content";
 import type { App } from "@shared/schema";
 
@@ -104,7 +105,7 @@ export default function MainContent({
     }
   };
 
-  const onTabDataUpdate = (tabKey: string, newTabData: any) => {
+  const handleTabDataUpdate = (tabKey: string, newTabData: any) => {
     const updatedConfig = { ...currentConfig };
     // Ensure referral_json and en exist before updating
     if (!updatedConfig.referral_json) {
@@ -435,9 +436,9 @@ export default function MainContent({
                 tabData = selectedApp ? {
                   packageName: selectedApp.packageName,
                   appName: selectedApp.appName,
-                  appDescription: selectedApp.appDescription || '',
-                  googlePlayLink: selectedApp.googlePlayLink || '',
-                  iosAppStoreLink: selectedApp.iosAppStoreLink || '',
+                  appDescription: selectedApp.meta?.description || '',
+                  googlePlayLink: selectedApp.meta?.playUrl || '',
+                  iosAppStoreLink: selectedApp.meta?.appStoreUrl || '',
                 } : {};
               } else if (isImageTab) {
                 // Assuming a structure for image tab data, adjust if needed
@@ -455,7 +456,7 @@ export default function MainContent({
                     editorMode={editorMode}
                     isLocked={isLocked}
                     onUpdate={onConfigUpdate}
-                    onTabDataUpdate={onTabDataUpdate}
+                    onTabDataUpdate={handleTabDataUpdate}
                     validateResult={validateResult}
                   />
                 </TabsContent>
