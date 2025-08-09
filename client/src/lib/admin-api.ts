@@ -304,7 +304,8 @@ class AdminApiService {
       // Log the actual response for debugging
       console.log('API Response:', JSON.stringify(result, null, 2));
 
-      if (result.status === 'success' && result.data) {
+      // Check if the API response indicates success (either "Done" or "success")
+      if ((result.response === 'Done' || result.status === 'success') && result.data) {
         // Handle the new API response structure where data is an object
         const responseData = result.data;
         
