@@ -402,6 +402,17 @@ class AdminApiService {
       }
     }
 
+    // Special handling for redeem code tab
+    if (tabKey === 'page4_referralRedeem') {
+      try {
+        const newSubtree = await this.getRedeemCodeData();
+        return { tabKey, newSubtree };
+      } catch (error) {
+        console.error('Error refreshing redeem code data:', error);
+        throw new Error('Failed to refresh redeem code data from API');
+      }
+    }
+
     // Fallback to simulated regeneration for other tabs
     await this.delay(800);
 
@@ -500,6 +511,47 @@ class AdminApiService {
     } catch (error) {
       console.error('Error calling promote download API:', error);
       throw new Error('Failed to fetch promote download data from API');
+    }
+  }
+
+  async getRedeemCodeData(): Promise<any> {
+    try {
+      const requestBody = {
+        "ask-dex": "cZKwhMg/Ge0bbCNWm3rkh/QbfaIWMWrT86HvAAL092Qyz16mBPdr9bZp2promirbXP94jshp67JvAXfukzqrY4qb0tgq5gwgYME9atMglqfxO3NchdCfpW7PPAxpEfA6pD35kQ+F4Rx64RyKYN5OwHdgZ7/Wpy2Flu/sIrb9+Eut2R2cP/jQ+fTR52QDMiTbzRQ4ipdVylyi8iwVpmG7EgOVdMpghD4aALCmT8JneZ4n5LxGzT+otHKWraTLUsrp/SQlLZDNe2o/SJo3H3QN7a1JSWHzJ+FuN6FIp58dRf8VEnrGGkPJL7lbTKhvn9C9rAijTJd10szdNZhU3hwffUC6fousDWB8jllXPOTG1pLtSfhT+s4+XcEa4jCmNZ/bpG4crEM9lSm3VVsdsVG0xsJfEs6NzJotVCjyhzzZ3b5cGqYq0hqFOjz4/Yab74Xhv0bYTQHgoM1BicCwt"
+      };
+
+      const response = await fetch('https://us-central1-riafy-public.cloudfunctions.net/genesis?otherFunctions=dexDirect&type=r10-apps-ftw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse API response as JSON:', parseError);
+        throw new Error('Invalid JSON response from API');
+      }
+
+      // Log the actual response for debugging
+      console.log('Redeem Code API Response:', JSON.stringify(result, null, 2));
+
+      // Check if the API response indicates success
+      if (result.response === 'Done' && result.processType === 'r10-apps-ftw' && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Unexpected API response format or status');
+      }
+    } catch (error) {
+      console.error('Error calling redeem code API:', error);
+      throw new Error('Failed to fetch redeem code data from API');
     }
   }
 

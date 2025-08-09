@@ -449,6 +449,9 @@ export default function AdminConsole() {
       appDescription = appDescription || 'App Description';
     }
 
+    // For special tabs that use the new API, don't pass app details
+    const isSpecialApiTab = ['page2_referralStatus', 'page3_referralDownload', 'page4_referralRedeem'].includes(tabKey);
+
     regenerateTabMutation.mutate({
       appId: selectedApp.appId,
       tabKey,
