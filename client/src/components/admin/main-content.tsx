@@ -77,14 +77,14 @@ export default function MainContent({
       // Get the raw JSON string from the Monaco editor if it exists
       const editorElement = document.querySelector('.monaco-editor');
       const monacoEditor = (window as any).monaco?.editor?.getEditors()?.[0];
-      
+
       let jsonString: string;
       if (monacoEditor) {
         jsonString = monacoEditor.getValue();
       } else {
         jsonString = JSON.stringify(currentConfig[activeTab]);
       }
-      
+
       // Try to parse the JSON
       JSON.parse(jsonString);
       setValidateResult({ valid: true });
@@ -343,11 +343,12 @@ export default function MainContent({
           <TabContent
             tabKey={activeTab}
             tabData={currentConfig[activeTab]}
+            fullConfigData={currentConfig}
             editorMode={editorMode}
             isLocked={isLocked}
-            onUpdate={(newData) => {
+            onUpdate={(newTabData) => {
               const newConfig = { ...currentConfig };
-              newConfig[activeTab] = newData;
+              newConfig[activeTab] = newTabData;
               onConfigUpdate(newConfig);
             }}
             validateResult={validateResult}
