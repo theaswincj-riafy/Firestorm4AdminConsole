@@ -75,16 +75,16 @@ export default function AdminConsole() {
       // Always include special tabs that don't come from referral_json.en
       const specialTabs = ['app-details', 'image'];
       
-      // Find available tabs from the referral_json.en structure
+      // Find available tabs from the referral_json.en structure, excluding special tabs
       const configTabs = configQuery.data.referral_json?.en ?
-        Object.keys(configQuery.data.referral_json.en) : [];
+        Object.keys(configQuery.data.referral_json.en).filter(tab => !specialTabs.includes(tab)) : [];
 
-      // Combine special tabs with config tabs in the desired order, avoiding duplicates
+      // Combine special tabs with config tabs in the desired order
       const orderedTabs = tabOrder.filter(tab => 
         specialTabs.includes(tab) || configTabs.includes(tab)
       );
       const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
-      const allTabs = [...new Set([...orderedTabs, ...additionalTabs])];
+      const allTabs = [...orderedTabs, ...additionalTabs];
 
       if (allTabs.length > 0 && !activeTab) {
         setActiveTab(allTabs[0]);

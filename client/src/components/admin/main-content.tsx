@@ -290,10 +290,10 @@ export default function MainContent({
   // Always include special tabs that don't come from referral_json.en
   const specialTabs = ['app-details', 'image'];
   
-  // Get tabs from referral_json.en
-  const configTabs = Object.keys(currentConfig.referral_json?.en || {});
+  // Get tabs from referral_json.en, excluding special tabs to avoid duplicates
+  const configTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !specialTabs.includes(tab));
   
-  // Get tabs in the desired order, including config tabs and special tabs, avoiding duplicates
+  // Get tabs in the desired order, including config tabs and special tabs
   const orderedTabs = tabOrder.filter(tab => {
     if (specialTabs.includes(tab)) {
       return true; // Always include special tabs
@@ -302,7 +302,7 @@ export default function MainContent({
   });
   
   const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
-  const allTabs = [...new Set([...orderedTabs, ...additionalTabs])];
+  const allTabs = [...orderedTabs, ...additionalTabs];
 
   return (
     <main className="admin-main">

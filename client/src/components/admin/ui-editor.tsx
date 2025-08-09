@@ -20,6 +20,7 @@ interface UIEditorProps {
 export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorProps) {
   // Local state to manage input values for immediate UI updates
   const [localData, setLocalData] = useState(data);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Update local state when data prop changes (e.g., when switching tabs)
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
       }
     };
   }, []);
+  
   // Handle special tabs
   if (tabKey === 'app-details') {
     return (
@@ -54,8 +56,6 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
       />
     );
   }
-
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const updateValue = useCallback((path: string, value: any) => {
     if (isLocked) return;
