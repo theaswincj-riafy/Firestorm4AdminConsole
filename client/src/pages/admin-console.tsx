@@ -443,21 +443,19 @@ export default function AdminConsole() {
     let appName = selectedApp.appName;
     let appDescription = selectedApp.meta?.description;
 
-    // Try to get app details from currentConfig if not available in selectedApp
-    if (tabKey === 'page1_referralPromote' && (!appName || !appDescription)) {
-      appName = appName || 'App Name';
-      appDescription = appDescription || 'App Description';
-    }
+    // Ensure we have app details for all API-based tabs
+    appName = appName || 'Demo App';
+    appDescription = appDescription || 'Demo app description';
 
-    // For special tabs that use the new API, don't pass app details
-    const isSpecialApiTab = ['page2_referralStatus', 'page3_referralDownload', 'page4_referralRedeem'].includes(tabKey);
+    // All special tabs need app name and description for ogQuery
+    const isSpecialApiTab = ['page1_referralPromote', 'page2_referralStatus', 'page3_referralDownload', 'page4_referralRedeem'].includes(tabKey);
 
     regenerateTabMutation.mutate({
       appId: selectedApp.appId,
       tabKey,
       currentSubtree,
-      appName: tabKey === 'page1_referralPromote' ? appName : undefined,
-      appDescription: tabKey === 'page1_referralPromote' ? appDescription : undefined
+      appName: isSpecialApiTab ? appName : undefined,
+      appDescription: isSpecialApiTab ? appDescription : undefined
     });
   };
 

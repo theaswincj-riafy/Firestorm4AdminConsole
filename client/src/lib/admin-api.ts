@@ -383,7 +383,7 @@ class AdminApiService {
     // Special handling for referrer status tab
     if (tabKey === 'page2_referralStatus') {
       try {
-        const newSubtree = await this.getReferrerStatusData();
+        const newSubtree = await this.getReferrerStatusData(appName, appDescription);
         return { tabKey, newSubtree };
       } catch (error) {
         console.error('Error refreshing referrer status data:', error);
@@ -394,7 +394,7 @@ class AdminApiService {
     // Special handling for promote download tab
     if (tabKey === 'page3_referralDownload') {
       try {
-        const newSubtree = await this.getPromoteDownloadData();
+        const newSubtree = await this.getPromoteDownloadData(appName, appDescription);
         return { tabKey, newSubtree };
       } catch (error) {
         console.error('Error refreshing promote download data:', error);
@@ -405,7 +405,7 @@ class AdminApiService {
     // Special handling for redeem code tab
     if (tabKey === 'page4_referralRedeem') {
       try {
-        const newSubtree = await this.getRedeemCodeData();
+        const newSubtree = await this.getRedeemCodeData(appName, appDescription);
         return { tabKey, newSubtree };
       } catch (error) {
         console.error('Error refreshing redeem code data:', error);
@@ -430,11 +430,16 @@ class AdminApiService {
     return { tabKey, newSubtree: regenerated };
   }
 
-  async getReferrerStatusData(): Promise<any> {
+  async getReferrerStatusData(appName?: string, appDescription?: string): Promise<any> {
     try {
       const requestBody = {
         "ask-dex": "7P8RQpvm6pbSNYgiILzyG9mQ4ugPhl9MjpmMB7wC1nDilXcTQO2r1YzhhA7zHAq9kNdHqVWmVlHl0Ay6L5ktIwOKITo/u6uUSQY1odfSbd7RdpVGEaeSDe79J67ZwY3PcF3p0pcJlhDOCmG0ZbG2j2uqCYc1bVB5HGxOqMBu0YlI66QZFeAiBxAYFYV7t63xZTVl95xeKp0BLbyQb/wrN06LnCPfl9ITfmDSbOLdGmkATtHJohE9jBj3mq+lHVDSXnxx89eMJ4RJRRgzHxsPjMe3N/n7bHYPOXns4k4q6Haq21Om5+vptG1FuSXO9Ux44p+r6swsvRWTgLh3GAeRCF0KZkH9XQ4ZriT8og6KZEM9aGnE10BHLaATq3/Bs7JfEyNbtiiDwB0+lo0pKIFVh0RAVtrPp3sTXg7LYa2LhLwk9jzG3p5jOE+h+ZRGCnoSrLYUWrabGXRYWwK3MdvRi1n7h4ypK0F4gw8fDIzHtzf5+2x2Dzl57OJOKuh2qttTpufr6bRtRbklzvVMeOKfq+rMLL0Vk4C4dxgHkQhdCmZB/V0OK64k/KIOimRDPWhpxNdARy2gE6t/wbOyXxMjW7Yog8AdPpaNKSiBVYdEQFbaz6d7E14Oy2Gti4S8JPY8xt6eYzhPofmURgp6Eqy2FFq2mxl0WFsCtzHb0YtZ+4eMqStBeMONmKD6aH3a5M+Db0kl5YL0GrjFflHtP18N9NLYW+hHl3Jow7x8yzP8dVJ1cqU1YKpL6zYJr2j1ZdMj7kBQ3vD0f7Mn9R0d+xKEgGmWKWuDRSrMJFiGqhfQRs5sLJtKVwYlUzLTGZGYAW9LMHNUDqZKCJyPi4qyYDJIc8g5XKGZyHKP3iMJCO5CuLHKhJtBqSqlF1zKX8jXlzJcWcl/T9oHJN4J1Kj3JQMbJDL7QLhbGxO5PgLGZu8gLkJYWQ8cDKZd6BqHdNOY2LmQJaULKpF7UKmP1K2ILGCLKr7wKmNQJ0cj8pnGQP0ItlOYI5lIbKQKoXLJ3b7Gn1b1I6yz4Hd2lHJx4jKjx4HM5TLQxq0WJA3SJFrKjvSDcEZYc/3HiA==",
         "appname": "acd",
+        "ogQuery": JSON.stringify({
+          "app_name": appName || 'Demo App',
+          "app_description": appDescription || 'Demo app description',
+          "target_language": "en"
+        }),
         "reply-mode": "json"
       };
 
@@ -473,10 +478,17 @@ class AdminApiService {
     }
   }
 
-  async getPromoteDownloadData(): Promise<any> {
+  async getPromoteDownloadData(appName?: string, appDescription?: string): Promise<any> {
     try {
       const requestBody = {
-        "ask-dex": "AOO6xOphLdfYy4YJtB1kLoBtZvC61OMPrgkktemw3eb2GCJNAx9k6kLJEo5DRBWZoJK/GH9qFfSIW2wuzud7JEd6XH3hZDja8jwZ0BOM8k5dz+UoI51Ee3e0Zu28aXWDC7asLJIdICrIMNv+jRJynP018QQIGgOEV4VX6qxsVHY4AxtjQ4kGZY/+gFxBnrpUhV+dC8HiMzdJDukcCDjC58gechELf6Jm97DotczOglaU9+H2gbsRfCaas7qA+S+FEIJb0MyVKE2FeIMk/btMShI1TLRQC5d38onFosnaMUXEgRElO483MD2NsFZG12+8QbrZZFmT8YzBfiGJa38akAY3Y9lAw63KvMvl2hEEn0H/ko1HPEy1sM8HcAKlzV2WWBrNUay+G2Ynel/M6+PXW6JcsKPjg8JhvD6NtawbM2jKjzJfjSSwRmoJ2LHe0mdZtZ6UUkJH3su4LjsLx"
+        "ask-dex": "AOO6xOphLdfYy4YJtB1kLoBtZvC61OMPrgkktemw3eb2GCJNAx9k6kLJEo5DRBWZoJK/GH9qFfSIW2wuzud7JEd6XH3hZDja8jwZ0BOM8k5dz+UoI51Ee3e0Zu28aXWDC7asLJIdICrIMNv+jRJynP018QQIGgOEV4VX6qxsVHY4AxtjQ4kGZY/+gFxBnrpUhV+dC8HiMzdJDukcCDjC58gechELf6Jm97DotczOglaU9+H2gbsRfCaas7qA+S+FEIJb0MyVKE2FeIMk/btMShI1TLRQC5d38onFosnaMUXEgRElO483MD2NsFZG12+8QbrZZFmT8YzBfiGJa38akAY3Y9lAw63KvMvl2hEEn0H/ko1HPEy1sM8HcAKlzV2WWBrNUay+G2Ynel/M6+PXW6JcsKPjg8JhvD6NtawbM2jKjzJfjSSwRmoJ2LHe0mdZtZ6UUkJH3su4LjsLx",
+        "appname": "acd",
+        "ogQuery": JSON.stringify({
+          "app_name": appName || 'Demo App',
+          "app_description": appDescription || 'Demo app description',
+          "target_language": "en"
+        }),
+        "reply-mode": "json"
       };
 
       const response = await fetch('https://us-central1-riafy-public.cloudfunctions.net/genesis?otherFunctions=dexDirect&type=r10-apps-ftw', {
@@ -514,10 +526,17 @@ class AdminApiService {
     }
   }
 
-  async getRedeemCodeData(): Promise<any> {
+  async getRedeemCodeData(appName?: string, appDescription?: string): Promise<any> {
     try {
       const requestBody = {
-        "ask-dex": "cZKwhMg/Ge0bbCNWm3rkh/QbfaIWMWrT86HvAAL092Qyz16mBPdr9bZp2promirbXP94jshp67JvAXfukzqrY4qb0tgq5gwgYME9atMglqfxO3NchdCfpW7PPAxpEfA6pD35kQ+F4Rx64RyKYN5OwHdgZ7/Wpy2Flu/sIrb9+Eut2R2cP/jQ+fTR52QDMiTbzRQ4ipdVylyi8iwVpmG7EgOVdMpghD4aALCmT8JneZ4n5LxGzT+otHKWraTLUsrp/SQlLZDNe2o/SJo3H3QN7a1JSWHzJ+FuN6FIp58dRf8VEnrGGkPJL7lbTKhvn9C9rAijTJd10szdNZhU3hwffUC6fousDWB8jllXPOTG1pLtSfhT+s4+XcEa4jCmNZ/bpG4crEM9lSm3VVsdsVG0xsJfEs6NzJotVCjyhzzZ3b5cGqYq0hqFOjz4/Yab74Xhv0bYTQHgoM1BicCwt"
+        "ask-dex": "cZKwhMg/Ge0bbCNWm3rkh/QbfaIWMWrT86HvAAL092Qyz16mBPdr9bZp2promirbXP94jshp67JvAXfukzqrY4qb0tgq5gwgYME9atMglqfxO3NchdCfpW7PPAxpEfA6pD35kQ+F4Rx64RyKYN5OwHdgZ7/Wpy2Flu/sIrb9+Eut2R2cP/jQ+fTR52QDMiTbzRQ4ipdVylyi8iwVpmG7EgOVdMpghD4aALCmT8JneZ4n5LxGzT+otHKWraTLUsrp/SQlLZDNe2o/SJo3H3QN7a1JSWHzJ+FuN6FIp58dRf8VEnrGGkPJL7lbTKhvn9C9rAijTJd10szdNZhU3hwffUC6fousDWB8jllXPOTG1pLtSfhT+s4+XcEa4jCmNZ/bpG4crEM9lSm3VVsdsVG0xsJfEs6NzJotVCjyhzzZ3b5cGqYq0hqFOjz4/Yab74Xhv0bYTQHgoM1BicCwt",
+        "appname": "acd",
+        "ogQuery": JSON.stringify({
+          "app_name": appName || 'Demo App',
+          "app_description": appDescription || 'Demo app description',
+          "target_language": "en"
+        }),
+        "reply-mode": "json"
       };
 
       const response = await fetch('https://us-central1-riafy-public.cloudfunctions.net/genesis?otherFunctions=dexDirect&type=r10-apps-ftw', {
