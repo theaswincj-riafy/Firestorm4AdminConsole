@@ -111,7 +111,7 @@ export default function MainContent({
                 Welcome to Referral Boost Console
               </h2>
               <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                Manage your referral campaigns with ease. Create, configure, and optimize your app's referral system from one central dashboard.
+                Manage your referral campaigns with ease. Create, configure, and optimize your referral system from one central dashboard.
               </p>
             </div>
 
@@ -321,19 +321,42 @@ export default function MainContent({
       {/* Tabs */}
       <div className="tabs-container">
         <div className="tabs-list">
-          {tabs.map((tabKey) => (
-            <div
-              key={tabKey}
-              className={`tab-item ${activeTab === tabKey ? 'active' : ''}`}
-            >
-              <span 
-                className="tab-label"
-                onClick={() => onTabChange(tabKey)}
-              >
-                {getTabTitle(tabKey)}
-              </span>
-            </div>
-          ))}
+          {currentConfig && (() => {
+            // Define the desired tab order
+            const tabOrder = [
+              'page1_referralPromote',
+              'page2_referralStatus', 
+              'page3_referralDownload',
+              'page4_referralRedeem',
+              'notifications',
+              'images',
+              'appDetails'
+            ];
+
+            // Get tabs in the desired order, including any additional tabs
+            const orderedTabs = tabOrder.filter(tab => currentConfig[tab]);
+            const additionalTabs = Object.keys(currentConfig).filter(tab => !tabOrder.includes(tab));
+            const allTabs = [...orderedTabs, ...additionalTabs];
+
+            return allTabs.map((tabKey) => {
+              const tabTitle = getTabTitle(tabKey);
+              const isActive = activeTab === tabKey;
+
+              return (
+                <div
+                  key={tabKey}
+                  className={`tab-item ${activeTab === tabKey ? 'active' : ''}`}
+                >
+                  <span 
+                    className="tab-label"
+                    onClick={() => onTabChange(tabKey)}
+                  >
+                    {getTabTitle(tabKey)}
+                  </span>
+                </div>
+              );
+            });
+          })()}
         </div>
       </div>
 

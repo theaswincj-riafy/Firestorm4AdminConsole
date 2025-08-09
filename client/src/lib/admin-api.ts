@@ -336,8 +336,70 @@ class AdminApiService {
   }
 
   async saveAppConfig(appId: string, config: any): Promise<{ saved: boolean; revisedAt: string }> {
-    await this.delay(500);
-    return { saved: true, revisedAt: new Date().toISOString() };
+    try {
+      // Find the app by appId to get the package name
+      const app = this.apps.find(a => a.appId === appId);
+      let packageName = appId;
+
+      // If appId matches an existing app's package name, use it directly
+      // Otherwise try to find by appId
+      if (app) {
+        packageName = app.packageName;
+      }
+
+      // Extract referral_json data (exclude appDetails from the referral_json)
+      const { appDetails, ...referralJsonData } = config;
+
+      // Prepare the request body
+      const requestBody = {
+        app_package_name: packageName,
+        referral_json: {
+          en: referralJsonData
+        }
+      };
+
+      const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/savereferraldata', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.message) {
+            errorMessage = `HTTP ${response.status}: ${errorJson.message}`;
+          }
+        } catch {
+          // If not JSON, keep the default message
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        return { saved: true, revisedAt: new Date().toISOString() };
+      } else {
+        throw new Error(result.message || 'Failed to save configuration');
+      }
+    } catch (error) {
+      console.error('Error saving app config:', error);
+      
+      // Re-throw with more specific error information
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Unknown error occurred while saving app config');
+      }
+    }
   }
 
   async regenerateTab(appId: string, tabKey: string, currentSubtree: any): Promise<{ tabKey: string; newSubtree: any }> {

@@ -21,19 +21,9 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Load Monaco Editor
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js';
-    script.onload = () => {
-      window.require.config({ 
-        paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } 
-      });
-      
-      window.require(['vs/editor/editor.main'], () => {
-        if (editorRef.current) {
-          editorRef.current.dispose();
-        }
-
+    // Check if Monaco is already loaded
+    if (window.monaco && !editorRef.current) {
+      try {
         editorRef.current = window.monaco.editor.create(containerRef.current, {
           value: JSON.stringify(data, null, 2),
           language: 'json',
@@ -56,25 +46,77 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
             // Don't update if JSON is invalid
           }
         });
-      });
-    };
+      } catch (error) {
+        console.error('Error creating Monaco editor:', error);
+      }
+      return;
+    }
 
-    document.head.appendChild(script);
+    // Load Monaco Editor if not already loaded
+    if (!window.monaco) {
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js';
+      script.onload = () => {
+        window.require.config({ 
+          paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } 
+        });
+        
+        window.require(['vs/editor/editor.main'], () => {
+          if (editorRef.current) {
+            editorRef.current.dispose();
+          }
+
+          try {
+            editorRef.current = window.monaco.editor.create(containerRef.current, {
+              value: JSON.stringify(data, null, 2),
+              language: 'json',
+              theme: 'vs',
+              readOnly: isLocked,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              fontSize: 14,
+              lineNumbers: 'on',
+              wordWrap: 'on',
+              folding: true
+            });
+
+            editorRef.current.onDidChangeModelContent(() => {
+              try {
+                const newData = JSON.parse(editorRef.current.getValue());
+                onUpdate(newData);
+              } catch (error) {
+                // Don't update if JSON is invalid
+              }
+            });
+          } catch (error) {
+            console.error('Error creating Monaco editor:', error);
+          }
+        });
+      };
+
+      document.head.appendChild(script);
+    }
 
     return () => {
       if (editorRef.current) {
         editorRef.current.dispose();
+        editorRef.current = null;
       }
     };
-  }, []);
+  }, [data, isLocked, onUpdate]);
 
   useEffect(() => {
-    if (editorRef.current) {
-      const currentValue = editorRef.current.getValue();
-      const newValue = JSON.stringify(data, null, 2);
-      
-      if (currentValue !== newValue) {
-        editorRef.current.setValue(newValue);
+    if (editorRef.current && data) {
+      try {
+        const currentValue = editorRef.current.getValue();
+        const newValue = JSON.stringify(data, null, 2);
+        
+        if (currentValue !== newValue) {
+          editorRef.current.setValue(newValue);
+        }
+      } catch (error) {
+        console.error('Error updating Monaco editor value:', error);
       }
     }
   }, [data]);
