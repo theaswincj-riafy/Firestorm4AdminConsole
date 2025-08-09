@@ -60,6 +60,8 @@ export default function AdminConsole() {
 
       // Set the first tab in the proper order
       const tabOrder = [
+        'app-details',
+        'image',
         'page1_referralPromote',
         'page2_referralStatus', 
         'page3_referralDownload',
@@ -332,6 +334,24 @@ export default function AdminConsole() {
     setActiveTab(tabKey);
   };
 
+  const handleRefreshTab = async (tabKey: string) => {
+    if (selectedApp) {
+      try {
+        await queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
+        toast({
+          title: "Success",
+          description: `${getTabTitle(tabKey)} refreshed successfully`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: `Error refreshing ${getTabTitle(tabKey)}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const handleLockToggle = () => {
     setIsLocked(!isLocked);
   };
@@ -345,6 +365,8 @@ export default function AdminConsole() {
     if (!tabKey || typeof tabKey !== 'string') return 'Unknown Tab';
 
     const TAB_MAPPINGS: Record<string, string> = {
+      'app-details': 'App Details',
+      'image': 'Image',
       'page1_referralPromote': 'Promote Sharing',
       'page2_referralStatus': 'Referrer Status',
       'page3_referralDownload': 'Promote Download',
@@ -426,6 +448,7 @@ export default function AdminConsole() {
           onRegenerateTab={handleRegenerateTab}
           onTranslate={handleTranslate}
           onDeleteApp={handleDeleteApp}
+          onRefreshTab={handleRefreshTab}
           getTabTitle={getTabTitle}
           isRegenerating={regenerateTabMutation.isPending}
           isSaving={saveConfigMutation.isPending}

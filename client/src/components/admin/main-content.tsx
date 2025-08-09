@@ -17,7 +17,7 @@ interface MainContentProps {
   translateStatus: Record<string, 'pending' | 'completed'>;
   onTabChange: (tabKey: string) => void;
   onConfigUpdate: (config: any) => void;
-  onTabDataUpdate: (tabKey: string, updatedTabData: any) => void;
+  onTabDataUpdate: (tabKey: string, newTabData: any) => void;
   onEditorModeChange: (mode: 'ui' | 'json') => void;
   onLockToggle: () => void;
   onSaveConfig: () => void;
@@ -25,13 +25,14 @@ interface MainContentProps {
   onRegenerateTab: (tabKey: string) => void;
   onTranslate: (lang: string) => void;
   onDeleteApp: (appId: string) => void;
+  onRefreshTab: (tabKey: string) => Promise<void>;
   getTabTitle: (tabKey: string) => string;
   isRegenerating: boolean;
   isSaving: boolean;
   isTranslating: boolean;
-  configError?: Error | null;
-  isLoadingConfig?: boolean;
-  onRetryConfig?: () => void;
+  configError: Error | null;
+  isLoadingConfig: boolean;
+  onRetryConfig: () => void;
 }
 
 const LANGUAGES = [
@@ -54,6 +55,7 @@ export default function MainContent({
   translateStatus,
   onTabChange,
   onConfigUpdate,
+  onTabDataUpdate,
   onEditorModeChange,
   onLockToggle,
   onSaveConfig,
@@ -61,6 +63,7 @@ export default function MainContent({
   onRegenerateTab,
   onTranslate,
   onDeleteApp,
+  onRefreshTab,
   getTabTitle,
   isRegenerating,
   isSaving,
@@ -70,6 +73,8 @@ export default function MainContent({
   onRetryConfig
 }: MainContentProps) {
   const [validateResult, setValidateResult] = useState<{ valid: boolean; error?: string } | null>(null);
+  const [refreshingTabs, setRefreshingTabs] = useState<Record<string, boolean>>({});
+  const [refreshSuccess, setRefreshSuccess] = useState<Record<string, boolean>>({});
 
   const handleValidateJson = () => {
     if (!currentConfig || !activeTab) return;
@@ -108,8 +113,37 @@ export default function MainContent({
     if (!updatedConfig.referral_json.en) {
       updatedConfig.referral_json.en = {};
     }
-    updatedConfig.referral_json.en[tabKey] = newTabData;
+    
+    // Handle special tabs that don't map directly to referral_json.en
+    if (tabKey === 'app-details') {
+      // App details are not stored in referral_json.en, so we don't update it here.
+      // If you need to save app details, a different mechanism would be required.
+      console.warn("App details tab is not saved via onTabDataUpdate");
+    } else if (tabKey === 'image') {
+      // Assuming image data might be stored differently or handled separately
+      // For now, we'll just log a warning if it's not in referral_json.en
+      if (!updatedConfig.referral_json.en[tabKey]) {
+        updatedConfig.referral_json.en[tabKey] = {};
+      }
+      updatedConfig.referral_json.en[tabKey] = newTabData;
+    } else {
+      updatedConfig.referral_json.en[tabKey] = newTabData;
+    }
     onConfigUpdate(updatedConfig);
+  };
+
+  const handleRefreshClick = async (tabKey: string) => {
+    setRefreshingTabs(prev => ({ ...prev, [tabKey]: true }));
+
+    try {
+      await onRefreshTab(tabKey);
+      setRefreshSuccess(prev => ({ ...prev, [tabKey]: true }));
+      setTimeout(() => {
+        setRefreshSuccess(prev => ({ ...prev, [tabKey]: false }));
+      }, 2000);
+    } finally {
+      setRefreshingTabs(prev => ({ ...prev, [tabKey]: false }));
+    }
   };
 
   if (!selectedApp) {
@@ -239,6 +273,24 @@ export default function MainContent({
   const tabKeys = currentConfig?.referral_json?.en ? 
     Object.keys(currentConfig.referral_json.en) : [];
 
+  // Define the desired tab order, including the new tabs
+  const tabOrder = [
+    'page1_referralPromote',
+    'page2_referralStatus', 
+    'page3_referralDownload',
+    'page4_referralRedeem',
+    'notifications',
+    'image', // New image tab
+    'appDetails', // New app details tab
+  ];
+
+  // Get tabs in the desired order, including any additional tabs
+  const orderedTabs = tabOrder.filter(tab => 
+    tab === 'image' || tab === 'appDetails' || currentConfig.referral_json?.en?.[tab]
+  );
+  const additionalTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !tabOrder.includes(tab));
+  const allTabs = [...orderedTabs, ...additionalTabs];
+
   return (
     <main className="admin-main">
       {/* Toolbar */}
@@ -336,97 +388,120 @@ export default function MainContent({
       {/* Tabs */}
       <div className="tabs-container">
         <div className="tabs-list">
-          {currentConfig && (() => {
-            // Define the desired tab order
-            const tabOrder = [
-              'page1_referralPromote',
-              'page2_referralStatus', 
-              'page3_referralDownload',
-              'page4_referralRedeem',
-              'notifications',
-              'images',
-              'appDetails'
-            ];
+          <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
+            <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-4" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+              {allTabs.map((tabKey) => {
+                const isImageTab = tabKey === 'image';
+                const isAppDetailsTab = tabKey === 'appDetails';
+                const tabTitle = getTabTitle(tabKey);
 
-            // Get tabs in the desired order, including any additional tabs
-            const orderedTabs = tabOrder.filter(tab => currentConfig.referral_json?.en?.[tab]);
-            const additionalTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !tabOrder.includes(tab));
-            const allTabs = [...orderedTabs, ...additionalTabs];
+                return (
+                  <TabsTrigger 
+                    key={tabKey} 
+                    value={tabKey}
+                    className="flex items-center gap-2 text-sm relative group"
+                  >
+                    <span>{tabTitle}</span>
+                    {(isImageTab || isAppDetailsTab) && ( // Only show refresh for specific tabs
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRefreshClick(tabKey);
+                        }}
+                        className="ml-1 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                        disabled={refreshingTabs[tabKey]}
+                      >
+                        {refreshSuccess[tabKey] ? (
+                          <Check className="w-3 h-3 text-green-500" />
+                        ) : (
+                          <RefreshCw 
+                            className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
+                          />
+                        )}
+                      </button>
+                    )}
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+            
+            {/* Tab Contents */}
+            {allTabs.map((tabKey) => {
+              let tabData;
+              const isAppDetailsTab = tabKey === 'appDetails';
+              const isImageTab = tabKey === 'image';
 
-            return allTabs.map((tabKey) => {
-              const isActive = activeTab === tabKey;
+              if (isAppDetailsTab) {
+                tabData = selectedApp ? {
+                  packageName: selectedApp.packageName,
+                  appName: selectedApp.appName,
+                  appDescription: selectedApp.appDescription || '',
+                  googlePlayLink: selectedApp.googlePlayLink || '',
+                  iosAppStoreLink: selectedApp.iosAppStoreLink || '',
+                } : {};
+              } else if (isImageTab) {
+                // Assuming a structure for image tab data, adjust if needed
+                tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
+              } else {
+                tabData = currentConfig?.referral_json?.en?.[tabKey] || {};
+              }
 
               return (
-                <div
-                  key={tabKey}
-                  className={`tab-item ${activeTab === tabKey ? 'active' : ''}`}
-                >
-                  <span 
-                    className="tab-label"
-                    onClick={() => onTabChange(tabKey)}
-                  >
-                    {getTabTitle(tabKey)}
-                  </span>
-                </div>
+                <TabsContent key={tabKey} value={tabKey} className="flex-1 flex flex-col">
+                  <TabContent
+                    tabKey={tabKey}
+                    tabData={tabData}
+                    fullConfigData={currentConfig}
+                    editorMode={editorMode}
+                    isLocked={isLocked}
+                    onUpdate={onConfigUpdate}
+                    onTabDataUpdate={onTabDataUpdate}
+                    validateResult={validateResult}
+                  />
+                </TabsContent>
               );
-            });
-          })()}
+            })}
+          </Tabs>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="work-area">
-        {activeTab && (
-          <TabContent
-            tabKey={activeTab}
-            tabData={currentConfig?.referral_json?.en?.[activeTab] || {}}
-            fullConfigData={currentConfig}
-            editorMode={editorMode}
-            isLocked={isLocked}
-            onUpdate={onConfigUpdate}
-            onTabDataUpdate={onTabDataUpdate}
-            validateResult={validateResult}
-          />
-        )}
+      {/* Global Actions */}
+      <div className="global-actions">
+        <Button 
+          onClick={onSaveConfig} 
+          disabled={isLocked || isSaving}
+          className="flex items-center gap-2"
+        >
+          <Save className="w-4 h-4" />
+          {isSaving ? 'Saving...' : 'Save'}
+        </Button>
 
-        {/* Global Actions */}
-        <div className="global-actions">
-          <Button 
-            onClick={onSaveConfig} 
-            disabled={isLocked || isSaving}
-            className="flex items-center gap-2"
-          >
-            <Save className="w-4 h-4" />
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
+        <Button
+          variant="outline"
+          onClick={onResetChanges}
+          disabled={isLocked || !isDirty}
+        >
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Reset Changes
+        </Button>
 
-          <Button
-            variant="outline"
-            onClick={onResetChanges}
-            disabled={isLocked || !isDirty}
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Reset Changes
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <MoreHorizontal className="w-4 h-4 mr-2" />
-                More Actions
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => onDeleteApp(selectedApp.appId)}
-                className="text-destructive"
-              >
-                <Trash className="w-4 h-4 mr-2" />
-                Delete App
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <MoreHorizontal className="w-4 h-4 mr-2" />
+              More Actions
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() => onDeleteApp(selectedApp.appId)}
+              className="text-destructive"
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              Delete App
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {validateResult && !validateResult.valid && (

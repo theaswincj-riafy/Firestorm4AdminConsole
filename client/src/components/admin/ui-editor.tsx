@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef } from "react";
 import { Plus, X, Code, Trash2, Package, Globe, Smartphone, FileText, Star, Users, Calendar, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,15 +7,38 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import AppDetailsEditor from './app-details-editor';
+import ImageEditor from './image-editor';
 
 interface UIEditorProps {
   data: any;
   isLocked: boolean;
   onUpdate: (data: any) => void;
-  tabKey?: string;
+  tabKey: string;
 }
 
 export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorProps) {
+  // Handle special tabs
+  if (tabKey === 'app-details') {
+    return (
+      <AppDetailsEditor 
+        data={data}
+        isLocked={isLocked}
+        onUpdate={onUpdate}
+      />
+    );
+  }
+
+  if (tabKey === 'images') {
+    return (
+      <ImageEditor 
+        data={data}
+        isLocked={isLocked}
+        onUpdate={onUpdate}
+      />
+    );
+  }
+
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const updateValue = useCallback((path: string, value: any) => {
@@ -26,7 +48,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
-    
+
     // Debounce the update to prevent excessive re-renders
     debounceTimeoutRef.current = setTimeout(() => {
       try {
