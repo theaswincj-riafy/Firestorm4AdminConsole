@@ -37,7 +37,7 @@ export default function AppDetailsEditor({ data, isLocked, onUpdate }: AppDetail
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
     
-    // Create updated app data structure
+    // Create updated app data structure immediately
     const updatedData = {
       ...data,
       packageName: newFormData.packageName,
@@ -50,6 +50,7 @@ export default function AppDetailsEditor({ data, isLocked, onUpdate }: AppDetail
       }
     };
     
+    // Call onUpdate immediately for real-time updates
     onUpdate(updatedData);
   };
 

@@ -44,33 +44,25 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
   const updateValue = useCallback((path: string, value: any) => {
     if (isLocked || !data) return;
 
-    // Clear existing debounce
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
+    try {
+      const newData = JSON.parse(JSON.stringify(data));
+      let current = newData;
+      const pathArray = path.split('.');
 
-    // Debounce the update to prevent excessive re-renders
-    debounceTimeoutRef.current = setTimeout(() => {
-      try {
-        const newData = JSON.parse(JSON.stringify(data));
-        let current = newData;
-        const pathArray = path.split('.');
-
-        for (let i = 0; i < pathArray.length - 1; i++) {
-          const segment = pathArray[i];
-          if (current[segment] === undefined) {
-            current[segment] = {};
-          }
-          current = current[segment];
+      for (let i = 0; i < pathArray.length - 1; i++) {
+        const segment = pathArray[i];
+        if (current[segment] === undefined) {
+          current[segment] = {};
         }
-
-        const lastSegment = pathArray[pathArray.length - 1];
-        current[lastSegment] = value;
-        onUpdate(newData);
-      } catch (error) {
-        console.error('Error updating value:', error);
+        current = current[segment];
       }
-    }, 100);
+
+      const lastSegment = pathArray[pathArray.length - 1];
+      current[lastSegment] = value;
+      onUpdate(newData);
+    } catch (error) {
+      console.error('Error updating value:', error);
+    }
   }, [data, isLocked, onUpdate]);
 
   const renderEmptyState = (title: string, description: string, icon: any) => {

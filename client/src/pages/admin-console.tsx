@@ -268,7 +268,7 @@ export default function AdminConsole() {
     try {
       const currentString = JSON.stringify(currentConfig);
       const newString = JSON.stringify(newConfig);
-      
+
       if (currentString === newString) {
         return;
       }
@@ -280,18 +280,46 @@ export default function AdminConsole() {
     setIsDirty(true);
   };
 
-  // This handler is specifically for updating a tab's data within the currentConfig
-  const handleTabDataUpdate = (tabKey: string, updatedTabData: any) => {
-    if (!currentConfig) return;
+  const getTabData = (tabKey: string) => {
+    if (!currentConfig) return null;
 
-    const newConfig = JSON.parse(JSON.stringify(currentConfig)); // Deep clone
-
-    // Update the specific tab data in the English section
-    if (newConfig.referral_json?.en) {
-      newConfig.referral_json.en[tabKey] = updatedTabData;
+    if (tabKey === 'app-details') {
+      return {
+        packageName: currentConfig.app_package_name || '',
+        appName: currentConfig.app_name || '',
+        meta: currentConfig.meta || {}
+      };
     }
 
-    setCurrentConfig(newConfig);
+    if (tabKey === 'images') {
+      return currentConfig.images || {};
+    }
+
+    // For other tabs, get from referral_json.en
+    const tabData = currentConfig.referral_json?.en?.[tabKey];
+    return tabData || {};
+  };
+
+  // This handler is specifically for updating a tab's data within the currentConfig
+  const handleTabDataUpdate = (tabKey: string, newTabData: any) => {
+    if (!currentConfig) return;
+
+    let updatedConfig = { ...currentConfig };
+
+    if (tabKey === 'app-details') {
+      updatedConfig.app_package_name = newTabData.packageName;
+      updatedConfig.app_name = newTabData.appName;
+      updatedConfig.meta = newTabData.meta;
+    } else if (tabKey === 'images') {
+      updatedConfig.images = newTabData;
+    } else {
+      // Update the specific tab data in referral_json.en
+      if (!updatedConfig.referral_json) updatedConfig.referral_json = {};
+      if (!updatedConfig.referral_json.en) updatedConfig.referral_json.en = {};
+      updatedConfig.referral_json.en[tabKey] = newTabData;
+    }
+
+    setCurrentConfig(updatedConfig);
     setIsDirty(true);
   };
 
@@ -430,8 +458,8 @@ export default function AdminConsole() {
         />
 
         <MainContent
-          selectedApp={selectedApp}
           apps={apps}
+          selectedApp={selectedApp}
           currentConfig={currentConfig}
           activeTab={activeTab}
           editorMode={editorMode}
