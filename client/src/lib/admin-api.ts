@@ -296,8 +296,55 @@ class AdminApiService {
       const result = await response.json();
 
       if (result.status === 'success' && result.data && result.data.length > 0) {
-        const promoteData = result.data[0].referral_json.en.page1_referralPromote;
-        return promoteData;
+        const responseData = result.data[0];
+        
+        // Check if the response has the expected structure
+        if (responseData.referral_json && responseData.referral_json.en) {
+          // Look for page1_referralPromote in the response
+          const promoteData = responseData.referral_json.en.page1_referralPromote;
+          
+          if (promoteData) {
+            return promoteData;
+          } else {
+            // If page1_referralPromote doesn't exist, generate a default structure
+            console.warn('page1_referralPromote not found in API response, creating default structure');
+            return {
+              "page_id": "referral-promote",
+              "personalization": {
+                "referrer_name": "{{referrer_name}}",
+                "referral_code": "{{referral_code}}",
+                "target_redemptions": 5
+              },
+              "hero": {
+                "title": "Share & Unlock Premium",
+                "subtitle": "Invite friends and get rewards when they join using your code.",
+                "badge": "Generated from API"
+              },
+              "benefits": [
+                {
+                  "title": "Premium Access",
+                  "desc": "Unlock exclusive features and benefits."
+                },
+                {
+                  "title": "Win Together", 
+                  "desc": "Your friends get perks when they join via your link."
+                },
+                {
+                  "title": "Fast & Simple",
+                  "desc": "Share your link and track your progress instantly."
+                }
+              ],
+              "share": {
+                "section_title": "Share your invite",
+                "primary_cta": "Share Invite",
+                "copy_code_cta": "Copy Code: {{referral_code}}",
+                "copy_link_cta": "Copy Link"
+              }
+            };
+          }
+        } else {
+          throw new Error('Invalid API response structure');
+        }
       } else {
         throw new Error('No promote sharing data found in response');
       }
