@@ -114,7 +114,7 @@ export default function MainContent({
     if (!updatedConfig.referral_json.en) {
       updatedConfig.referral_json.en = {};
     }
-    
+
     // Handle special tabs that don't map directly to referral_json.en
     if (tabKey === 'app-details') {
       // App details are not stored in referral_json.en, so we don't update it here.
@@ -234,7 +234,7 @@ export default function MainContent({
                   <strong>Error:</strong> {configError.message}
                 </div>
                 <div className="mb-4 text-sm opacity-90">
-                  <strong>App:</strong> {selectedApp.appName} ({selectedApp.packageName})
+                  <strong>App:</strong> {selectedApp.packageName} ({selectedApp.appName})
                 </div>
                 <Button 
                   onClick={onRetryConfig}
@@ -395,18 +395,19 @@ export default function MainContent({
                 const tabTitle = getTabTitle(tabKey);
 
                 return (
-                  <TabsTrigger 
-                    key={tabKey} 
-                    value={tabKey}
-                    className="flex items-center gap-2 text-sm relative group"
-                  >
-                    <span>{tabTitle}</span>
+                  <div key={tabKey} className="relative group">
+                    <TabsTrigger
+                      value={tabKey}
+                      className="flex items-center gap-2 text-sm pr-8"
+                    >
+                      <span>{tabTitle}</span>
+                    </TabsTrigger>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRefreshClick(tabKey);
                       }}
-                      className="ml-1 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                       disabled={refreshingTabs[tabKey]}
                     >
                       {refreshSuccess[tabKey] ? (
@@ -417,11 +418,11 @@ export default function MainContent({
                         />
                       )}
                     </button>
-                  </TabsTrigger>
+                  </div>
                 );
               })}
             </TabsList>
-            
+
             {/* Tab Contents */}
             {allTabs.map((tabKey) => {
               let tabData;

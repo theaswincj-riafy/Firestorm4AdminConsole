@@ -19,17 +19,19 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
 
   // Initialize editor value only when data prop changes from external source
   useEffect(() => {
-    if (!data || isUpdatingFromProp.current) {
+    if (isUpdatingFromProp.current) {
       return;
     }
 
     try {
+      // Handle null/undefined data
+      const safeData = data || {};
       const currentDataString = JSON.stringify(dataRef.current);
-      const newDataString = JSON.stringify(data);
+      const newDataString = JSON.stringify(safeData);
       
       if (currentDataString !== newDataString) {
-        dataRef.current = data;
-        const jsonString = JSON.stringify(data, null, 2);
+        dataRef.current = safeData;
+        const jsonString = JSON.stringify(safeData, null, 2);
         setEditorValue(jsonString);
         
         // Update editor if it's already mounted, but preserve cursor position
@@ -42,20 +44,36 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
             if (position) {
               editorRef.current.setPosition(position);
             }
-            isUpdatingFromProp.current = false;
+            setTimeout(() => {
+              isUpdatingFromProp.current = false;
+            }, 50);
           }
         }
       }
     } catch (error) {
       console.error('Error processing data:', error);
-      setEditorValue('{}');
+      const fallbackJson = '{}';
+      setEditorValue(fallbackJson);
+      dataRef.current = {};
     }
   }, [data, isInitialized]);
 
   const handleEditorDidMount = useCallback((editor: any) => {
     editorRef.current = editor;
     setIsInitialized(true);
-  }, []);
+    
+    // Ensure editor has the correct value on mount
+    if (data) {
+      try {
+        const jsonString = JSON.stringify(data, null, 2);
+        if (editor.getValue() !== jsonString) {
+          editor.setValue(jsonString);
+        }
+      } catch (error) {
+        console.error('Error setting initial editor value:', error);
+      }
+    }
+  }, [data]);
 
   const handleEditorChange = useCallback((value: string | undefined) => {
     if (!value || isLocked || isUpdatingFromProp.current) return;
