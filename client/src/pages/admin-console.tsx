@@ -73,10 +73,9 @@ export default function AdminConsole() {
         'notifications'
       ];
 
-      // Find available tabs from the config
-      const availableTabs = Object.keys(configQuery.data).filter(key => 
-        !['app_package_name', 'referral_json'].includes(key)
-      );
+      // Find available tabs from the referral_json.en structure
+      const availableTabs = configQuery.data.referral_json?.en ? 
+        Object.keys(configQuery.data.referral_json.en) : [];
 
       const orderedTabs = tabOrder.filter(tab => availableTabs.includes(tab));
       const additionalTabs = availableTabs.filter(tab => !tabOrder.includes(tab));
@@ -176,8 +175,16 @@ export default function AdminConsole() {
       adminApi.regenerateTab(appId, tabKey, currentSubtree),
     onSuccess: (result) => {
       if (currentConfig && result) {
-        const newConfig = { ...currentConfig };
-        newConfig[result.tabKey] = result.newSubtree;
+        const newConfig = {
+          ...currentConfig,
+          referral_json: {
+            ...currentConfig.referral_json,
+            en: {
+              ...currentConfig.referral_json.en,
+              [result.tabKey]: result.newSubtree
+            }
+          }
+        };
         setCurrentConfig(newConfig);
         setIsDirty(true);
 
@@ -262,15 +269,26 @@ export default function AdminConsole() {
   };
 
   // This handler is specifically for updating a tab's data within the currentConfig
-  const handleTabDataUpdate = (updatedData: any) => {
-    if (!currentConfig) return;
+  const handleTabDataUpdate = (tabKey: string, newTabData: any) => {
+    if (!currentConfig || !currentConfig.referral_json?.en) return;
+    
+    const updatedConfig = {
+      ...currentConfig,
+      referral_json: {
+        ...currentConfig.referral_json,
+        en: {
+          ...currentConfig.referral_json.en,
+          [tabKey]: newTabData
+        }
+      }
+    };
     
     // Prevent unnecessary updates if data is the same
-    if (JSON.stringify(currentConfig) === JSON.stringify(updatedData)) {
+    if (JSON.stringify(currentConfig) === JSON.stringify(updatedConfig)) {
       return;
     }
     
-    setCurrentConfig(updatedData);
+    setCurrentConfig(updatedConfig);
     setIsDirty(true);
   };
 
@@ -289,11 +307,11 @@ export default function AdminConsole() {
   };
 
   const handleRegenerateTab = (tabKey: string) => {
-    if (selectedApp && currentConfig && currentConfig[tabKey]) {
+    if (selectedApp && currentConfig?.referral_json?.en?.[tabKey]) {
       regenerateTabMutation.mutate({
         appId: selectedApp.appId,
         tabKey,
-        currentSubtree: currentConfig[tabKey]
+        currentSubtree: currentConfig.referral_json.en[tabKey]
       });
     }
   };

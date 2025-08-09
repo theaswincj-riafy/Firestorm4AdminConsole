@@ -8,6 +8,7 @@ interface TabContentProps {
   editorMode: 'ui' | 'json';
   isLocked: boolean;
   onUpdate: (data: any) => void;
+  onTabDataUpdate: (tabKey: string, newTabData: any) => void;
   validateResult?: { valid: boolean; error?: string } | null;
 }
 
@@ -18,6 +19,7 @@ export default function TabContent({
   editorMode,
   isLocked,
   onUpdate,
+  onTabDataUpdate,
   validateResult
 }: TabContentProps) {
 
@@ -28,20 +30,13 @@ export default function TabContent({
           data={tabData}
           isLocked={isLocked}
           onUpdate={(newTabData) => {
-            // For UI editor, update only the specific tab data
-            if (fullConfigData) {
-              const updatedConfig = {
-                ...fullConfigData,
-                [tabKey]: newTabData
-              };
-              onUpdate(updatedConfig);
-            }
+            onTabDataUpdate(tabKey, newTabData);
           }}
           tabKey={tabKey}
         />
       ) : (
         <JsonEditor
-          data={fullConfigData || tabData}
+          data={fullConfigData}
           isLocked={isLocked}
           onUpdate={onUpdate}
           validateResult={validateResult}

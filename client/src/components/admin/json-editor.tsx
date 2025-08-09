@@ -19,21 +19,27 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
     if (data) {
       try {
         const jsonString = JSON.stringify(data, null, 2);
-        setCurrentValue(jsonString);
         
-        // Update editor if it's already mounted and value is different
-        if (editorRef.current && isInitialized) {
-          const currentEditorValue = editorRef.current.getValue();
-          if (currentEditorValue !== jsonString) {
-            editorRef.current.setValue(jsonString);
+        // Only update if the value is actually different
+        if (currentValue !== jsonString) {
+          setCurrentValue(jsonString);
+          
+          // Update editor if it's already mounted and value is different
+          if (editorRef.current && isInitialized) {
+            const currentEditorValue = editorRef.current.getValue();
+            if (currentEditorValue !== jsonString) {
+              editorRef.current.setValue(jsonString);
+            }
           }
         }
       } catch (error) {
         console.error('Error stringifying data:', error);
-        setCurrentValue('{}');
+        if (currentValue !== '{}') {
+          setCurrentValue('{}');
+        }
       }
     }
-  }, [data, isInitialized]);
+  }, [data, isInitialized, currentValue]);
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;

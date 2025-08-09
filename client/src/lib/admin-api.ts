@@ -144,23 +144,13 @@ class AdminApiService {
       const result = await response.json();
 
       if (result.status === 'success' && result.data && result.data.length > 0) {
-        // Return the exact structure from the API response
+        // Return only the exact structure from the API response
         const dataContent = result.data[0];
-        const referralData = dataContent.referral_json;
-
-        // Structure should match exactly what comes from the API
-        const apiResponse = {
+        
+        return {
           app_package_name: dataContent.app_package_name,
-          referral_json: referralData
+          referral_json: dataContent.referral_json
         };
-
-        // Extract individual tabs from referral_json.en for UI editing
-        if (referralData && referralData.en) {
-          // Add the individual tab data for UI editor
-          Object.assign(apiResponse, referralData.en);
-        }
-
-        return apiResponse;
       } else if (result.status === 'error') {
         throw new Error(result.message || 'API returned error status');
       } else {
@@ -190,15 +180,10 @@ class AdminApiService {
         packageName = app.packageName;
       }
 
-      // Extract only the referral data, exclude metadata fields
-      const { app_package_name, referral_json, ...tabData } = config;
-
       // Prepare the request body in the exact format expected by the API
       const requestBody = {
         app_package_name: packageName,
-        referral_json: {
-          en: tabData
-        }
+        referral_json: config.referral_json
       };
 
       const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/savereferraldata', {

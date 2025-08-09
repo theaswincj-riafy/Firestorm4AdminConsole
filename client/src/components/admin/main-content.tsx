@@ -101,7 +101,14 @@ export default function MainContent({
 
   const onTabDataUpdate = (tabKey: string, newTabData: any) => {
     const updatedConfig = { ...currentConfig };
-    updatedConfig[tabKey] = newTabData;
+    // Ensure referral_json and en exist before updating
+    if (!updatedConfig.referral_json) {
+      updatedConfig.referral_json = {};
+    }
+    if (!updatedConfig.referral_json.en) {
+      updatedConfig.referral_json.en = {};
+    }
+    updatedConfig.referral_json.en[tabKey] = newTabData;
     onConfigUpdate(updatedConfig);
   };
 
@@ -229,7 +236,8 @@ export default function MainContent({
     );
   }
 
-  const tabs = Object.keys(currentConfig);
+  const tabKeys = currentConfig?.referral_json?.en ? 
+    Object.keys(currentConfig.referral_json.en) : [];
 
   return (
     <main className="admin-main">
@@ -341,12 +349,11 @@ export default function MainContent({
             ];
 
             // Get tabs in the desired order, including any additional tabs
-            const orderedTabs = tabOrder.filter(tab => currentConfig[tab]);
-            const additionalTabs = Object.keys(currentConfig).filter(tab => !tabOrder.includes(tab));
+            const orderedTabs = tabOrder.filter(tab => currentConfig.referral_json?.en?.[tab]);
+            const additionalTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !tabOrder.includes(tab));
             const allTabs = [...orderedTabs, ...additionalTabs];
 
             return allTabs.map((tabKey) => {
-              const tabTitle = getTabTitle(tabKey);
               const isActive = activeTab === tabKey;
 
               return (
@@ -371,15 +378,14 @@ export default function MainContent({
       <div className="work-area">
         {activeTab && (
           <TabContent
+            key={activeTab}
             tabKey={activeTab}
-            tabData={currentConfig[activeTab]}
+            tabData={currentConfig?.referral_json?.en?.[activeTab]}
             fullConfigData={currentConfig}
             editorMode={editorMode}
             isLocked={isLocked}
-            onUpdate={editorMode === 'json' ? onConfigUpdate : (newTabData) => {
-              // For UI editor mode, update only the current tab
-              onTabDataUpdate(activeTab, newTabData);
-            }}
+            onUpdate={onTabDataUpdate}
+            onTabDataUpdate={onTabDataUpdate}
             validateResult={validateResult}
           />
         )}
