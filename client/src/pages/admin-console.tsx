@@ -65,14 +65,14 @@ export default function AdminConsole() {
         'app-details',
         'image',
         'page1_referralPromote',
-        'page2_referralStatus', 
+        'page2_referralStatus',
         'page3_referralDownload',
         'page4_referralRedeem',
         'notifications'
       ];
 
       // Find available tabs from the referral_json.en structure
-      const availableTabs = configQuery.data.referral_json?.en ? 
+      const availableTabs = configQuery.data.referral_json?.en ?
         Object.keys(configQuery.data.referral_json.en) : [];
 
       const orderedTabs = tabOrder.filter(tab => availableTabs.includes(tab));
@@ -173,8 +173,8 @@ export default function AdminConsole() {
   });
 
   const regenerateTabMutation = useMutation({
-    mutationFn: ({ appId, tabKey, currentSubtree }: { appId: string; tabKey: string; currentSubtree: any }) =>
-      adminApi.regenerateTab(appId, tabKey, currentSubtree),
+    mutationFn: ({ appId, tabKey, currentSubtree, appName, appDescription }: { appId: string; tabKey: string; currentSubtree: any; appName?: string; appDescription?: string }) =>
+      adminApi.regenerateTab(appId, tabKey, currentSubtree, appName, appDescription),
     onSuccess: (result) => {
       if (currentConfig && result) {
         const newConfig = {
@@ -365,21 +365,28 @@ export default function AdminConsole() {
   };
 
   const handleRefreshTab = async (tabKey: string) => {
-    if (selectedApp) {
-      try {
-        await queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
-        toast({
-          title: "Success",
-          description: `${getTabTitle(tabKey)} refreshed successfully`,
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: `Error refreshing ${getTabTitle(tabKey)}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          variant: "destructive",
-        });
-      }
+    if (!selectedApp || !currentConfig) return;
+
+    const currentSubtree = currentConfig.referral_json?.en?.[tabKey];
+    if (!currentSubtree) return;
+
+    // For promote sharing tab, we need app details
+    let appName = selectedApp.appName;
+    let appDescription = selectedApp.meta?.description;
+
+    // Try to get app details from currentConfig if not available in selectedApp
+    if (tabKey === 'page1_referralPromote' && (!appName || !appDescription)) {
+      appName = appName || 'App Name';
+      appDescription = appDescription || 'App Description';
     }
+
+    regenerateTabMutation.mutate({
+      appId: selectedApp.appId,
+      tabKey,
+      currentSubtree,
+      appName: tabKey === 'page1_referralPromote' ? appName : undefined,
+      appDescription: tabKey === 'page1_referralPromote' ? appDescription : undefined
+    });
   };
 
   const handleLockToggle = () => {
