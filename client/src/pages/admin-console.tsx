@@ -275,7 +275,7 @@ export default function AdminConsole() {
 
   const getTabTitle = (tabKey: string): string => {
     if (!tabKey || typeof tabKey !== 'string') return 'Unknown Tab';
-
+    
     const TAB_MAPPINGS: Record<string, string> = {
       'page1_referralPromote': 'Promote Sharing',
       'page2_referralStatus': 'Referrer Status',
