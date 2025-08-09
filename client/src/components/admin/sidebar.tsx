@@ -1,5 +1,6 @@
-import { Plus, Edit2 } from "lucide-react";
+import { Plus, Lock, LockOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { App } from "@shared/schema";
 
 interface SidebarProps {
@@ -8,7 +9,6 @@ interface SidebarProps {
   isLoading: boolean;
   onSelectApp: (app: App) => void;
   onCreateApp: () => void;
-  onEditApp: (app: App) => void;
 }
 
 export default function Sidebar({
@@ -16,8 +16,7 @@ export default function Sidebar({
   selectedApp,
   isLoading,
   onSelectApp,
-  onCreateApp,
-  onEditApp,
+  onCreateApp
 }: SidebarProps) {
   if (isLoading) {
     return (
@@ -69,30 +68,49 @@ export default function Sidebar({
         </h2>
       </div>
 
-      <div className="p-4">
-        {apps.map((app) => (
-          <div
-            key={app.appId}
-            className={`app-item ${selectedApp?.appId === app.appId ? "active" : ""}`}
-            onClick={() => onSelectApp(app)}
-          >
-            <div className="app-info">
-              <h3>{app.appName}</h3>
-              <p>{app.packageName}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => {
-                onSelectApp(app);
-              }}
-            >
-              <Edit2 className="w-4 h-4" />
-            </Button>
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger className="w-full p-4 text-left hover:bg-sidebar-accent transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-sidebar-foreground">All Apps ({apps.length})</span>
           </div>
-        ))}
-      </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="p-3 md:p-4">
+            {apps.map((app) => {
+              const isLocked = lockedApps[app.appId] || false;
+
+              return (
+                <div
+                  key={app.appId}
+                  className={`group flex items-center justify-between p-2 md:p-3 mb-2 rounded-md cursor-pointer transition-colors ${
+                    selectedApp?.appId === app.appId
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                  }`}
+                  onClick={() => onSelectApp(app)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium truncate">{app.appName}</h3>
+                    <p className="text-xs text-muted-foreground truncate">{app.packageName}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleAppLock(app.appId);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    title={isLocked ? "Unlock app" : "Lock app"}
+                  >
+                    {isLocked ? <Lock className="w-4 h-4" /> : <LockOpen className="w-4 h-4" />}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </aside>
   );
 }
