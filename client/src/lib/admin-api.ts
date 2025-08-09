@@ -293,14 +293,23 @@ class AdminApiService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse API response as JSON:', parseError);
+        throw new Error('Invalid JSON response from API');
+      }
+
+      // Log the actual response for debugging
+      console.log('API Response:', JSON.stringify(result, null, 2));
 
       if (result.status === 'success' && result.data) {
         // Handle the new API response structure where data is an object
         const responseData = result.data;
         
         // Check if this is the new structure with direct data object
-        if (responseData.page_id === "referral-promote" || responseData.benefits || responseData.hero) {
+        if (responseData && (responseData.page_id === "referral-promote" || responseData.benefits || responseData.hero)) {
           // Transform the new API structure to match our expected page1_referralPromote format
           return {
             "page_id": responseData.page_id || "referral-promote",
@@ -380,9 +389,44 @@ class AdminApiService {
           }
         }
         
-        throw new Error('Invalid API response structure');
+        // If we get here, return a default structure to prevent errors
+        console.warn('API returned success but data structure was not recognized. Using fallback.');
+        return {
+          "page_id": "referral-promote",
+          "personalization": {
+            "referrer_name": "{{referrer_name}}",
+            "referral_code": "{{referral_code}}",
+            "target_redemptions": 5
+          },
+          "hero": {
+            "title": "Share & Unlock Premium",
+            "subtitle": "Invite friends and get rewards when they join using your code.",
+            "badge": "Only {{target_redemptions}} redemptions needed"
+          },
+          "benefits": [
+            {
+              "title": "Premium Access",
+              "desc": "Unlock exclusive features and benefits."
+            },
+            {
+              "title": "Win Together", 
+              "desc": "Your friends get perks when they join via your link."
+            },
+            {
+              "title": "Fast & Simple",
+              "desc": "Share your link and track your progress instantly."
+            }
+          ],
+          "share": {
+            "section_title": "Share your invite",
+            "primary_cta": "Share Invite",
+            "copy_code_cta": "Copy Code: {{referral_code}}",
+            "copy_link_cta": "Copy Link"
+          }
+        };
       } else {
-        throw new Error('No promote sharing data found in response');
+        console.error('API Error:', result);
+        throw new Error(result.message || 'No promote sharing data found in response');
       }
     } catch (error) {
       console.error('Error fetching promote sharing data:', error);
