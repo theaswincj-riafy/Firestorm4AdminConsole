@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 
 interface AuthContextType {
   user: User | null;
@@ -38,6 +39,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -56,6 +58,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: "Success",
         description: "Successfully logged out",
       });
+      // Redirect to login page after successful logout
+      setLocation('/login');
     } catch (error: any) {
       toast({
         title: "Error",
