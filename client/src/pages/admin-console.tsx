@@ -273,6 +273,14 @@ export default function AdminConsole() {
     }
   };
 
+  const handleTabChange = (tabKey: string) => {
+    setActiveTab(tabKey);
+  };
+
+  const handleLockToggle = () => {
+    setIsLocked(!isLocked);
+  };
+
   const handleEditorModeChange = (mode: 'ui' | 'json') => {
     setEditorMode(mode);
     localStorage.setItem('editorMode', mode);
