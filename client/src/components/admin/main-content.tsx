@@ -291,7 +291,9 @@ export default function MainContent({
   const specialTabs = ['app-details', 'image'];
   
   // Get tabs from referral_json.en, excluding special tabs to avoid duplicates
-  const configTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !specialTabs.includes(tab));
+  // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
+  const excludedTabs = [...specialTabs, 'appDetails'];
+  const configTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !excludedTabs.includes(tab));
   
   // Get tabs in the desired order, including config tabs and special tabs
   const orderedTabs = tabOrder.filter(tab => {

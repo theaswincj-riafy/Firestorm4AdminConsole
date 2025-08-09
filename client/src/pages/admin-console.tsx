@@ -76,8 +76,10 @@ export default function AdminConsole() {
       const specialTabs = ['app-details', 'image'];
       
       // Find available tabs from the referral_json.en structure, excluding special tabs
+      // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
+      const excludedTabs = [...specialTabs, 'appDetails'];
       const configTabs = configQuery.data.referral_json?.en ?
-        Object.keys(configQuery.data.referral_json.en).filter(tab => !specialTabs.includes(tab)) : [];
+        Object.keys(configQuery.data.referral_json.en).filter(tab => !excludedTabs.includes(tab)) : [];
 
       // Combine special tabs with config tabs in the desired order
       const orderedTabs = tabOrder.filter(tab => 
