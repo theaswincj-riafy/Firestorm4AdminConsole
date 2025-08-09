@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/contexts/auth-context";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { adminApi } from "@/lib/admin-api";
 import { useToast } from "@/hooks/use-toast";
 import { Menu, X } from "lucide-react";
@@ -13,7 +13,7 @@ import type { App, AppFormData } from "@shared/schema";
 
 export default function AdminConsole() {
   const { user, logout } = useAuthContext();
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   
   // Sidebar state
@@ -44,11 +44,11 @@ export default function AdminConsole() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      setLocation('/login');
       return;
     }
     loadApps();
-  }, [user, navigate]);
+  }, [user, setLocation]);
 
   const loadApps = async () => {
     try {
