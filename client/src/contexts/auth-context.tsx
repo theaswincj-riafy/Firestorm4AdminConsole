@@ -4,6 +4,7 @@ import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
+import { queryClient } from '@/lib/queryClient';
 
 interface AuthContextType {
   user: User | null;
@@ -25,15 +26,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const logout = async () => {
-  try {
-    await signOut(auth);
-    return { success: true };
-  } catch (error: any) {
-    console.error('Logout error:', error);
-    return { success: false, error: error.message };
-  }
-};
+
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
@@ -52,20 +45,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
       await signOut(auth);
       setUser(null);
+      // Clear any cached data
+      queryClient.clear();
       toast({
         title: "Success",
         description: "Successfully logged out",
       });
       // Redirect to login page after successful logout
-      setLocation('/login');
+      window.location.href = '/login';
     } catch (error: any) {
+      console.error('Logout error:', error);
       toast({
         title: "Error",
         description: `Failed to logout: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
