@@ -295,56 +295,92 @@ class AdminApiService {
 
       const result = await response.json();
 
-      if (result.status === 'success' && result.data && result.data.length > 0) {
-        const responseData = result.data[0];
+      if (result.status === 'success' && result.data) {
+        // Handle the new API response structure where data is an object
+        const responseData = result.data;
         
-        // Check if the response has the expected structure
-        if (responseData.referral_json && responseData.referral_json.en) {
-          // Look for page1_referralPromote in the response
-          const promoteData = responseData.referral_json.en.page1_referralPromote;
-          
-          if (promoteData) {
-            return promoteData;
-          } else {
-            // If page1_referralPromote doesn't exist, generate a default structure
-            console.warn('page1_referralPromote not found in API response, creating default structure');
-            return {
-              "page_id": "referral-promote",
-              "personalization": {
-                "referrer_name": "{{referrer_name}}",
-                "referral_code": "{{referral_code}}",
-                "target_redemptions": 5
+        // Check if this is the new structure with direct data object
+        if (responseData.page_id === "referral-promote" || responseData.benefits || responseData.hero) {
+          // Transform the new API structure to match our expected page1_referralPromote format
+          return {
+            "page_id": responseData.page_id || "referral-promote",
+            "personalization": {
+              "referrer_name": "{{referrer_name}}",
+              "referral_code": responseData.hero?.referral_code || "{{referral_code}}",
+              "target_redemptions": 5
+            },
+            "hero": {
+              "title": responseData.hero?.hero_title?.replace(/\*/g, '') || responseData.hero?.page_title?.replace(/\*/g, '') || "Share & Unlock Premium",
+              "subtitle": responseData.hero?.subtitle || "Invite friends and get rewards when they join using your code.",
+              "badge": responseData.progress_teaser?.title || "Only {{target_redemptions}} redemptions needed"
+            },
+            "benefits": responseData.benefits || [
+              {
+                "title": "Premium Access",
+                "desc": "Unlock exclusive features and benefits."
               },
-              "hero": {
-                "title": "Share & Unlock Premium",
-                "subtitle": "Invite friends and get rewards when they join using your code.",
-                "badge": "Generated from API"
+              {
+                "title": "Win Together", 
+                "desc": "Your friends get perks when they join via your link."
               },
-              "benefits": [
-                {
-                  "title": "Premium Access",
-                  "desc": "Unlock exclusive features and benefits."
-                },
-                {
-                  "title": "Win Together", 
-                  "desc": "Your friends get perks when they join via your link."
-                },
-                {
-                  "title": "Fast & Simple",
-                  "desc": "Share your link and track your progress instantly."
-                }
-              ],
-              "share": {
-                "section_title": "Share your invite",
-                "primary_cta": "Share Invite",
-                "copy_code_cta": "Copy Code: {{referral_code}}",
-                "copy_link_cta": "Copy Link"
+              {
+                "title": "Fast & Simple",
+                "desc": "Share your link and track your progress instantly."
               }
-            };
-          }
-        } else {
-          throw new Error('Invalid API response structure');
+            ],
+            "progress_teaser": {
+              "label": "Your current progress",
+              "value": "{{current_redemptions}}/{{target_redemptions}}",
+              "hint": responseData.progress_teaser?.subtitle || "Keep sharing—each redemption brings you closer to Premium!"
+            },
+            "share": {
+              "section_title": "Share your invite",
+              "primary_cta": responseData.share?.primary_cta?.replace(/\*/g, '') || "Share Invite",
+              "copy_code_cta": "Copy Code: {{referral_code}}",
+              "copy_link_cta": "Copy Link",
+              "success_toast": "Copied! Now paste it anywhere.",
+              "messages": {
+                "whatsapp": responseData.share?.messages?.default || "Hey! I'm using this app and it's awesome. Use my code {{referral_code}} or link {{referral_link}} to join—helps me unlock 1 month Premium 🎉",
+                "sms": responseData.share?.messages?.default || "Join this app with my code {{referral_code}} (link: {{referral_link}}). You'll love it—and you'll help me unlock Premium!",
+                "generic": responseData.share?.messages?.default || "{{referrer_name}} invited you to try this app. Redeem code {{referral_code}} via {{referral_link}}."
+              }
+            },
+            "nudges": responseData.nudges || [
+              "Best results: share with 5–10 close contacts first.",
+              "Add a personal note: tell them why you like the app.",
+              "Post your link in a relevant group or community."
+            ],
+            "how_it_works": responseData.how_it_works || undefined,
+            "social_proof": {
+              "title": "Why people join",
+              "bullets": [
+                "Top-rated features that save time",
+                "Fresh content weekly",
+                "Secure & private by design"
+              ]
+            },
+            "privacy_note": "We never reveal who redeemed your code. Only your totals are shown.",
+            "footer_cta": {
+              "label": responseData.hero?.quickButtonText?.replace(/\*/g, '') || "View My Referral Status",
+              "action": "go_to_status"
+            }
+          };
         }
+        
+        // Handle legacy structure with referral_json.en.page1_referralPromote
+        if (Array.isArray(result.data) && result.data.length > 0) {
+          const responseData = result.data[0];
+          
+          if (responseData.referral_json && responseData.referral_json.en) {
+            const promoteData = responseData.referral_json.en.page1_referralPromote;
+            
+            if (promoteData) {
+              return promoteData;
+            }
+          }
+        }
+        
+        throw new Error('Invalid API response structure');
       } else {
         throw new Error('No promote sharing data found in response');
       }
