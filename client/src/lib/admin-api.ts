@@ -391,6 +391,17 @@ class AdminApiService {
       }
     }
 
+    // Special handling for promote download tab
+    if (tabKey === 'page3_referralDownload') {
+      try {
+        const newSubtree = await this.getPromoteDownloadData();
+        return { tabKey, newSubtree };
+      } catch (error) {
+        console.error('Error refreshing promote download data:', error);
+        throw new Error('Failed to refresh promote download data from API');
+      }
+    }
+
     // Fallback to simulated regeneration for other tabs
     await this.delay(800);
 
@@ -411,7 +422,9 @@ class AdminApiService {
   async getReferrerStatusData(): Promise<any> {
     try {
       const requestBody = {
-        "ask-dex": "7P8RQpvm6pbSNYgiILzyG9mQ4ugPhl9MjpmMB7wC1nDilXcTQO2r1YzhhA7zHAq9kNdHqVWmVlHl0Ay6L5ktIwOKITo/u6uUSQY1odfSbd7RdpVGEaeSDe79J67ZwY3PcF3p0pcJlhDOCmG0ZbG2j2uqCYc1bVB5HGxOqMBu0YlI66QZFeAiBxAYFYV7t63xZTVl95xeKp0BLbyQb/wrN06LnCPfl9ITfmDSbOLdGmkATtHJohE9jBj3mq+lHVDSXnxx89eMJ4RJRRgzHxsPjMe3N/n7bHYPOXns4k4q6Haq21Om5+vptG1FuSXO9Ux44p+r6swsvRWTgLh3GAeRCF0KZkH9XQ4ZriT8og6KZEM9aGnE10BHLaATq3/Bs7JfEyNbtiiDwB0+lo0pKIFVh0RAVtrPp3sTXg7LYa2LhLwk9jzG3p5jOE+h+ZRGCnoSrLYUWrabGXRYWwK3M"
+        "ask-dex": "7P8RQpvm6pbSNYgiILzyG9mQ4ugPhl9MjpmMB7wC1nDilXcTQO2r1YzhhA7zHAq9kNdHqVWmVlHl0Ay6L5ktIwOKITo/u6uUSQY1odfSbd7RdpVGEaeSDe79J67ZwY3PcF3p0pcJlhDOCmG0ZbG2j2uqCYc1bVB5HGxOqMBu0YlI66QZFeAiBxAYFYV7t63xZTVl95xeKp0BLbyQb/wrN06LnCPfl9ITfmDSbOLdGmkATtHJohE9jBj3mq+lHVDSXnxx89eMJ4RJRRgzHxsPjMe3N/n7bHYPOXns4k4q6Haq21Om5+vptG1FuSXO9Ux44p+r6swsvRWTgLh3GAeRCF0KZkH9XQ4ZriT8og6KZEM9aGnE10BHLaATq3/Bs7JfEyNbtiiDwB0+lo0pKIFVh0RAVtrPp3sTXg7LYa2LhLwk9jzG3p5jOE+h+ZRGCnoSrLYUWrabGXRYWwK3MdvRi1n7h4ypK0F4gw8fDIzHtzf5+2x2Dzl57OJOKuh2qttTpufr6bRtRbklzvVMeOKfq+rMLL0Vk4C4dxgHkQhdCmZB/V0OK64k/KIOimRDPWhpxNdARy2gE6t/wbOyXxMjW7Yog8AdPpaNKSiBVYdEQFbaz6d7E14Oy2Gti4S8JPY8xt6eYzhPofmURgp6Eqy2FFq2mxl0WFsCtzHb0YtZ+4eMqStBeMONmKD6aH3a5M+Db0kl5YL0GrjFflHtP18N9NLYW+hHl3Jow7x8yzP8dVJ1cqU1YKpL6zYJr2j1ZdMj7kBQ3vD0f7Mn9R0d+xKEgGmWKWuDRSrMJFiGqhfQRs5sLJtKVwYlUzLTGZGYAW9LMHNUDqZKCJyPi4qyYDJIc8g5XKGZyHKP3iMJCO5CuLHKhJtBqSqlF1zKX8jXlzJcWcl/T9oHJN4J1Kj3JQMbJDL7QLhbGxO5PgLGZu8gLkJYWQ8cDKZd6BqHdNOY2LmQJaULKpF7UKmP1K2ILGCLKr7wKmNQJ0cj8pnGQP0ItlOYI5lIbKQKoXLJ3b7Gn1b1I6yz4Hd2lHJx4jKjx4HM5TLQxq0WJA3SJFrKjvSDcEZYc/3HiA==",
+        "appname": "acd",
+        "reply-mode": "json"
       };
 
       const response = await fetch('https://us-central1-riafy-public.cloudfunctions.net/genesis?otherFunctions=dexDirect&type=r10-apps-ftw', {
@@ -446,6 +459,47 @@ class AdminApiService {
     } catch (error) {
       console.error('Error calling referrer status API:', error);
       throw new Error('Failed to fetch referrer status data from API');
+    }
+  }
+
+  async getPromoteDownloadData(): Promise<any> {
+    try {
+      const requestBody = {
+        "ask-dex": "AOO6xOphLdfYy4YJtB1kLoBtZvC61OMPrgkktemw3eb2GCJNAx9k6kLJEo5DRBWZoJK/GH9qFfSIW2wuzud7JEd6XH3hZDja8jwZ0BOM8k5dz+UoI51Ee3e0Zu28aXWDC7asLJIdICrIMNv+jRJynP018QQIGgOEV4VX6qxsVHY4AxtjQ4kGZY/+gFxBnrpUhV+dC8HiMzdJDukcCDjC58gechELf6Jm97DotczOglaU9+H2gbsRfCaas7qA+S+FEIJb0MyVKE2FeIMk/btMShI1TLRQC5d38onFosnaMUXEgRElO483MD2NsFZG12+8QbrZZFmT8YzBfiGJa38akAY3Y9lAw63KvMvl2hEEn0H/ko1HPEy1sM8HcAKlzV2WWBrNUay+G2Ynel/M6+PXW6JcsKPjg8JhvD6NtawbM2jKjzJfjSSwRmoJ2LHe0mdZtZ6UUkJH3su4LjsLx"
+      };
+
+      const response = await fetch('https://us-central1-riafy-public.cloudfunctions.net/genesis?otherFunctions=dexDirect&type=r10-apps-ftw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse API response as JSON:', parseError);
+        throw new Error('Invalid JSON response from API');
+      }
+
+      // Log the actual response for debugging
+      console.log('Promote Download API Response:', JSON.stringify(result, null, 2));
+
+      // Check if the API response indicates success
+      if (result.response === 'Done' && result.processType === 'r10-apps-ftw' && result.data) {
+        return result.data;
+      } else {
+        throw new Error('Unexpected API response format or status');
+      }
+    } catch (error) {
+      console.error('Error calling promote download API:', error);
+      throw new Error('Failed to fetch promote download data from API');
     }
   }
 
