@@ -392,8 +392,6 @@ export default function MainContent({
           <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
             <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-4" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
               {allTabs.map((tabKey) => {
-                const isImageTab = tabKey === 'image';
-                const isAppDetailsTab = tabKey === 'appDetails';
                 const tabTitle = getTabTitle(tabKey);
 
                 return (
@@ -403,24 +401,22 @@ export default function MainContent({
                     className="flex items-center gap-2 text-sm relative group"
                   >
                     <span>{tabTitle}</span>
-                    {(isImageTab || isAppDetailsTab) && ( // Only show refresh for specific tabs
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRefreshClick(tabKey);
-                        }}
-                        className="ml-1 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity"
-                        disabled={refreshingTabs[tabKey]}
-                      >
-                        {refreshSuccess[tabKey] ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <RefreshCw 
-                            className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
-                          />
-                        )}
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRefreshClick(tabKey);
+                      }}
+                      className="ml-1 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                      disabled={refreshingTabs[tabKey]}
+                    >
+                      {refreshSuccess[tabKey] ? (
+                        <Check className="w-3 h-3 text-green-500" />
+                      ) : (
+                        <RefreshCw 
+                          className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
+                        />
+                      )}
+                    </button>
                   </TabsTrigger>
                 );
               })}
