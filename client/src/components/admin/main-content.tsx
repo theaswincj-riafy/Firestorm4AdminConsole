@@ -436,12 +436,12 @@ export default function MainContent({
               const isImageTab = tabKey === 'image';
 
               if (isAppDetailsTab) {
-                tabData = selectedApp ? {
-                  packageName: selectedApp.packageName,
-                  appName: selectedApp.appName,
-                  appDescription: selectedApp.meta?.description || '',
-                  googlePlayLink: selectedApp.meta?.playUrl || '',
-                  iosAppStoreLink: selectedApp.meta?.appStoreUrl || '',
+                tabData = currentConfig ? {
+                  packageName: currentConfig.app_package_name || '',
+                  appName: currentConfig.app_name || '',
+                  appDescription: currentConfig.meta?.description || '',
+                  googlePlayLink: currentConfig.meta?.playUrl || '',
+                  iosAppStoreLink: currentConfig.meta?.appStoreUrl || '',
                 } : {};
               } else if (isImageTab) {
                 // Assuming a structure for image tab data, adjust if needed

@@ -851,7 +851,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
         return renderNotifications(localData);
       case 'images':
         return renderImages(localData);
-      case 'appDetails':
+      case 'app-details':
         return renderAppDetails(localData);
       default:
         return renderEmptyState("Unknown Tab", "This tab content is not recognized.", Package);

@@ -364,8 +364,8 @@ export default function AdminConsole() {
     if (selectedApp && currentConfig) {
       // If we're on the app-details tab, call the editApp API
       if (activeTab === 'app-details') {
-        const playStoreLink = currentConfig.meta?.playUrl;
-        const appStoreLink = currentConfig.meta?.appStoreUrl;
+        const playStoreLink = currentConfig.meta?.playUrl || '';
+        const appStoreLink = currentConfig.meta?.appStoreUrl || '';
         editAppMutation.mutate({ 
           appId: selectedApp.appId, 
           playStoreLink, 
