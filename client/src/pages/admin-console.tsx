@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth-context";
 import Sidebar from "@/components/admin/sidebar";
 import MainContent from "@/components/admin/main-content";
 import AppModal from "@/components/admin/app-modal";
@@ -19,6 +20,7 @@ export default function AdminConsole() {
   const [translateStatus, setTranslateStatus] = useState<Record<string, 'pending' | 'completed'>>({});
 
   const { toast } = useToast();
+  const { logout } = useAuth();
   const queryClient = useQueryClient();
 
   // Load saved preferences
@@ -314,14 +316,7 @@ export default function AdminConsole() {
             className="btn btn-outline"
             onClick={async () => {
               if (confirm('Are you sure you want to logout?')) {
-                try {
-                  const { logout } = await import('@/contexts/auth-context');
-                  await logout();
-                  window.location.href = '/';
-                } catch (error) {
-                  console.error('Logout error:', error);
-                  window.location.href = '/';
-                }
+                await logout();
               }
             }}
           >
