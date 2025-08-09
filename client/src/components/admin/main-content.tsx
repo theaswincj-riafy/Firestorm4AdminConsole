@@ -182,7 +182,7 @@ export default function MainContent({
   return (
     <main className="admin-main">
       {/* Toolbar */}
-      <div className="content-toolbar">
+      <div className="content-toolbar flex-col md:flex-row gap-4 md:gap-0">
         <div className="editor-mode-toggle">
           <Button
             variant={editorMode === 'ui' ? 'default' : 'outline'}
@@ -190,8 +190,9 @@ export default function MainContent({
             onClick={() => onEditorModeChange('ui')}
             className="rounded-r-none"
           >
-            <Palette className="w-4 h-4 mr-2" />
-            UI Editor
+            <Palette className="w-4 h-4 mr-1 md:mr-2" />
+            <span className="hidden sm:inline">UI Editor</span>
+            <span className="sm:hidden">UI</span>
           </Button>
           <Button
             variant={editorMode === 'json' ? 'default' : 'outline'}
@@ -199,12 +200,13 @@ export default function MainContent({
             onClick={() => onEditorModeChange('json')}
             className="rounded-l-none"
           >
-            <Code className="w-4 h-4 mr-2" />
-            JSON Editor
+            <Code className="w-4 h-4 mr-1 md:mr-2" />
+            <span className="hidden sm:inline">JSON Editor</span>
+            <span className="sm:hidden">JSON</span>
           </Button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -212,6 +214,9 @@ export default function MainContent({
             className={isLocked ? 'bg-red-50 border-red-200 text-red-700' : ''}
           >
             {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+            <span className="hidden md:inline ml-2">
+              {isLocked ? 'Locked' : 'Unlocked'}
+            </span>
           </Button>
 
           {editorMode === 'json' && (
@@ -227,19 +232,21 @@ export default function MainContent({
                   : ''
               }
             >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Validate JSON
-              {validateResult?.valid === true && <Check className="w-4 h-4 ml-2 text-green-600" />}
-              {validateResult?.valid === false && <span className="ml-2 text-red-600">✗</span>}
+              <CheckCircle className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Validate JSON</span>
+              <span className="sm:hidden">Validate</span>
+              {validateResult?.valid === true && <Check className="w-4 h-4 ml-1 md:ml-2 text-green-600" />}
+              {validateResult?.valid === false && <span className="ml-1 md:ml-2 text-red-600">✗</span>}
             </Button>
           )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <Languages className="w-4 h-4 mr-2" />
-                Translate
-                <ChevronDown className="w-4 h-4 ml-2" />
+                <Languages className="w-4 h-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Translate</span>
+                <span className="sm:hidden">Trans</span>
+                <ChevronDown className="w-4 h-4 ml-1 md:ml-2" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
@@ -275,11 +282,11 @@ export default function MainContent({
 
       {/* Tabs */}
       <div className="tabs-container">
-        <div className="tabs-list">
+        <div className="tabs-list overflow-x-auto md:overflow-x-visible">
           {tabs.map((tabKey) => (
             <div
               key={tabKey}
-              className={`tab-item ${activeTab === tabKey ? 'active' : ''}`}
+              className={`tab-item whitespace-nowrap ${activeTab === tabKey ? 'active' : ''}`}
             >
               <span 
                 className="tab-label"
@@ -310,11 +317,11 @@ export default function MainContent({
         )}
 
         {/* Global Actions */}
-        <div className="global-actions">
+        <div className="global-actions flex-col sm:flex-row gap-2 sm:gap-4">
           <Button 
             onClick={onSaveConfig} 
             disabled={isLocked || isSaving}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 w-full sm:w-auto"
           >
             <Save className="w-4 h-4" />
             {isSaving ? 'Saving...' : 'Save'}
@@ -324,16 +331,19 @@ export default function MainContent({
             variant="outline"
             onClick={onResetChanges}
             disabled={isLocked || !isDirty}
+            className="w-full sm:w-auto"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
-            Reset Changes
+            <span className="hidden sm:inline">Reset Changes</span>
+            <span className="sm:hidden">Reset</span>
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <MoreHorizontal className="w-4 h-4 mr-2" />
-                More Actions
+                <span className="hidden sm:inline">More Actions</span>
+                <span className="sm:hidden">More</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

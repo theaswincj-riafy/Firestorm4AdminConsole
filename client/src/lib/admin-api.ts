@@ -5,12 +5,12 @@ class AdminApiService {
   private apps: App[] = [
     {
       appId: 'demo-1',
-      appName: 'Demo Referral App',
-      packageName: 'com.demo.referral',
+      appName: 'BookAI App',
+      packageName: 'com.bookai.app',
       meta: {
-        description: 'A sample referral application',
-        playUrl: 'https://play.google.com/store/apps/details?id=com.demo.referral',
-        appStoreUrl: 'https://apps.apple.com/app/demo-referral-app/id123456789'
+        description: 'AI-powered reading and book recommendation app',
+        playUrl: 'https://play.google.com/store/apps/details?id=com.bookai.app',
+        appStoreUrl: 'https://apps.apple.com/app/bookai-app/id123456789'
       }
     }
   ];
