@@ -45,7 +45,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
     );
   }
 
-  if (tabKey === 'images') {
+  if (tabKey === 'image' || tabKey === 'images') {
     return (
       <ImageEditor 
         data={data}
@@ -849,6 +849,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
         return renderRedeemCode(localData);
       case 'notifications':
         return renderNotifications(localData);
+      case 'image':
       case 'images':
         return renderImages(localData);
       case 'app-details':
