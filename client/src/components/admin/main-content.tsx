@@ -378,13 +378,12 @@ export default function MainContent({
       <div className="work-area">
         {activeTab && (
           <TabContent
-            key={activeTab}
             tabKey={activeTab}
-            tabData={currentConfig?.referral_json?.en?.[activeTab]}
+            tabData={currentConfig?.referral_json?.en?.[activeTab] || {}}
             fullConfigData={currentConfig}
             editorMode={editorMode}
             isLocked={isLocked}
-            onUpdate={onTabDataUpdate}
+            onUpdate={onConfigUpdate}
             onTabDataUpdate={onTabDataUpdate}
             validateResult={validateResult}
           />

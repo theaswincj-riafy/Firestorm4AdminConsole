@@ -23,22 +23,30 @@ export default function TabContent({
   validateResult
 }: TabContentProps) {
 
+  const handleUIUpdate = (newTabData: any) => {
+    // Update the tab data which will trigger a config update
+    onTabDataUpdate(tabKey, newTabData);
+  };
+
+  const handleJsonUpdate = (newConfigData: any) => {
+    // Update the full config data
+    onUpdate(newConfigData);
+  };
+
   return (
     <div className="tab-content">
       {editorMode === 'ui' ? (
         <UIEditor
           data={tabData}
           isLocked={isLocked}
-          onUpdate={(newTabData) => {
-            onTabDataUpdate(tabKey, newTabData);
-          }}
+          onUpdate={handleUIUpdate}
           tabKey={tabKey}
         />
       ) : (
         <JsonEditor
           data={fullConfigData}
           isLocked={isLocked}
-          onUpdate={onUpdate}
+          onUpdate={handleJsonUpdate}
           validateResult={validateResult}
         />
       )}

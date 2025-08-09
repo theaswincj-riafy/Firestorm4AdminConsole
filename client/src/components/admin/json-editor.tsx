@@ -14,7 +14,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   const [currentValue, setCurrentValue] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize editor value only once when data changes
+  // Initialize editor value when data changes (without currentValue in dependencies)
   useEffect(() => {
     if (data) {
       try {
@@ -34,12 +34,10 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
         }
       } catch (error) {
         console.error('Error stringifying data:', error);
-        if (currentValue !== '{}') {
-          setCurrentValue('{}');
-        }
+        setCurrentValue('{}');
       }
     }
-  }, [data, isInitialized, currentValue]);
+  }, [data, isInitialized]);
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;

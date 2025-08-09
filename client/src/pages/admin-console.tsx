@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -63,7 +62,7 @@ export default function AdminConsole() {
     if (configQuery.data) {
       setCurrentConfig(configQuery.data);
       setIsDirty(false);
-      
+
       // Set the first tab in the proper order
       const tabOrder = [
         'page1_referralPromote',
@@ -263,32 +262,23 @@ export default function AdminConsole() {
     if (!newConfig || JSON.stringify(currentConfig) === JSON.stringify(newConfig)) {
       return; // Prevent unnecessary updates
     }
-    
+
     setCurrentConfig(newConfig);
     setIsDirty(true);
   };
 
   // This handler is specifically for updating a tab's data within the currentConfig
-  const handleTabDataUpdate = (tabKey: string, newTabData: any) => {
-    if (!currentConfig || !currentConfig.referral_json?.en) return;
-    
-    const updatedConfig = {
-      ...currentConfig,
-      referral_json: {
-        ...currentConfig.referral_json,
-        en: {
-          ...currentConfig.referral_json.en,
-          [tabKey]: newTabData
-        }
-      }
-    };
-    
-    // Prevent unnecessary updates if data is the same
-    if (JSON.stringify(currentConfig) === JSON.stringify(updatedConfig)) {
-      return;
+  const handleTabDataUpdate = (tabKey: string, updatedTabData: any) => {
+    if (!currentConfig) return;
+
+    const newConfig = JSON.parse(JSON.stringify(currentConfig)); // Deep clone
+
+    // Update the specific tab data in the English section
+    if (newConfig.referral_json?.en) {
+      newConfig.referral_json.en[tabKey] = updatedTabData;
     }
-    
-    setCurrentConfig(updatedConfig);
+
+    setCurrentConfig(newConfig);
     setIsDirty(true);
   };
 
