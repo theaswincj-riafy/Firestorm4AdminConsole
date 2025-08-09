@@ -4,6 +4,14 @@
 
 This is a full-stack web application built as an admin console for managing referral configurations. The application allows administrators to create and manage apps with their associated referral settings through both a visual UI editor and a JSON editor. The system supports CRUD operations on app metadata and dynamic configuration management with features like translation and content regeneration.
 
+## Recent Changes
+
+**January 9, 2025:**
+- Fixed duplicate identifier error in main-content.tsx component
+- Added missing Tabs component imports from Radix UI
+- Updated App schema property access to use meta object structure
+- Application successfully running on port 5000
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
