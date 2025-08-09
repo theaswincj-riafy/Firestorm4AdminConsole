@@ -14,30 +14,30 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   const [currentValue, setCurrentValue] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize editor value when data changes (without currentValue in dependencies)
+  // Initialize editor value only when data prop changes
   useEffect(() => {
     if (data) {
       try {
         const jsonString = JSON.stringify(data, null, 2);
-        
-        // Only update if the value is actually different
-        if (currentValue !== jsonString) {
-          setCurrentValue(jsonString);
-          
-          // Update editor if it's already mounted and value is different
-          if (editorRef.current && isInitialized) {
-            const currentEditorValue = editorRef.current.getValue();
-            if (currentEditorValue !== jsonString) {
-              editorRef.current.setValue(jsonString);
-            }
-          }
-        }
+        setCurrentValue(jsonString);
       } catch (error) {
         console.error('Error stringifying data:', error);
         setCurrentValue('{}');
       }
+    } else {
+      setCurrentValue('{}');
     }
-  }, [data, isInitialized]);
+  }, [data]);
+
+  // Update editor value when currentValue changes and editor is ready
+  useEffect(() => {
+    if (editorRef.current && isInitialized && currentValue !== undefined) {
+      const currentEditorValue = editorRef.current.getValue();
+      if (currentEditorValue !== currentValue) {
+        editorRef.current.setValue(currentValue);
+      }
+    }
+  }, [currentValue, isInitialized]);
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
@@ -47,14 +47,13 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   const handleEditorChange = (value: string | undefined) => {
     if (!value || isLocked) return;
     
+    // Update local state immediately for responsiveness
     setCurrentValue(value);
     
     try {
       const parsedData = JSON.parse(value);
-      // Only call onUpdate if the parsed data is actually different
-      if (JSON.stringify(parsedData) !== JSON.stringify(data)) {
-        onUpdate(parsedData);
-      }
+      // Call onUpdate with parsed data
+      onUpdate(parsedData);
     } catch (error) {
       // Don't update on invalid JSON, let user fix it
       console.warn('Invalid JSON, not updating:', error);

@@ -21,16 +21,11 @@ export default function AdminConsole() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Load saved preferences
+  // Load saved preferences - always default to UI editor
   useEffect(() => {
-    const savedEditorMode = localStorage.getItem('editorMode') as 'ui' | 'json';
-    if (savedEditorMode && ['ui', 'json'].includes(savedEditorMode)) {
-      setEditorMode(savedEditorMode);
-    } else {
-      // Default to UI editor if no preference is saved
-      setEditorMode('ui');
-      localStorage.setItem('editorMode', 'ui');
-    }
+    // Always default to UI editor
+    setEditorMode('ui');
+    localStorage.setItem('editorMode', 'ui');
   }, []);
 
   // Navigation guard
