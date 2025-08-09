@@ -665,3 +665,23 @@
     margin-top: 16px;
   }
 }
+
+.app-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lock-btn {
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.lock-btn.locked {
+  color: rgb(239 68 68);
+  background-color: rgb(254 242 242);
+}
+
+&:hover .lock-btn {
+  opacity: 1;
+}

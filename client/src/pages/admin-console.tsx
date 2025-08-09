@@ -333,7 +333,6 @@ export default function AdminConsole() {
           isLoading={appsLoading}
           onSelectApp={handleSelectApp}
           onCreateApp={handleCreateApp}
-          onEditApp={handleEditApp}
         />
 
         <MainContent

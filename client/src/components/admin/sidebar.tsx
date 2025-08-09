@@ -1,4 +1,4 @@
-import { Plus, Edit2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Edit2, ChevronDown, ChevronUp, Lock, Unlock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -18,8 +18,7 @@ export default function Sidebar({
   selectedApp,
   isLoading,
   onSelectApp,
-  onCreateApp,
-  onEditApp,
+  onCreateApp
 }: SidebarProps) {
   const [isAppsCollapsed, setIsAppsCollapsed] = useState(false);
 
@@ -93,29 +92,34 @@ export default function Sidebar({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="p-3 md:p-4">
-            {apps.map((app) => (
-              <div
-                key={app.appId}
-                className={`app-item group ${selectedApp?.appId === app.appId ? "active" : ""}`}
-                onClick={() => onSelectApp(app)}
-              >
-                <div className="app-info min-w-0 flex-1">
-                  <h3 className="truncate">{app.appName}</h3>
-                  <p className="truncate">{app.packageName}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditApp(app);
-                  }}
+            {apps.map((app) => {
+              const [isLocked, setIsLocked] = useState(false);
+
+              return (
+                <div
+                  key={app.appId}
+                  className={`app-item group ${selectedApp?.appId === app.appId ? "active" : ""}`}
+                  onClick={() => onSelectApp(app)}
                 >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
+                  <div className="app-info min-w-0 flex-1">
+                    <h3 className="truncate">{app.appName}</h3>
+                    <p className="truncate">{app.packageName}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsLocked(!isLocked);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    title={isLocked ? "Unlock app" : "Lock app"}
+                  >
+                    {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         </CollapsibleContent>
       </Collapsible>
