@@ -285,11 +285,18 @@ export default function MainContent({
     'appDetails', // New app details tab
   ];
 
-  // Get tabs in the desired order, including any additional tabs
-  const orderedTabs = tabOrder.filter(tab => 
-    tab === 'image' || tab === 'appDetails' || currentConfig.referral_json?.en?.[tab]
-  );
-  const additionalTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !tabOrder.includes(tab));
+  // Get tabs from referral_json.en
+  const configTabs = Object.keys(currentConfig.referral_json?.en || {});
+  
+  // Get tabs in the desired order, including config tabs and special tabs
+  const orderedTabs = tabOrder.filter(tab => {
+    if (tab === 'image' || tab === 'appDetails') {
+      return true; // Always include special tabs
+    }
+    return configTabs.includes(tab);
+  });
+  
+  const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
   const allTabs = [...orderedTabs, ...additionalTabs];
 
   return (
@@ -395,20 +402,19 @@ export default function MainContent({
                 const tabTitle = getTabTitle(tabKey);
 
                 return (
-                  <div key={tabKey} className="relative group">
+                  <div key={tabKey} className="relative group flex items-center">
                     <TabsTrigger
                       value={tabKey}
                       className="flex items-center gap-2 text-sm pr-8"
                     >
                       <span>{tabTitle}</span>
                     </TabsTrigger>
-                    <button
+                    <div
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRefreshClick(tabKey);
                       }}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                      disabled={refreshingTabs[tabKey]}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
                     >
                       {refreshSuccess[tabKey] ? (
                         <Check className="w-3 h-3 text-green-500" />
@@ -417,7 +423,7 @@ export default function MainContent({
                           className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
                         />
                       )}
-                    </button>
+                    </div>
                   </div>
                 );
               })}

@@ -109,10 +109,10 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
   }, []);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 border rounded-md overflow-hidden">
+    <div className="h-full flex flex-col min-h-[500px]">
+      <div className="flex-1 border rounded-md overflow-hidden" style={{ minHeight: '450px' }}>
         <Editor
-          height="100%"
+          height="450px"
           defaultLanguage="json"
           value={editorValue}
           onMount={handleEditorDidMount}
@@ -130,6 +130,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
             formatOnType: true,
           }}
           theme="vs-dark"
+          loading={<div className="flex items-center justify-center h-full">Loading editor...</div>}
         />
       </div>
       

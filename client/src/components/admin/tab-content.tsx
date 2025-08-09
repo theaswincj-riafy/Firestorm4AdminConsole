@@ -36,7 +36,7 @@ export default function TabContent({
   };
 
   return (
-    <div className="tab-content">
+    <div className="tab-content h-full flex flex-col p-4">
       {editorMode === 'ui' ? (
         <UIEditor
           data={tabData}
