@@ -38,13 +38,18 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
           folding: true
         });
 
+        // Debounce changes to prevent rapid updates
+        let changeTimeout: NodeJS.Timeout;
         editorRef.current.onDidChangeModelContent(() => {
-          try {
-            const newData = JSON.parse(editorRef.current.getValue());
-            onUpdate(newData);
-          } catch (error) {
-            // Don't update if JSON is invalid
-          }
+          clearTimeout(changeTimeout);
+          changeTimeout = setTimeout(() => {
+            try {
+              const newData = JSON.parse(editorRef.current.getValue());
+              onUpdate(newData);
+            } catch (error) {
+              // Don't update if JSON is invalid
+            }
+          }, 300);
         });
       } catch (error) {
         console.error('Error creating Monaco editor:', error);
@@ -81,13 +86,18 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
               folding: true
             });
 
+            // Debounce changes to prevent rapid updates
+            let changeTimeout: NodeJS.Timeout;
             editorRef.current.onDidChangeModelContent(() => {
-              try {
-                const newData = JSON.parse(editorRef.current.getValue());
-                onUpdate(newData);
-              } catch (error) {
-                // Don't update if JSON is invalid
-              }
+              clearTimeout(changeTimeout);
+              changeTimeout = setTimeout(() => {
+                try {
+                  const newData = JSON.parse(editorRef.current.getValue());
+                  onUpdate(newData);
+                } catch (error) {
+                  // Don't update if JSON is invalid
+                }
+              }, 300);
             });
           } catch (error) {
             console.error('Error creating Monaco editor:', error);
@@ -115,14 +125,8 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
         
         // Only update if the content is actually different
         if (currentValue !== newValue) {
-          // Temporarily remove the change listener to prevent infinite loop
-          const currentModel = editorRef.current.getModel();
-          if (currentModel) {
-            currentModel.pushEditOperations([], [{
-              range: currentModel.getFullModelRange(),
-              text: newValue
-            }], () => null);
-          }
+          // Use setValue to avoid triggering change events
+          editorRef.current.setValue(newValue);
         }
       } catch (error) {
         console.error('Error updating Monaco editor content:', error);

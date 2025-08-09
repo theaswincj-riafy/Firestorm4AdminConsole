@@ -51,12 +51,7 @@ export default function AdminConsole() {
     queryFn: () => adminApi.getApps(),
   });
 
-  const {
-    data: appConfig,
-    isLoading: appConfigLoading,
-    error: appConfigError,
-    refetch: refetchAppConfig
-  } = useQuery({
+  const configQuery = useQuery({
     queryKey: ['/api/apps', selectedApp?.appId, 'config'],
     queryFn: () => selectedApp ? adminApi.getAppConfig(selectedApp.appId) : null,
     enabled: !!selectedApp,
@@ -64,15 +59,15 @@ export default function AdminConsole() {
 
   // Handle config changes
   useEffect(() => {
-    if (appConfig) {
-      setCurrentConfig(appConfig);
+    if (configQuery.data) {
+      setCurrentConfig(configQuery.data);
       setIsDirty(false);
-      const firstTab = Object.keys(appConfig)[0];
+      const firstTab = Object.keys(configQuery.data)[0];
       if (firstTab) {
         setActiveTab(firstTab);
       }
     }
-  }, [appConfig]);
+  }, [configQuery.data]);
 
   const createAppMutation = useMutation({
     mutationFn: (data: AppFormData) => adminApi.createApp(data),
@@ -242,6 +237,19 @@ export default function AdminConsole() {
     setIsDirty(true);
   };
 
+  // This handler is specifically for updating a tab's data within the currentConfig
+  const handleTabDataUpdate = (tabKey: string, updatedTabData: any) => {
+    setCurrentConfig(prevConfig => {
+      if (!prevConfig) return prevConfig;
+      const newConfig = {
+        ...prevConfig,
+        [tabKey]: updatedTabData
+      };
+      setIsDirty(true);
+      return newConfig;
+    });
+  };
+
   const handleSaveConfig = () => {
     if (selectedApp && currentConfig) {
       saveConfigMutation.mutate({ appId: selectedApp.appId, config: currentConfig });
@@ -387,6 +395,7 @@ export default function AdminConsole() {
           translateStatus={translateStatus}
           onTabChange={handleTabChange}
           onConfigUpdate={handleConfigUpdate}
+          onTabDataUpdate={handleTabDataUpdate}
           onEditorModeChange={handleEditorModeChange}
           onLockToggle={handleLockToggle}
           onSaveConfig={handleSaveConfig}
@@ -398,9 +407,9 @@ export default function AdminConsole() {
           isRegenerating={regenerateTabMutation.isPending}
           isSaving={saveConfigMutation.isPending}
           isTranslating={translateMutation.isPending}
-          configError={appConfigError}
-          isLoadingConfig={appConfigLoading}
-          onRetryConfig={() => refetchAppConfig()}
+          configError={configQuery.error}
+          isLoadingConfig={configQuery.isPending}
+          onRetryConfig={() => configQuery.refetch()}
         />
       </div>
 

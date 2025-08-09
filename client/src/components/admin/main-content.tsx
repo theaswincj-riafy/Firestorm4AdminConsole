@@ -98,6 +98,12 @@ export default function MainContent({
     }
   };
 
+  const onTabDataUpdate = (tabKey: string, newTabData: any) => {
+    const updatedConfig = { ...currentConfig };
+    updatedConfig[tabKey] = newTabData;
+    onConfigUpdate(updatedConfig);
+  };
+
   if (!selectedApp) {
     return (
       <main className="admin-main">
@@ -369,11 +375,7 @@ export default function MainContent({
             fullConfigData={currentConfig}
             editorMode={editorMode}
             isLocked={isLocked}
-            onUpdate={(newTabData) => {
-              const newConfig = { ...currentConfig };
-              newConfig[activeTab] = newTabData;
-              onConfigUpdate(newConfig);
-            }}
+            onUpdate={editorMode === 'json' ? onConfigUpdate : (newTabData) => onTabDataUpdate(activeTab, newTabData)}
             validateResult={validateResult}
           />
         )}
