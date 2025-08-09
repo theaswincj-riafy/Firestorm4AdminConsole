@@ -59,21 +59,74 @@ class AdminApiService {
   }
 
   async createApp(appData: AppFormData): Promise<App> {
-    await this.delay(500);
-
-    const newApp: App = {
-      appId: 'app-' + Date.now(),
-      appName: appData.appName,
-      packageName: appData.packageName,
-      meta: {
+    try {
+      const requestBody = {
+        app_package_name: appData.packageName,
+        app_name: appData.appName,
         description: appData.appDescription || '',
-        playUrl: appData.playUrl || '',
-        appStoreUrl: appData.appStoreUrl || ''
-      }
-    };
+        app_store_link: appData.appStoreUrl || '',
+        play_store_link: appData.playUrl || ''
+      };
 
-    this.apps.push(newApp);
-    return newApp;
+      const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/createapp', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.message) {
+            errorMessage = `HTTP ${response.status}: ${errorJson.message}`;
+          }
+        } catch {
+          // If not JSON, keep the default message
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+
+      if (result.status === 'success' && result.data) {
+        // Transform API response to match our App interface
+        const apiApp = result.data;
+        
+        const newApp: App = {
+          appId: apiApp.app_package_name, // Using package name as unique ID
+          appName: apiApp.app_name,
+          packageName: apiApp.app_package_name,
+          meta: {
+            description: apiApp.description || '',
+            playUrl: '', // API doesn't return these, will be empty
+            appStoreUrl: ''
+          }
+        };
+
+        // Add to local apps array for immediate UI update
+        this.apps.push(newApp);
+        
+        return newApp;
+      } else {
+        throw new Error(result.message || 'Failed to create app');
+      }
+    } catch (error) {
+      console.error('Error creating app:', error);
+      
+      // Re-throw with more specific error information
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Unknown error occurred while creating app');
+      }
+    }
   }
 
   async updateApp(appId: string, appData: Partial<AppFormData>): Promise<App> {

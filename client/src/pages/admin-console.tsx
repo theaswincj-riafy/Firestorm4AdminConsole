@@ -87,13 +87,24 @@ export default function AdminConsole() {
 
   const createAppMutation = useMutation({
     mutationFn: (data: AppFormData) => adminApi.createApp(data),
-    onSuccess: (newApp) => {
+    onSuccess: async (newApp) => {
+      // Invalidate apps query to refresh the sidebar
       queryClient.invalidateQueries({ queryKey: ['/api/apps'] });
+      
+      // Select the new app
       setSelectedApp(newApp);
       setIsAppModalOpen(false);
+      
+      // Reset any existing state
+      setActiveTab(null);
+      setCurrentConfig(null);
+      
+      // Trigger config loading for the new app
+      queryClient.invalidateQueries({ queryKey: ['/api/config', newApp.appId] });
+      
       toast({
         title: "Success",
-        description: "App created successfully",
+        description: "App created successfully and loaded",
       });
     },
     onError: (error: Error) => {
