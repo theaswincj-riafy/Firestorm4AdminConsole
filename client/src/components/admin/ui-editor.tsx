@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Plus, X, Code, Trash2, Package, Globe, Smartphone, FileText, Star, Users, Calendar, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,22 @@ interface UIEditorProps {
 }
 
 export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorProps) {
+  // Local state to manage input values for immediate UI updates
+  const [localData, setLocalData] = useState(data);
+  
+  // Update local state when data prop changes (e.g., when switching tabs)
+  useEffect(() => {
+    setLocalData(data);
+  }, [data]);
+
+  // Cleanup debounce timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
   // Handle special tabs
   if (tabKey === 'app-details') {
     return (
@@ -42,11 +58,12 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const updateValue = useCallback((path: string, value: any) => {
-    if (isLocked || !data) return;
+    if (isLocked) return;
 
     try {
-      const newData = JSON.parse(JSON.stringify(data));
-      let current = newData;
+      // Update local state immediately for UI responsiveness
+      const newLocalData = JSON.parse(JSON.stringify(localData || {}));
+      let current = newLocalData;
       const pathArray = path.split('.');
 
       for (let i = 0; i < pathArray.length - 1; i++) {
@@ -59,11 +76,21 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
 
       const lastSegment = pathArray[pathArray.length - 1];
       current[lastSegment] = value;
-      onUpdate(newData);
+      setLocalData(newLocalData);
+
+      // Clear previous timeout
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+
+      // Debounce the parent update to avoid excessive re-renders
+      debounceTimeoutRef.current = setTimeout(() => {
+        onUpdate(newLocalData);
+      }, 300);
     } catch (error) {
       console.error('Error updating value:', error);
     }
-  }, [data, isLocked, onUpdate]);
+  }, [localData, isLocked, onUpdate]);
 
   const renderEmptyState = (title: string, description: string, icon: any) => {
     const IconComponent = icon;
@@ -224,7 +251,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
                   key={index}
                   value={bullet}
                   onChange={(e) => {
-                    const newBullets = [...(pageData.social_proof.bullets || [])];
+                    const newBullets = [...(localData?.social_proof?.bullets || [])];
                     newBullets[index] = e.target.value;
                     updateValue('social_proof.bullets', newBullets);
                   }}
@@ -809,7 +836,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
                   <Input
                     value={feature}
                     onChange={(e) => {
-                      const newFeatures = [...(appData.features || [])];
+                      const newFeatures = [...(localData?.features || [])];
                       newFeatures[index] = e.target.value;
                       updateValue('features', newFeatures);
                     }}
@@ -833,19 +860,19 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
   const renderContent = () => {
     switch (tabKey) {
       case 'page1_referralPromote':
-        return renderPromoteSharing(data);
+        return renderPromoteSharing(localData);
       case 'page2_referralStatus':
-        return renderReferrerStatus(data);
+        return renderReferrerStatus(localData);
       case 'page3_referralDownload':
-        return renderPromoteDownload(data);
+        return renderPromoteDownload(localData);
       case 'page4_referralRedeem':
-        return renderRedeemCode(data);
+        return renderRedeemCode(localData);
       case 'notifications':
-        return renderNotifications(data);
+        return renderNotifications(localData);
       case 'images':
-        return renderImages(data);
+        return renderImages(localData);
       case 'appDetails':
-        return renderAppDetails(data);
+        return renderAppDetails(localData);
       default:
         return renderEmptyState("Unknown Tab", "This tab content is not recognized.", Package);
     }
