@@ -26,6 +26,10 @@ export default function AdminConsole() {
     const savedEditorMode = localStorage.getItem('editorMode') as 'ui' | 'json';
     if (savedEditorMode && ['ui', 'json'].includes(savedEditorMode)) {
       setEditorMode(savedEditorMode);
+    } else {
+      // Default to UI editor if no preference is saved
+      setEditorMode('ui');
+      localStorage.setItem('editorMode', 'ui');
     }
   }, []);
 
@@ -294,10 +298,28 @@ export default function AdminConsole() {
       'page2_referralStatus': 'Referrer Status',
       'page3_referralDownload': 'Promote Download',
       'page4_referralRedeem': 'Redeem Code',
-      'notifications': 'Notifications',
       'images': 'Images',
-      'appDetails': 'App Details'
+      'appDetails': 'App Details',
+      'notifications': 'Notifications'
     };
+
+    // Determine the correct tab order
+    const tabOrder: string[] = [
+      'page1_referralPromote',
+      'page2_referralStatus',
+      'page3_referralDownload',
+      'page4_referralRedeem',
+      'notifications',
+      'images',
+      'appDetails'
+    ];
+
+    const tabIndex = tabOrder.indexOf(tabKey);
+
+    // If the tabKey is not in the defined order, append it to the end
+    if (tabIndex === -1) {
+      return TAB_MAPPINGS[tabKey] || humanizeKey(tabKey);
+    }
 
     return TAB_MAPPINGS[tabKey] || humanizeKey(tabKey);
   };

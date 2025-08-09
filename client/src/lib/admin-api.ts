@@ -34,7 +34,7 @@ class AdminApiService {
       }
 
       const result = await response.json();
-      
+
       if (result.status === 'success') {
         // Transform API response to match our App interface
         return result.data.map((apiApp: any) => ({
@@ -109,7 +109,7 @@ class AdminApiService {
       // Find the app by appId to get the package name
       const app = this.apps.find(a => a.appId === appId);
       let packageName = appId;
-      
+
       // If appId matches an existing app's package name, use it directly
       // Otherwise try to find by appId
       if (app) {
@@ -127,7 +127,7 @@ class AdminApiService {
       if (!response.ok) {
         const errorText = await response.text();
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        
+
         try {
           const errorJson = JSON.parse(errorText);
           if (errorJson.message) {
@@ -136,15 +136,15 @@ class AdminApiService {
         } catch {
           // If not JSON, keep the default message
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const result = await response.json();
-      
+
       if (result.status === 'success' && result.data && result.data.length > 0) {
         const referralData = result.data[0].referral_json;
-        
+
         // Transform API response to match the expected format
         return {
           ...referralData.en,
@@ -192,14 +192,14 @@ class AdminApiService {
       }
     } catch (error) {
       console.error('Error fetching app config:', error);
-      
+
       // Re-throw with more specific error information
       if (error instanceof Error) {
         throw error;
       } else {
         throw new Error('Unknown error occurred while fetching app config');
       }
-      
+
       // Fallback to mock data if API fails
       await this.delay(300);
       const jsonData = {
@@ -298,7 +298,11 @@ class AdminApiService {
       };
 
       return {
-        ...jsonData,
+        page1_referralPromote: jsonData.page1_referralPromote,
+        page2_referralStatus: jsonData.page2_referralStatus,
+        page3_referralDownload: jsonData.page3_referralDownload,
+        page4_referralRedeem: jsonData.page4_referralRedeem,
+        notifications: jsonData.notifications,
         images: {
           logo: {
             url: "https://example.com/logo.png",
