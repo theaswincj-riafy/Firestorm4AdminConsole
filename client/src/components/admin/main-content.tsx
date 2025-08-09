@@ -19,6 +19,7 @@ interface MainContentProps {
   onTabChange: (tabKey: string) => void;
   onConfigUpdate: (config: any) => void;
   onTabDataUpdate: (tabKey: string, newTabData: any) => void;
+  onAppUpdate: (appData: any) => void;
   onEditorModeChange: (mode: 'ui' | 'json') => void;
   onLockToggle: () => void;
   onSaveConfig: () => void;
@@ -57,6 +58,7 @@ export default function MainContent({
   onTabChange,
   onConfigUpdate,
   onTabDataUpdate,
+  onAppUpdate,
   onEditorModeChange,
   onLockToggle,
   onSaveConfig,
@@ -274,23 +276,26 @@ export default function MainContent({
   const tabKeys = currentConfig?.referral_json?.en ? 
     Object.keys(currentConfig.referral_json.en) : [];
 
-  // Define the desired tab order, including the new tabs
+  // Define the desired tab order, including the special tabs
   const tabOrder = [
+    'app-details',
+    'image',
     'page1_referralPromote',
     'page2_referralStatus', 
     'page3_referralDownload',
     'page4_referralRedeem',
-    'notifications',
-    'image', // New image tab
-    'appDetails', // New app details tab
+    'notifications'
   ];
 
+  // Always include special tabs that don't come from referral_json.en
+  const specialTabs = ['app-details', 'image'];
+  
   // Get tabs from referral_json.en
   const configTabs = Object.keys(currentConfig.referral_json?.en || {});
   
   // Get tabs in the desired order, including config tabs and special tabs
   const orderedTabs = tabOrder.filter(tab => {
-    if (tab === 'image' || tab === 'appDetails') {
+    if (specialTabs.includes(tab)) {
       return true; // Always include special tabs
     }
     return configTabs.includes(tab);
@@ -432,17 +437,12 @@ export default function MainContent({
             {/* Tab Contents */}
             {allTabs.map((tabKey) => {
               let tabData;
-              const isAppDetailsTab = tabKey === 'appDetails';
+              const isAppDetailsTab = tabKey === 'app-details';
               const isImageTab = tabKey === 'image';
 
               if (isAppDetailsTab) {
-                tabData = currentConfig ? {
-                  packageName: currentConfig.app_package_name || '',
-                  appName: currentConfig.app_name || '',
-                  appDescription: currentConfig.meta?.description || '',
-                  googlePlayLink: currentConfig.meta?.playUrl || '',
-                  iosAppStoreLink: currentConfig.meta?.appStoreUrl || '',
-                } : {};
+                // For app details, pass the selected app data directly
+                tabData = selectedApp;
               } else if (isImageTab) {
                 // Assuming a structure for image tab data, adjust if needed
                 tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
@@ -456,10 +456,12 @@ export default function MainContent({
                     tabKey={tabKey}
                     tabData={tabData}
                     fullConfigData={currentConfig}
+                    selectedApp={selectedApp}
                     editorMode={editorMode}
                     isLocked={isLocked}
                     onUpdate={onConfigUpdate}
                     onTabDataUpdate={handleTabDataUpdate}
+                    onAppUpdate={onAppUpdate}
                     validateResult={validateResult}
                   />
                 </TabsContent>

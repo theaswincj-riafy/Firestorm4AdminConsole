@@ -1,14 +1,17 @@
 import UIEditor from "./ui-editor";
 import JsonEditor from "./json-editor";
+import AppDetailsEditor from "./app-details-editor";
 
 interface TabContentProps {
   tabKey: string;
   tabData: any;
   fullConfigData?: any;
+  selectedApp?: any;
   editorMode: 'ui' | 'json';
   isLocked: boolean;
   onUpdate: (data: any) => void;
   onTabDataUpdate: (tabKey: string, newTabData: any) => void;
+  onAppUpdate?: (appData: any) => void;
   validateResult?: { valid: boolean; error?: string } | null;
 }
 
@@ -16,10 +19,12 @@ export default function TabContent({
   tabKey,
   tabData,
   fullConfigData,
+  selectedApp,
   editorMode,
   isLocked,
   onUpdate,
   onTabDataUpdate,
+  onAppUpdate,
   validateResult
 }: TabContentProps) {
 
@@ -47,6 +52,19 @@ export default function TabContent({
     // Update the full config data
     onUpdate(newConfigData);
   };
+
+  // Special handling for app-details tab
+  if (tabKey === 'app-details') {
+    return (
+      <div className="tab-content h-full flex flex-col">
+        <AppDetailsEditor
+          data={selectedApp}
+          isLocked={isLocked}
+          onUpdate={onAppUpdate || (() => {})}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="tab-content h-full flex flex-col p-4">

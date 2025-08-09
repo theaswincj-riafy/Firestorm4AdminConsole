@@ -18,6 +18,7 @@ export default function AdminConsole() {
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [editingApp, setEditingApp] = useState<App | null>(null);
   const [translateStatus, setTranslateStatus] = useState<Record<string, 'pending' | 'completed'>>({});
+  const [appDetailsChanges, setAppDetailsChanges] = useState<any>(null);
 
   const { toast } = useToast();
   const { logout } = useAuth();
@@ -71,12 +72,18 @@ export default function AdminConsole() {
         'notifications'
       ];
 
+      // Always include special tabs that don't come from referral_json.en
+      const specialTabs = ['app-details', 'image'];
+      
       // Find available tabs from the referral_json.en structure
-      const availableTabs = configQuery.data.referral_json?.en ?
+      const configTabs = configQuery.data.referral_json?.en ?
         Object.keys(configQuery.data.referral_json.en) : [];
 
-      const orderedTabs = tabOrder.filter(tab => availableTabs.includes(tab));
-      const additionalTabs = availableTabs.filter(tab => !tabOrder.includes(tab));
+      // Combine special tabs with config tabs in the desired order
+      const orderedTabs = tabOrder.filter(tab => 
+        specialTabs.includes(tab) || configTabs.includes(tab)
+      );
+      const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
       const allTabs = [...orderedTabs, ...additionalTabs];
 
       if (allTabs.length > 0 && !activeTab) {
@@ -317,6 +324,17 @@ export default function AdminConsole() {
     setIsDirty(true);
   };
 
+  const handleAppUpdate = (updatedAppData: any) => {
+    // Store the app details changes for later saving
+    setAppDetailsChanges(updatedAppData);
+    setIsDirty(true);
+    
+    // Update the selected app data for immediate UI updates
+    if (selectedApp) {
+      setSelectedApp({ ...selectedApp, ...updatedAppData });
+    }
+  };
+
   const getTabData = (tabKey: string) => {
     if (!currentConfig) return null;
 
@@ -361,20 +379,22 @@ export default function AdminConsole() {
   };
 
   const handleSaveConfig = () => {
-    if (selectedApp && currentConfig) {
-      // If we're on the app-details tab, call the editApp API
-      if (activeTab === 'app-details') {
-        const playStoreLink = currentConfig.meta?.playUrl || '';
-        const appStoreLink = currentConfig.meta?.appStoreUrl || '';
-        editAppMutation.mutate({ 
-          appId: selectedApp.appId, 
-          playStoreLink, 
-          appStoreLink 
-        });
-      } else {
-        // For other tabs, save the config as usual
-        saveConfigMutation.mutate({ appId: selectedApp.appId, config: currentConfig });
-      }
+    if (!selectedApp) return;
+
+    // If we're on the app-details tab and have changes, call the editApp API
+    if (activeTab === 'app-details' && appDetailsChanges) {
+      const playStoreLink = appDetailsChanges.meta?.playUrl || '';
+      const appStoreLink = appDetailsChanges.meta?.appStoreUrl || '';
+      editAppMutation.mutate({ 
+        appId: selectedApp.appId, 
+        playStoreLink, 
+        appStoreLink 
+      });
+      // Clear the app details changes after saving
+      setAppDetailsChanges(null);
+    } else if (currentConfig) {
+      // For other tabs, save the config as usual
+      saveConfigMutation.mutate({ appId: selectedApp.appId, config: currentConfig });
     }
   };
 
@@ -518,6 +538,7 @@ export default function AdminConsole() {
           onTabChange={handleTabChange}
           onConfigUpdate={handleConfigUpdate}
           onTabDataUpdate={handleTabDataUpdate}
+          onAppUpdate={handleAppUpdate}
           onEditorModeChange={handleEditorModeChange}
           onLockToggle={handleLockToggle}
           onSaveConfig={handleSaveConfig}
