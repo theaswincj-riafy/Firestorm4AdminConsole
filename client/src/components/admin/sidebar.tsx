@@ -11,7 +11,6 @@ interface SidebarProps {
   onSelectApp: (app: App) => void;
   onCreateApp: () => void;
   onEditApp: (app: App) => void;
-  isCollapsed?: boolean;
 }
 
 export default function Sidebar({
@@ -21,7 +20,6 @@ export default function Sidebar({
   onSelectApp,
   onCreateApp,
   onEditApp,
-  isCollapsed = false,
 }: SidebarProps) {
   const [isAppsCollapsed, setIsAppsCollapsed] = useState(false);
 
@@ -61,23 +59,15 @@ export default function Sidebar({
           <CollapsibleContent>
 
         <div className="p-4 md:p-6 text-center">
-              {!isCollapsed && (
-                <>
-                  <h3 className="text-base font-medium mb-2 text-sidebar-foreground">
-                    No apps yet
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Create your first app to get started with referral configuration.
-                  </p>
-                </>
-              )}
-              <Button 
-                onClick={onCreateApp} 
-                className={`w-full ${isCollapsed ? "px-2" : ""}`}
-                title={isCollapsed ? "Create App" : undefined}
-              >
-                <Plus className="w-4 h-4" />
-                {!isCollapsed && <span className="ml-2">Create App</span>}
+              <h3 className="text-base font-medium mb-2 text-sidebar-foreground">
+                No apps yet
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Create your first app to get started with referral configuration.
+              </p>
+              <Button onClick={onCreateApp} className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Create App
               </Button>
             </div>
           </CollapsibleContent>
@@ -91,25 +81,13 @@ export default function Sidebar({
       <Collapsible open={!isAppsCollapsed} onOpenChange={setIsAppsCollapsed}>
         <CollapsibleTrigger asChild>
           <div className="p-4 md:p-6 border-b border-sidebar-border flex items-center justify-between cursor-pointer hover:bg-sidebar-accent/50 transition-colors">
-            {!isCollapsed && (
-              <h2 className="text-base font-semibold text-sidebar-foreground">
-                Apps ({apps.length})
-              </h2>
-            )}
-            {isCollapsed ? (
-              <div className="w-full flex justify-center">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-primary-foreground text-sm font-bold">{apps.length}</span>
-                </div>
-              </div>
+            <h2 className="text-base font-semibold text-sidebar-foreground">
+              Apps ({apps.length})
+            </h2>
+            {isAppsCollapsed ? (
+              <ChevronDown className="w-4 h-4 text-sidebar-foreground" />
             ) : (
-              <div>
-                {isAppsCollapsed ? (
-                  <ChevronDown className="w-4 h-4 text-sidebar-foreground" />
-                ) : (
-                  <ChevronUp className="w-4 h-4 text-sidebar-foreground" />
-                )}
-              </div>
+              <ChevronUp className="w-4 h-4 text-sidebar-foreground" />
             )}
           </div>
         </CollapsibleTrigger>
@@ -118,37 +96,24 @@ export default function Sidebar({
             {apps.map((app) => (
               <div
                 key={app.appId}
-                className={`app-item group ${selectedApp?.appId === app.appId ? "active" : ""} ${isCollapsed ? "collapsed" : ""}`}
+                className={`app-item group ${selectedApp?.appId === app.appId ? "active" : ""}`}
                 onClick={() => onSelectApp(app)}
-                title={isCollapsed ? app.appName : undefined}
               >
-                {isCollapsed ? (
-                  <div className="app-icon">
-                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                      <span className="text-primary-foreground text-sm font-bold">
-                        {app.appName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="app-info min-w-0 flex-1">
-                      <h3 className="truncate">{app.appName}</h3>
-                      <p className="truncate">{app.packageName}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditApp(app);
-                      }}
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                  </>
-                )}
+                <div className="app-info min-w-0 flex-1">
+                  <h3 className="truncate">{app.appName}</h3>
+                  <p className="truncate">{app.packageName}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditApp(app);
+                  }}
+                >
+                  <Edit2 className="w-4 h-4" />
+                </Button>
               </div>
             ))}
           </div>
