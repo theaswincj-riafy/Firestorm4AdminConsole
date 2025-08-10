@@ -224,20 +224,8 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
                   if (typeof item === 'object' && item !== null) {
                     return (
                       <Card key={itemPath} className="p-4">
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center mb-3">
                           <Badge variant="outline">Item {index + 1}</Badge>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const newArray = [...value];
-                              newArray.splice(index, 1);
-                              updateValue(path, newArray);
-                            }}
-                            disabled={isLocked}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
                         </div>
                         <div className="space-y-4">
                           {renderObjectFields(item, itemPath, level + 1)}
@@ -246,8 +234,12 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
                     );
                   } else {
                     return (
-                      <div key={itemPath} className="flex items-center space-x-2">
+                      <div key={itemPath} className="space-y-2">
+                        <Label htmlFor={itemPath} className="text-sm font-medium">
+                          {fieldName} {index + 1}
+                        </Label>
                         <Input
+                          id={itemPath}
                           value={item || ''}
                           onChange={(e) => {
                             const newArray = [...value];
@@ -255,48 +247,12 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
                             updateValue(path, newArray);
                           }}
                           disabled={isLocked}
-                          placeholder={`${fieldName} ${index + 1}`}
+                          placeholder={`Enter ${fieldName.toLowerCase()} ${index + 1}`}
                         />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            const newArray = [...value];
-                            newArray.splice(index, 1);
-                            updateValue(path, newArray);
-                          }}
-                          disabled={isLocked}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
                       </div>
                     );
                   }
                 })}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newArray = [...(value || [])];
-                    // Determine what type of item to add based on existing items
-                    if (newArray.length > 0) {
-                      const firstItem = newArray[0];
-                      if (typeof firstItem === 'object') {
-                        newArray.push({});
-                      } else {
-                        newArray.push('');
-                      }
-                    } else {
-                      newArray.push('');
-                    }
-                    updateValue(path, newArray);
-                  }}
-                  disabled={isLocked}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add {fieldName.slice(0, -1)} {/* Remove 's' from plural */}
-                </Button>
               </div>
             </div>
           </div>
@@ -357,7 +313,7 @@ export default function UIEditor({ data, isLocked, onUpdate, tabKey }: UIEditorP
   };
 
   return (
-    <div className="p-8 space-y-6 max-w-5xl mx-auto bg-background">
+    <div className="p-8 space-y-6 max-w-5xl bg-background">
       {renderContent()}
     </div>
   );
