@@ -56,7 +56,7 @@ export default function TabContent({
   // Special handling for JSON editor mode - show full config
   if (editorMode === 'json') {
     return (
-      <div className="tab-content h-full flex flex-col p-4">
+      <div className="tab-content h-full flex flex-col">
         <JsonEditor
           data={fullConfigData}
           isLocked={isLocked}

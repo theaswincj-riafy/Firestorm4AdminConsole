@@ -577,3 +577,9 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+.json-editor-container {
+  background: var(--background);
+  height: 100%;
+  min-height: 0;
+}
