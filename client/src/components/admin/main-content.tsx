@@ -463,7 +463,7 @@ export default function MainContent({
                         e.stopPropagation();
                         handleRefreshClick(tabKey);
                       }}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
                     >
                       {refreshSuccess[tabKey] ? (
                         <Check className="w-3 h-3 text-green-500" />
