@@ -76,9 +76,10 @@ export default function ImageEditor({
         alt: 'Generated app image'
       };
 
-      setFormData(newFormData);
-      
       console.log('Generated image URL:', generatedImageUrl);
+      
+      // Update local state first
+      setFormData(newFormData);
       
       // Update the full config data structure to include the new image
       if (onTabDataUpdate && fullConfigData) {
@@ -90,7 +91,16 @@ export default function ImageEditor({
         };
         
         console.log('Calling onTabDataUpdate with images:', updatedImages);
+        console.log('Full config before update:', fullConfigData);
         onTabDataUpdate('images', updatedImages);
+        
+        // Force a re-render by updating the local state again
+        setTimeout(() => {
+          setFormData({
+            imageUrl: generatedImageUrl,
+            alt: 'Generated app image'
+          });
+        }, 100);
       }
       
       // Also call onUpdate for backward compatibility

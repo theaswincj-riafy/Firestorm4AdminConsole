@@ -418,6 +418,7 @@ export default function AdminConsole() {
   const handleTabDataUpdate = (tabKey: string, newTabData: any) => {
     if (!currentConfig) return;
 
+    console.log('handleTabDataUpdate called with:', tabKey, newTabData);
     let updatedConfig = { ...currentConfig };
 
     if (tabKey === 'app-details') {
@@ -431,6 +432,7 @@ export default function AdminConsole() {
       updatedConfig.referral_json.en[tabKey] = newTabData;
     }
 
+    console.log('Updated config:', updatedConfig);
     setCurrentConfig(updatedConfig);
     setIsDirty(true);
   };
