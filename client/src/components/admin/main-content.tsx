@@ -42,13 +42,20 @@ interface MainContentProps {
 }
 
 const LANGUAGES = [
-  { code: 'en', name: 'English' },
   { code: 'es', name: 'Spanish' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'bn', name: 'Bengali' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'zh', name: 'Chinese' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'ml', name: 'Malayalam' },
   { code: 'ta', name: 'Tamil' },
   { code: 'te', name: 'Telugu' },
-  { code: 'ml', name: 'Malayalam' },
+  { code: 'kn', name: 'Kannada' },
+  { code: 'hi', name: 'Hindi' },
 ];
 
 export default function MainContent({

@@ -267,8 +267,39 @@ class AdminApiService {
   }
 
   async deleteApp(appId: string): Promise<void> {
-    await this.delay(300);
-    this.apps = this.apps.filter((app) => app.appId !== appId);
+    try {
+      // Find the app to get the package name
+      const app = this.apps.find((a) => a.appId === appId);
+      const packageName = app ? app.packageName : appId;
+
+      // Call the external API to delete the app
+      const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/deleteapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q'
+        },
+        body: JSON.stringify({
+          app_package_name: packageName
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete app: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        // Remove from local apps array
+        this.apps = this.apps.filter((app) => app.appId !== appId);
+      } else {
+        throw new Error(result.message || 'Failed to delete app');
+      }
+    } catch (error) {
+      console.error('Error deleting app:', error);
+      throw error;
+    }
   }
 
   async getAppConfig(appId: string): Promise<any> {
@@ -416,59 +447,47 @@ class AdminApiService {
     appName?: string,
     appDescription?: string,
   ): Promise<{ tabKey: string; newSubtree: any }> {
-    // Special handling for promote sharing tab
-    if (tabKey === "page1_referralPromote" && appName && appDescription) {
-      try {
-        const newSubtree = await this.getPromoteSharingData(
-          appName,
-          appDescription,
-        );
-        return { tabKey, newSubtree };
-      } catch (error) {
-        console.error("Error refreshing promote sharing data:", error);
-        throw new Error("Failed to refresh promote sharing data from API");
-      }
-    }
+    // Map tab keys to API types
+    const tabToTypeMap: Record<string, string> = {
+      'page1_referralPromote': 'referral_promote',
+      'page2_referralStatus': 'referral_status', 
+      'page3_referralDownload': 'referral_download',
+      'page4_referralRedeem': 'referral_redeem',
+      'notifications': 'referral_notification'
+    };
 
-    // Special handling for referrer status tab
-    if (tabKey === "page2_referralStatus") {
+    const apiType = tabToTypeMap[tabKey];
+    
+    if (apiType && appName && appDescription) {
       try {
-        const newSubtree = await this.getReferrerStatusData(
-          appName,
-          appDescription,
-        );
-        return { tabKey, newSubtree };
-      } catch (error) {
-        console.error("Error refreshing referrer status data:", error);
-        throw new Error("Failed to refresh referrer status data from API");
-      }
-    }
+        const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q'
+          },
+          body: JSON.stringify({
+            app_name: appName,
+            description: appDescription,
+            language: 'en',
+            type: apiType
+          })
+        });
 
-    // Special handling for promote download tab
-    if (tabKey === "page3_referralDownload") {
-      try {
-        const newSubtree = await this.getPromoteDownloadData(
-          appName,
-          appDescription,
-        );
-        return { tabKey, newSubtree };
-      } catch (error) {
-        console.error("Error refreshing promote download data:", error);
-        throw new Error("Failed to refresh promote download data from API");
-      }
-    }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    // Special handling for redeem code tab
-    if (tabKey === "page4_referralRedeem") {
-      try {
-        const newSubtree = await this.getRedeemCodeData(
-          appName,
-          appDescription,
-        );
-        return { tabKey, newSubtree };
+        const result = await response.json();
+        
+        if (result.status === 'success' && result.data) {
+          return { tabKey, newSubtree: result.data };
+        } else {
+          throw new Error(result.message || 'Failed to regenerate tab data');
+        }
       } catch (error) {
-        console.error("Error refreshing redeem code data:", error);
-        throw new Error("Failed to refresh redeem code data from API");
+        console.error(`Error regenerating ${tabKey} data:`, error);
+        throw new Error(`Failed to regenerate ${tabKey} data from API`);
       }
     }
 

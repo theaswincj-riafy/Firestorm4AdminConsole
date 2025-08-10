@@ -1,0 +1,93 @@
+create a promote
+
+Need some API integrations and updates
+1. while clicking the delete button call the API with curl
+curl --location 'https://referral-system-o0yw.onrender.com/api/admin/deleteapp' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q' \
+--data '{
+    "app_package_name": "com.example.myapp"
+  }'
+
+sample response:
+{
+    "deleted_app_count": 1,
+    "deleted_referral_count": 1,
+    "message": "App and related referral data deleted successfully",
+    "status": "success"
+}
+
+2. There is a change in the regenerate button API for each tabs. response are same only the API
+- promote sharing curl
+curl --location 'https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q' \
+--data '{
+    "app_name": "My App",
+    "description": "A great app for rewards",
+    "language": "en",
+    "type": "referral_status"
+  }'
+
+- referrer status
+curl --location 'https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q' \
+--data '{
+    "app_name": "My App",
+    "description": "A great app for rewards",
+    "language": "en",
+    "type": "referral_promote"
+  }'
+
+- promote download
+
+curl --location 'https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q' \
+--data '{
+    "app_name": "My App",
+    "description": "A great app for rewards",
+    "language": "en",
+    "type": "referral_download"
+  }'
+
+- redeem code
+curl --location 'https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q' \
+--data '{
+    "app_name": "My App",
+    "description": "A great app for rewards",
+    "language": "en",
+    "type": "referral_redeem"
+  }'
+
+- notification
+curl --location 'https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q' \
+--data '{
+    "app_name": "My App",
+    "description": "A great app for rewards",
+    "language": "en",
+    "type": "referral_notification"
+  }'
+
+3. update the translate language list
+[
+  { name: "Spanish",    code: "es" },
+  { name: "French",     code: "fr" },
+  { name: "German",     code: "de" },
+  { name: "Italian",    code: "it" },
+  { name: "Portuguese", code: "pt" },
+  { name: "Russian",    code: "ru" },
+  { name: "Chinese",    code: "zh" },
+  { name: "Japanese",   code: "ja" },
+  { name: "Korean",     code: "ko" },
+  { name: "Malayalam",  code: "ml" },
+  { name: "Tamil",      code: "ta" },
+  { name: "Telugu",     code: "te" },
+  { name: "Kannada",    code: "kn" },
+  { name: "Hindi",      code: "hi" }
+];
