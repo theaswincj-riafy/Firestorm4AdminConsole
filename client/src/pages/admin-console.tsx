@@ -603,6 +603,7 @@ export default function AdminConsole() {
           onSelectApp={handleSelectApp}
           onCreateApp={handleCreateApp}
           onEditApp={handleEditApp}
+          onDeleteApp={handleDeleteApp}
         />
 
         <MainContent

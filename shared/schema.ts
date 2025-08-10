@@ -3,7 +3,7 @@ import { z } from "zod";
 export const appFormSchema = z.object({
   packageName: z.string().min(1, "Package name is required"),
   appName: z.string().min(1, "App name is required"),
-  appDescription: z.string().optional(),
+  appDescription: z.string().min(1, "App description is required"),
   playUrl: z.string().url().optional().or(z.literal("")),
   appStoreUrl: z.string().url().optional().or(z.literal(""))
 });

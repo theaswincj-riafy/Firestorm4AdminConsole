@@ -56,7 +56,7 @@ export default function TabContent({
   // Special handling for JSON editor mode - show full config
   if (editorMode === 'json') {
     return (
-      <div className="tab-content h-full flex flex-col">
+      <div className="tab-content h-full flex flex-col overflow-hidden">
         <JsonEditor
           data={fullConfigData}
           isLocked={isLocked}
@@ -70,25 +70,29 @@ export default function TabContent({
   // Special handling for app-details tab
   if (tabKey === 'app-details') {
     return (
-      <div className="tab-content h-full flex flex-col">
-        <AppDetailsEditor
-          data={selectedApp}
-          isLocked={isLocked}
-          onUpdate={onAppUpdate || (() => {})}
-        />
+      <div className="tab-content h-full flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-4">
+          <AppDetailsEditor
+            data={selectedApp}
+            isLocked={isLocked}
+            onUpdate={onAppUpdate || (() => {})}
+          />
+        </div>
       </div>
     );
   }
 
   // UI Editor mode - show specific tab content
   return (
-    <div className="tab-content h-full flex flex-col p-4">
-      <UIEditor
-        data={tabData}
-        isLocked={isLocked}
-        onUpdate={handleUIUpdate}
-        tabKey={tabKey}
-      />
+    <div className="tab-content h-full flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto p-4">
+        <UIEditor
+          data={tabData}
+          isLocked={isLocked}
+          onUpdate={handleUIUpdate}
+          tabKey={tabKey}
+        />
+      </div>
     </div>
   );
 }

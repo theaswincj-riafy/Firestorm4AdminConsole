@@ -1,4 +1,4 @@
-import { Plus, Edit2 } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { App } from "@shared/schema";
 
@@ -9,6 +9,7 @@ interface SidebarProps {
   onSelectApp: (app: App) => void;
   onCreateApp: () => void;
   onEditApp: (app: App) => void;
+  onDeleteApp: (appId: string) => void;
 }
 
 export default function Sidebar({
@@ -18,6 +19,7 @@ export default function Sidebar({
   onSelectApp,
   onCreateApp,
   onEditApp,
+  onDeleteApp,
 }: SidebarProps) {
   if (isLoading) {
     return (
@@ -69,29 +71,66 @@ export default function Sidebar({
         </h2>
       </div>
 
-      <div className="p-4">
-        {apps.map((app) => (
-          <div
-            key={app.appId}
-            className={`app-item ${selectedApp?.appId === app.appId ? "active" : ""}`}
-            onClick={() => onSelectApp(app)}
-          >
-            <div className="app-info">
-              <h3>{app.appName}</h3>
-              <p>{app.packageName}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => {
-                onSelectApp(app);
-              }}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-2">
+          {apps.map((app) => (
+            <div
+              key={app.appId}
+              className={`group relative rounded-lg border transition-colors cursor-pointer hover:bg-accent/50 ${
+                selectedApp?.appId === app.appId 
+                  ? "bg-accent border-accent-foreground/20" 
+                  : "border-border"
+              }`}
+              onClick={() => onSelectApp(app)}
             >
-              <Edit2 className="w-4 h-4" />
-            </Button>
-          </div>
-        ))}
+              <div className="p-3">
+                <div className="flex items-start justify-between">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-sm text-foreground truncate">
+                      {app.appName}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
+                      {app.packageName}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditApp(app);
+                      }}
+                      title="Edit app"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteApp(app.appId);
+                      }}
+                      title="Delete app"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="border-t border-sidebar-border p-4">
+        <Button onClick={onCreateApp} className="w-full">
+          <Plus className="w-4 h-4 mr-2" />
+          Create New App
+        </Button>
       </div>
     </aside>
   );

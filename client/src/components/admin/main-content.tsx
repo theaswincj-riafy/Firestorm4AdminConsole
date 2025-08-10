@@ -465,10 +465,12 @@ export default function MainContent({
                     >
                       {refreshSuccess[tabKey] ? (
                         <Check className="w-3 h-3 text-green-500" />
+                      ) : refreshingTabs[tabKey] ? (
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                       ) : (
-                        <RefreshCw 
-                          className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
-                        />
+                        <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
                       )}
                     </div>
                   </div>

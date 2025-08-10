@@ -44,6 +44,7 @@ export default function AppModal({
         appStoreUrl: editingApp.meta?.appStoreUrl || ''
       });
     } else {
+      // Always reset to empty values when creating a new app
       form.reset({
         packageName: '',
         appName: '',
@@ -52,7 +53,7 @@ export default function AppModal({
         appStoreUrl: ''
       });
     }
-  }, [editingApp, form]);
+  }, [editingApp, form, isOpen]); // Add isOpen to dependencies to reset when modal opens
 
   const handleSubmit = (data: AppFormData) => {
     onSubmit(data);
@@ -104,7 +105,7 @@ export default function AppModal({
           </div>
 
           <div>
-            <Label htmlFor="appDescription">App Description</Label>
+            <Label htmlFor="appDescription">App Description *</Label>
             <Textarea
               id="appDescription"
               placeholder="A brief description of your app"
