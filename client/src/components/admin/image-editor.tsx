@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImageIcon, Wand2 } from 'lucide-react';
+import { ImageIcon, Wand2, Loader2 } from 'lucide-react';
 
 interface ImageEditorProps {
   data: any;
@@ -14,6 +14,7 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
     imageUrl: '',
     alt: ''
   });
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -25,18 +26,29 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
   }, [data]);
 
   const handleGenerateImage = async () => {
-    if (isLocked) return;
+    if (isLocked || isGenerating) return;
 
-    // TODO: Implement image generation logic here
-    // For now, we'll use a placeholder
-    const generatedImageUrl = 'https://via.placeholder.com/400x200?text=Generated+App+Image';
-    const newFormData = {
-      imageUrl: generatedImageUrl,
-      alt: 'Generated app image'
-    };
+    setIsGenerating(true);
+    
+    try {
+      // TODO: Implement image generation logic here
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // For now, we'll use a placeholder
+      const generatedImageUrl = 'https://via.placeholder.com/400x200?text=Generated+App+Image';
+      const newFormData = {
+        imageUrl: generatedImageUrl,
+        alt: 'Generated app image'
+      };
 
-    setFormData(newFormData);
-    onUpdate(newFormData);
+      setFormData(newFormData);
+      onUpdate(newFormData);
+    } catch (error) {
+      console.error('Error generating image:', error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -77,12 +89,16 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
           <div className="flex justify-center">
             <Button
               onClick={handleGenerateImage}
-              disabled={isLocked}
+              disabled={isLocked || isGenerating}
               className="flex items-center gap-2"
               size="lg"
             >
-              <Wand2 className="w-4 h-4" />
-              Generate Image
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Wand2 className="w-4 h-4" />
+              )}
+              {isGenerating ? 'Generating...' : 'Generate Image'}
             </Button>
           </div>
         </CardContent>
