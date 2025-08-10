@@ -1,0 +1,285 @@
+{
+            "add_description": "A google App",
+            "app_name": "google App",
+            "app_package_name": "com.google.app",
+            "referral_json": {
+                "en": {
+                    "images": {
+                        "image1": "https://res.cloudinary.com/dmeloyjp3/image/upload/v1754849158/webp_uploads/kxuvp7hicvqkvtuiwz0b.webp"
+                    },
+                    "notifications": {
+                        "referrer": [
+                            {
+                                "body": "Someone used your referral code for Google App! Just 4 more referrals to unlock a free month of Premium.",
+                                "current_redemptions": 1,
+                                "id": "referral_progress_4_left",
+                                "title": "🎉 Google App: First Referral!"
+                            },
+                            {
+                                "body": "Another friend joined Google App using your code! Only 3 more referrals needed for your free Premium month.",
+                                "current_redemptions": 2,
+                                "id": "referral_progress_3_left",
+                                "title": "🚀 Google App: Great Start!"
+                            },
+                            {
+                                "body": "You're halfway to a free month of Google App Premium! Just 2 more referrals to go.",
+                                "current_redemptions": 3,
+                                "id": "referral_progress_2_left",
+                                "title": "⭐ Google App: Halfway There!"
+                            },
+                            {
+                                "body": "One more referral and you'll unlock a free month of Google App Premium! Keep sharing!",
+                                "current_redemptions": 4,
+                                "id": "referral_progress_1_left",
+                                "title": "🔥 Google App: Almost There!"
+                            },
+                            {
+                                "body": "Congratulations! You've earned a free month of Google App Premium through your referrals. Enjoy!",
+                                "current_redemptions": 5,
+                                "id": "referral_reward_unlocked",
+                                "title": "🎁 Google App: Premium Unlocked!"
+                            }
+                        ]
+                    },
+                    "page1_referralPromote": {
+                        "benefits": [
+                            {
+                                "desc": "Ad-free experience, pro features, and priority support for 1 month.",
+                                "title": "Premium Access"
+                            },
+                            {
+                                "desc": "Your friends get an exclusive newcomer perk when they join via your link.",
+                                "title": "Win Together"
+                            },
+                            {
+                                "desc": "Share your link; they download and redeem. You progress instantly.",
+                                "title": "Fast & Simple"
+                            }
+                        ],
+                        "hero": {
+                            "hero_title": "Invite & Unlock 1 Month Premium",
+                            "page_title": "Invite Friends",
+                            "quickButtonText": "View my referrals",
+                            "referral_code": "{{referral_code}}",
+                            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code."
+                        },
+                        "how_it_works": [
+                            {
+                                "desc": "Invite your friends and family using your referral code",
+                                "step": 1
+                            },
+                            {
+                                "desc": "After your friend has installed the google App, they can redeem your code.",
+                                "step": 2
+                            },
+                            {
+                                "desc": "On every successful redemption, you will gain a new level!",
+                                "step": 3
+                            },
+                            {
+                                "desc": "Your friend receives a week of free premium as well!",
+                                "step": 4
+                            },
+                            {
+                                "desc": "You can unlock a month of free premium on reaching level 5!",
+                                "step": 5
+                            }
+                        ],
+                        "nudges": [
+                            "Best results: share with 5–10 close contacts first.",
+                            "Add a personal note: tell them why you like the google App.",
+                            "Post your link in a relevant group or community."
+                        ],
+                        "page_id": "referral-promote",
+                        "progress_teaser": {
+                            "subtitle": "Each redemption brings you closer to Premium!",
+                            "title": "Only {{pending_redemptions}} more levels to go!"
+                        },
+                        "share": {
+                            "messages": {
+                                "default": "{{referrer_name}} invited you to try this google App. Get 1 week of Premium features for free using this referral: {{referral_link}}"
+                            },
+                            "primary_cta": "Invite Friends & Family"
+                        }
+                    },
+                    "page2_referralStatus": {
+                        "benefits": [
+                            {
+                                "desc": "Ad-free experience, pro features, and priority support for 1 month.",
+                                "title": "Premium Access"
+                            },
+                            {
+                                "desc": "Your friends get an exclusive newcomer perk when they join via your link.",
+                                "title": "Win Together"
+                            },
+                            {
+                                "desc": "Share your link; they download and redeem. You progress instantly.",
+                                "title": "Fast & Simple"
+                            }
+                        ],
+                        "faq": [
+                            {
+                                "a": "When a new redemption occurs, you will get a notification. However, the identity of the referrer won't be available.",
+                                "q": "Do I see who redeemed?"
+                            },
+                            {
+                                "a": "Instantly after {{target_redemptions}} redemptions. You’ll get an in-app confirmation.",
+                                "q": "When do I get Premium?"
+                            }
+                        ],
+                        "hero": {
+                            "hero_title": "Invite & Unlock 1 Month Premium",
+                            "page_title": "My Referrals",
+                            "quickButtonText": "View my referrals",
+                            "referral_code": "{{referral_code}}",
+                            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code."
+                        },
+                        "milestones": [
+                            {
+                                "achievedOn": "Not Applicable",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 0,
+                                "message": "Waiting for your first referral! No redemptions yet.",
+                                "title": "Let's Start"
+                            },
+                            {
+                                "achievedOn": "Achieved on 09 August",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 1,
+                                "message": "Your first referral is in! You’ve started your Premium journey.",
+                                "title": "The Kickoff"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 2,
+                                "message": "Two friends on board! You’re warming up nicely.",
+                                "title": "Building Momentum"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 3,
+                                "message": "Three redemptions—more than halfway to your goal!",
+                                "title": "Halfway Hero"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 4,
+                                "message": "Four done! Just one more to unlock Premium.",
+                                "title": "Almost There"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 5,
+                                "message": "Congratulations! You’ve completed your referral goal and earned 1 month of Premium.",
+                                "title": "Premium Unlocked 🎉"
+                            }
+                        ],
+                        "notifications": {
+                            "recent_event_banner": {
+                                "text": "Nice! Someone redeemed your code. Your progress just moved to {{current_redemptions}}/{{target_redemptions}}.",
+                                "visible": "{{show_recent_event}}"
+                            }
+                        },
+                        "nudges": [
+                            "Best results: share with 5–10 close contacts first.",
+                            "Add a personal note: tell them why you like the google App.",
+                            "Post your link in a relevant group or community."
+                        ],
+                        "page_id": "referral-status",
+                        "progress_teaser": {
+                            "subtitle": "Each redemption brings you closer to Premium!",
+                            "title": "Only {{pending_redemptions}} more levels to go!"
+                        },
+                        "status": {
+                            "current": "{{current_redemptions}}",
+                            "progress_text": "{{current_redemptions}} of {{target_redemptions}} completed",
+                            "target": "{{target_redemptions}}"
+                        }
+                    },
+                    "page3_referralDownload": {
+                        "hero": {
+                            "hero_title": "{{referrer_name}} invited you",
+                            "page_title": "google App",
+                            "quickButtonText": "Copy to clipboard",
+                            "referral_code": "{{referral_code}}",
+                            "subtitle": "Download the app to claim your invite and get 1 week of Premium features for Free!"
+                        },
+                        "how_it_works": [
+                            {
+                                "desc": "Download the app from Google Play or Apple App Store",
+                                "step": 1
+                            },
+                            {
+                                "desc": "Open google App and click on Redeem Referral Code",
+                                "step": 2
+                            },
+                            {
+                                "desc": "Paste {{referrer_name}}’s referral code and hit redeem to unlock a week of Premium features for yourself!",
+                                "step": 3
+                            }
+                        ],
+                        "page_id": "referral-download",
+                        "store_ctas": {
+                            "app_store_button": "Download on the App Store",
+                            "app_store_link": "{{app_store_link}}",
+                            "play_store_button": "Get it on Google Play",
+                            "play_store_link": "{{play_store_link}}"
+                        }
+                    },
+                    "page4_referralRedeem": {
+                        "hero": {
+                            "hero_title": "Redeem Referral Invite Code",
+                            "page_title": "Redeem Referral Code",
+                            "quickButtonText": "Paste from Clipboard",
+                            "referral_code": "Enter Code",
+                            "subtitle": "Enter or paste the invite from your friend to continue."
+                        },
+                        "how_it_works": [
+                            {
+                                "desc": "Copy the referral invitation sent by your friends or family",
+                                "step": 1
+                            },
+                            {
+                                "desc": "Paste the referral invitation using the button above",
+                                "step": 2
+                            },
+                            {
+                                "desc": "If the code is valid, you’ll unlock a week of Premium features on google App",
+                                "step": 3
+                            }
+                        ],
+                        "page_id": "referral-redeem",
+                        "redeem": {
+                            "messages": {
+                                "default": "{{referrer_name}} invited you to try google App. Redeem code {{referral_code}} via {{referral_link}}."
+                            },
+                            "primary_cta": "Redeem Code",
+                            "redemptionSuccess": {
+                                "hero_title": "You’re all set!",
+                                "nudges": [
+                                    "Your redemption also helps {{referrer_name}} progress toward a reward."
+                                ],
+                                "primary_cta": "Unlock 1 Week Premium 🎉",
+                                "subtitle": "You have redeemed a valid referral code from {{referrer_name}}! Enjoy 1 week of Premium features on google App."
+                            },
+                            "validation": {
+                                "empty": "Please enter a code.",
+                                "expired": "This invite has expired. Ask {{referrer_name}} for a new one.",
+                                "invalid": "That code doesn’t look right. Check and try again.",
+                                "success": "Success! Your invite is confirmed."
+                            }
+                        }
+                    }
+                }
+            }
+        }

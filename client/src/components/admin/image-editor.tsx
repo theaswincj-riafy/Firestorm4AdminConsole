@@ -30,13 +30,13 @@ export default function ImageEditor({
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if there's an existing image in en.images (could be image, image1, or other variants)
+    // Check if there's an existing image in en.images (prioritize image1 to match the structure)
     const imagesData = fullConfigData?.referral_json?.en?.images;
     let existingImage = null;
     
     if (imagesData) {
-      // Check for various image key patterns
-      existingImage = imagesData.image || imagesData.image1 || imagesData.imageUrl;
+      // Check for various image key patterns, prioritizing image1
+      existingImage = imagesData.image1 || imagesData.image || imagesData.imageUrl;
     }
     
     if (existingImage) {
@@ -78,20 +78,16 @@ export default function ImageEditor({
 
       setFormData(newFormData);
       
-      console.log('Updating image with URL:', generatedImageUrl);
+      console.log('Generated image URL:', generatedImageUrl);
       
       // Update the full config data structure to include the new image
       if (onTabDataUpdate && fullConfigData) {
-        // Update the images object in the config - use 'image' as the standard key
+        // Update the images object in the config - keep 'image1' for compatibility with existing structure
         const currentImages = fullConfigData.referral_json?.en?.images || {};
         const updatedImages = {
           ...currentImages,
-          image: generatedImageUrl
+          image1: generatedImageUrl  // Use image1 to match the API response format
         };
-        
-        // Remove any old image keys to standardize on 'image'
-        delete updatedImages.image1;
-        delete updatedImages.imageUrl;
         
         console.log('Calling onTabDataUpdate with images:', updatedImages);
         onTabDataUpdate('images', updatedImages);
