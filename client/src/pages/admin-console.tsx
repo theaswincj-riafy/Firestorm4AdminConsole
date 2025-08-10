@@ -494,13 +494,56 @@ export default function AdminConsole() {
     }
   };
 
-  const handleTranslate = (lang: string) => {
-    if (selectedApp && currentConfig && !translateStatus[lang]) {
-      setTranslateStatus(prev => ({ ...prev, [lang]: 'pending' }));
-      translateMutation.mutate({
-        appId: selectedApp.appId,
-        lang,
-        sourceJson: currentConfig
+  const handleTranslate = async (languages: string[]) => {
+    if (!selectedApp || !currentConfig || languages.length === 0) return;
+    
+    // Set all selected languages to pending status
+    const pendingStatus = languages.reduce((acc, lang) => {
+      acc[lang] = 'pending';
+      return acc;
+    }, {} as Record<string, 'pending'>);
+    
+    setTranslateStatus(prev => ({ ...prev, ...pendingStatus }));
+    
+    try {
+      // Call the new multiple language translation API
+      await adminApi.translateMultipleLanguages(
+        selectedApp.packageName, 
+        languages, 
+        currentConfig
+      );
+      
+      // After successful translations, refresh the config data
+      queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
+      
+      // Mark all languages as completed
+      const completedStatus = languages.reduce((acc, lang) => {
+        acc[lang] = 'completed';
+        return acc;
+      }, {} as Record<string, 'completed'>);
+      
+      setTranslateStatus(prev => ({ ...prev, ...completedStatus }));
+      
+      toast({
+        title: "Translation Completed",
+        description: `Successfully translated to ${languages.length} language(s)`,
+      });
+      
+    } catch (error) {
+      console.error('Translation failed:', error);
+      
+      // Reset status for failed translations
+      const resetStatus = languages.reduce((acc, lang) => {
+        delete acc[lang];
+        return acc;
+      }, { ...translateStatus });
+      
+      setTranslateStatus(resetStatus);
+      
+      toast({
+        title: "Translation Failed",
+        description: error instanceof Error ? error.message : "An error occurred during translation",
+        variant: "destructive",
       });
     }
   };

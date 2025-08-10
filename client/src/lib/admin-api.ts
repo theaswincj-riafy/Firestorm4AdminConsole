@@ -734,6 +734,60 @@ class AdminApiService {
     });
   }
 
+  async translateToLanguage(appPackageName: string, targetLanguage: string, jsonData: any): Promise<any> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout for translation
+
+      const response = await fetch("https://referral-system-o0yw.onrender.com/api/admin/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": "HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q",
+        },
+        body: JSON.stringify({
+          app_package_name: appPackageName,
+          target_language_code: targetLanguage,
+          ...jsonData
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Translation API error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === "success") {
+        return result;
+      } else {
+        throw new Error(result.message || "Translation failed");
+      }
+    } catch (error) {
+      console.error(`Error translating to ${targetLanguage}:`, error);
+      throw error;
+    }
+  }
+
+  async translateMultipleLanguages(appPackageName: string, targetLanguages: string[], jsonData: any): Promise<any[]> {
+    try {
+      // Execute all translation calls asynchronously
+      const translationPromises = targetLanguages.map(lang => 
+        this.translateToLanguage(appPackageName, lang, jsonData)
+      );
+
+      // Wait for all translations to complete
+      const results = await Promise.all(translationPromises);
+      return results;
+    } catch (error) {
+      console.error("Error in bulk translation:", error);
+      throw error;
+    }
+  }
+
   async getPromoteSharingData(
     appName: string,
     appDescription: string,
