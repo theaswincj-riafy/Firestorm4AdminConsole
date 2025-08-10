@@ -236,10 +236,12 @@
   padding: 16px 24px;
   border-top: 1px solid var(--border);
   background: var(--card);
-  flex-shrink: 0;
-  position: sticky;
+  position: fixed;
   bottom: 0;
-  z-index: 10;
+  left: var(--sidebar-width);
+  right: 0;
+  z-index: 50;
+  box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 /* Authentication styles */
@@ -302,6 +304,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-bottom: 80px; /* Space for fixed footer */
 }
 
 .content-toolbar {
