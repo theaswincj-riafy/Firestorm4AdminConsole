@@ -1,9 +1,43 @@
 import { useState } from "react";
-import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, ChevronDown, Trash, Package, Smartphone, Globe, FileText, Plus, Check, RefreshCw, Palette, Code, AlertTriangle } from "lucide-react";
+import {
+  Lock,
+  Unlock,
+  CheckCircle,
+  MoreHorizontal,
+  Save,
+  RotateCcw,
+  Languages,
+  ChevronDown,
+  Trash,
+  Package,
+  Smartphone,
+  Globe,
+  FileText,
+  Plus,
+  Check,
+  RefreshCw,
+  Palette,
+  Code,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import TabContent from "./tab-content";
 import type { App } from "@shared/schema";
@@ -14,16 +48,16 @@ interface MainContentProps {
   currentConfig: any;
   originalConfig: any;
   activeTab: string | null;
-  editorMode: 'ui' | 'json';
+  editorMode: "ui" | "json";
   isLocked: boolean;
   isDirty: boolean;
   hasChanges: boolean;
-  translateStatus: Record<string, 'pending' | 'completed'>;
+  translateStatus: Record<string, "pending" | "completed">;
   onTabChange: (tabKey: string) => void;
   onConfigUpdate: (config: any) => void;
   onTabDataUpdate: (tabKey: string, newTabData: any) => void;
   onAppUpdate: (appData: any) => void;
-  onEditorModeChange: (mode: 'ui' | 'json') => void;
+  onEditorModeChange: (mode: "ui" | "json") => void;
   onLockToggle: () => void;
   onSaveConfig: () => void;
   onResetChanges: () => void;
@@ -42,20 +76,20 @@ interface MainContentProps {
 }
 
 const LANGUAGES = [
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'it', name: 'Italian' },
-  { code: 'pt', name: 'Portuguese' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'zh', name: 'Chinese' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ko', name: 'Korean' },
-  { code: 'ml', name: 'Malayalam' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'te', name: 'Telugu' },
-  { code: 'kn', name: 'Kannada' },
-  { code: 'hi', name: 'Hindi' },
+  { code: "es", name: "Spanish" },
+  { code: "fr", name: "French" },
+  { code: "de", name: "German" },
+  { code: "it", name: "Italian" },
+  { code: "pt", name: "Portuguese" },
+  { code: "ru", name: "Russian" },
+  { code: "zh", name: "Chinese" },
+  { code: "ja", name: "Japanese" },
+  { code: "ko", name: "Korean" },
+  { code: "ml", name: "Malayalam" },
+  { code: "ta", name: "Tamil" },
+  { code: "te", name: "Telugu" },
+  { code: "kn", name: "Kannada" },
+  { code: "hi", name: "Hindi" },
 ];
 
 export default function MainContent({
@@ -90,9 +124,16 @@ export default function MainContent({
   onRetryConfig,
   onCreateApp, // Added onCreateApp to function parameters
 }: MainContentProps) {
-  const [validateResult, setValidateResult] = useState<{ valid: boolean; error?: string } | null>(null);
-  const [refreshingTabs, setRefreshingTabs] = useState<Record<string, boolean>>({});
-  const [refreshSuccess, setRefreshSuccess] = useState<Record<string, boolean>>({});
+  const [validateResult, setValidateResult] = useState<{
+    valid: boolean;
+    error?: string;
+  } | null>(null);
+  const [refreshingTabs, setRefreshingTabs] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [refreshSuccess, setRefreshSuccess] = useState<Record<string, boolean>>(
+    {},
+  );
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleValidateJson = () => {
@@ -100,7 +141,7 @@ export default function MainContent({
 
     try {
       // Get the raw JSON string from the Monaco editor if it exists
-      const editorElement = document.querySelector('.monaco-editor');
+      const editorElement = document.querySelector(".monaco-editor");
       const monacoEditor = (window as any).monaco?.editor?.getEditors()?.[0];
 
       let jsonString: string;
@@ -115,9 +156,10 @@ export default function MainContent({
       setValidateResult({ valid: true });
       setTimeout(() => setValidateResult(null), 3000);
     } catch (error) {
-      setValidateResult({ 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'Invalid JSON structure' 
+      setValidateResult({
+        valid: false,
+        error:
+          error instanceof Error ? error.message : "Invalid JSON structure",
       });
       setTimeout(() => setValidateResult(null), 5000);
     }
@@ -129,16 +171,16 @@ export default function MainContent({
   };
 
   const handleRefreshClick = async (tabKey: string) => {
-    setRefreshingTabs(prev => ({ ...prev, [tabKey]: true }));
+    setRefreshingTabs((prev) => ({ ...prev, [tabKey]: true }));
 
     try {
       await onRefreshTab(tabKey);
-      setRefreshSuccess(prev => ({ ...prev, [tabKey]: true }));
+      setRefreshSuccess((prev) => ({ ...prev, [tabKey]: true }));
       setTimeout(() => {
-        setRefreshSuccess(prev => ({ ...prev, [tabKey]: false }));
+        setRefreshSuccess((prev) => ({ ...prev, [tabKey]: false }));
       }, 2000);
     } finally {
-      setRefreshingTabs(prev => ({ ...prev, [tabKey]: false }));
+      setRefreshingTabs((prev) => ({ ...prev, [tabKey]: false }));
     }
   };
 
@@ -168,7 +210,8 @@ export default function MainContent({
                 Welcome to Referral Boost Console
               </h2>
               <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                Manage your referral campaigns with ease. Create, configure, and optimize your referral system from one central dashboard.
+                Manage your referral campaigns with ease. Create, configure, and
+                optimize your referral system from one central dashboard.
               </p>
             </div>
 
@@ -177,37 +220,50 @@ export default function MainContent({
                 <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-blue-100 flex items-center justify-center">
                   <Smartphone className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Multi-Platform</h3>
-                <p className="text-sm text-muted-foreground">Configure referral flows for iOS, Android, and web platforms</p>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Multi-Platform
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Configure referral flows for iOS, Android, and web platforms
+                </p>
               </div>
 
               <div className="bg-card border rounded-lg p-6 text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-green-100 flex items-center justify-center">
                   <Globe className="w-6 h-6 text-green-600" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Global Reach</h3>
-                <p className="text-sm text-muted-foreground">Support multiple languages and localized content</p>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Global Reach
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Support multiple languages and localized content
+                </p>
               </div>
 
               <div className="bg-card border rounded-lg p-6 text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-purple-100 flex items-center justify-center">
                   <FileText className="w-6 h-6 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Easy Setup</h3>
-                <p className="text-sm text-muted-foreground">Visual editor and JSON editor for flexible configuration</p>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Easy Setup
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Visual editor and JSON editor for flexible configuration
+                </p>
               </div>
             </div>
 
             <div className="bg-gradient-to-r from-primary/5 to-accent/5 border rounded-lg p-6">
-              <h3 className="font-semibold text-foreground mb-3">Get Started</h3>
+              <h3 className="font-semibold text-foreground mb-3">
+                Get Started
+              </h3>
               <p className="text-muted-foreground mb-4">
-                {apps.length === 0 
+                {apps.length === 0
                   ? "Create your first app to begin configuring your referral program"
-                  : "Select an app from the sidebar or create a new one to get started"
-                }
+                  : "Select an app from the sidebar or create a new one to get started"}
               </p>
               <div className="flex items-center justify-center gap-4">
-                <Button 
+                <Button
                   onClick={onCreateApp} // Use the onCreateApp prop
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
@@ -236,17 +292,20 @@ export default function MainContent({
                   <strong>Error:</strong> {configError.message}
                 </div>
                 <div className="mb-4 text-sm opacity-90">
-                  <strong>App:</strong> {selectedApp.packageName} ({selectedApp.appName})
+                  <strong>App:</strong> {selectedApp.packageName} (
+                  {selectedApp.appName})
                 </div>
-                <Button 
+                <Button
                   onClick={onRetryConfig}
                   variant="outline"
                   size="sm"
                   className="bg-background text-foreground hover:bg-muted"
                   disabled={isLoadingConfig}
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingConfig ? 'animate-spin' : ''}`} />
-                  {isLoadingConfig ? 'Retrying...' : 'Try Again'}
+                  <RefreshCw
+                    className={`w-4 h-4 mr-2 ${isLoadingConfig ? "animate-spin" : ""}`}
+                  />
+                  {isLoadingConfig ? "Retrying..." : "Try Again"}
                 </Button>
               </AlertDescription>
             </Alert>
@@ -273,37 +332,40 @@ export default function MainContent({
     );
   }
 
-  const tabKeys = currentConfig?.referral_json?.en ? 
-    Object.keys(currentConfig.referral_json.en) : [];
+  const tabKeys = currentConfig?.referral_json?.en
+    ? Object.keys(currentConfig.referral_json.en)
+    : [];
 
   // Define the desired tab order, including the special tabs
   const tabOrder = [
-    'page1_referralPromote',
-    'page2_referralStatus', 
-    'page3_referralDownload',
-    'page4_referralRedeem',
-    'notifications',
-    'image',
-    'app-details'
+    "page1_referralPromote",
+    "page2_referralStatus",
+    "page3_referralDownload",
+    "page4_referralRedeem",
+    "notifications",
+    "image",
+    "app-details",
   ];
 
   // Always include special tabs that don't come from referral_json.en
-  const specialTabs = ['app-details', 'image'];
+  const specialTabs = ["app-details", "image"];
 
   // Get tabs from referral_json.en, excluding special tabs to avoid duplicates
   // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
-  const excludedTabs = [...specialTabs, 'appDetails'];
-  const configTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(tab => !excludedTabs.includes(tab));
+  const excludedTabs = [...specialTabs, "appDetails"];
+  const configTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(
+    (tab) => !excludedTabs.includes(tab),
+  );
 
   // Get tabs in the desired order, including config tabs and special tabs
-  const orderedTabs = tabOrder.filter(tab => {
+  const orderedTabs = tabOrder.filter((tab) => {
     if (specialTabs.includes(tab)) {
       return true; // Always include special tabs
     }
     return configTabs.includes(tab);
   });
 
-  const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
+  const additionalTabs = configTabs.filter((tab) => !tabOrder.includes(tab));
   const allTabs = [...orderedTabs, ...additionalTabs];
 
   return (
@@ -312,18 +374,18 @@ export default function MainContent({
       <div className="content-toolbar">
         <div className="editor-mode-toggle">
           <Button
-            variant={editorMode === 'ui' ? 'default' : 'outline'}
+            variant={editorMode === "ui" ? "default" : "outline"}
             size="sm"
-            onClick={() => onEditorModeChange('ui')}
+            onClick={() => onEditorModeChange("ui")}
             className="rounded-r-none"
           >
             <Palette className="w-4 h-4 mr-2" />
             UI Editor
           </Button>
           <Button
-            variant={editorMode === 'json' ? 'default' : 'outline'}
+            variant={editorMode === "json" ? "default" : "outline"}
             size="sm"
-            onClick={() => onEditorModeChange('json')}
+            onClick={() => onEditorModeChange("json")}
             className="rounded-l-none"
           >
             <Code className="w-4 h-4 mr-2" />
@@ -336,28 +398,36 @@ export default function MainContent({
             variant="outline"
             size="sm"
             onClick={onLockToggle}
-            className={isLocked ? 'bg-red-50 border-red-200 text-red-700' : ''}
+            className={isLocked ? "bg-red-50 border-red-200 text-red-700" : ""}
           >
-            {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+            {isLocked ? (
+              <Lock className="w-4 h-4" />
+            ) : (
+              <Unlock className="w-4 h-4" />
+            )}
           </Button>
 
-          {editorMode === 'json' && (
+          {editorMode === "json" && (
             <Button
               variant="outline"
               size="sm"
               onClick={handleValidateJson}
               className={
-                validateResult?.valid === true 
-                  ? 'border-green-500 text-green-600 bg-green-50' 
-                  : validateResult?.valid === false 
-                  ? 'border-red-500 text-red-600 bg-red-50'
-                  : ''
+                validateResult?.valid === true
+                  ? "border-green-500 text-green-600 bg-green-50"
+                  : validateResult?.valid === false
+                    ? "border-red-500 text-red-600 bg-red-50"
+                    : ""
               }
             >
               <CheckCircle className="w-4 h-4 mr-2" />
               Validate JSON
-              {validateResult?.valid === true && <Check className="w-4 h-4 ml-2 text-green-600" />}
-              {validateResult?.valid === false && <span className="ml-2 text-red-600">✗</span>}
+              {validateResult?.valid === true && (
+                <Check className="w-4 h-4 ml-2 text-green-600" />
+              )}
+              {validateResult?.valid === false && (
+                <span className="ml-2 text-red-600">✗</span>
+              )}
             </Button>
           )}
 
@@ -378,14 +448,16 @@ export default function MainContent({
                     onTranslate(lang.code);
                   }}
                   onSelect={(e) => e.preventDefault()}
-                  disabled={translateStatus[lang.code] === 'completed'}
+                  disabled={translateStatus[lang.code] === "completed"}
                   className="flex items-center justify-between cursor-pointer"
                 >
-                  <span>{lang.name} ({lang.code})</span>
+                  <span>
+                    {lang.name} ({lang.code})
+                  </span>
                   <div className="flex items-center ml-4">
-                    {translateStatus[lang.code] === 'pending' ? (
+                    {translateStatus[lang.code] === "pending" ? (
                       <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    ) : translateStatus[lang.code] === 'completed' ? (
+                    ) : translateStatus[lang.code] === "completed" ? (
                       <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center">
                         <Check className="w-3 h-3 text-white" />
                       </div>
@@ -401,7 +473,7 @@ export default function MainContent({
       </div>
 
       {/* Conditional Tabs or JSON Editor */}
-      {editorMode === 'json' ? (
+      {editorMode === "json" ? (
         // JSON Editor Mode - Show full JSON without tabs
         <div className="json-editor-container flex-1 flex flex-col">
           <TabContent
@@ -428,7 +500,10 @@ export default function MainContent({
                 const isActive = activeTab === tabKey;
 
                 return (
-                  <div key={tabKey} className={`tab-item ${isActive ? 'active' : ''} relative group`}>
+                  <div
+                    key={tabKey}
+                    className={`tab-item ${isActive ? "active" : ""} relative group`}
+                  >
                     <div
                       className="tab-label"
                       onClick={() => onTabChange(tabKey)}
@@ -459,18 +534,21 @@ export default function MainContent({
           </div>
 
           {/* Tab Contents - with proper spacing for fixed elements */}
-          <div className="flex-1 overflow-y-auto" style={{ paddingTop: '60px' }}>
+          <div className="flex-1 overflow-y-auto">
             {allTabs.map((tabKey) => {
               let tabData;
-              const isAppDetailsTab = tabKey === 'app-details';
-              const isImageTab = tabKey === 'image';
+              const isAppDetailsTab = tabKey === "app-details";
+              const isImageTab = tabKey === "image";
 
               if (isAppDetailsTab) {
                 // For app details, pass the selected app data directly
                 tabData = selectedApp;
               } else if (isImageTab) {
                 // Assuming a structure for image tab data, adjust if needed
-                tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
+                tabData = currentConfig?.referral_json?.en?.[tabKey] || {
+                  imageUrl: "",
+                  alt: "",
+                };
               } else {
                 tabData = currentConfig?.referral_json?.en?.[tabKey] || {};
               }
@@ -500,8 +578,8 @@ export default function MainContent({
 
       {/* Global Actions */}
       <div className="global-actions">
-        <Button 
-          onClick={onSaveConfig} 
+        <Button
+          onClick={onSaveConfig}
           disabled={isLocked || isSaving}
           className="flex items-center gap-2 relative"
         >
@@ -551,12 +629,18 @@ export default function MainContent({
           <AlertDialogHeader>
             <AlertDialogTitle>Reset Changes</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to reset all changes? This will revert the configuration back to the original state and cannot be undone.
+              Are you sure you want to reset all changes? This will revert the
+              configuration back to the original state and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelReset}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogCancel onClick={handleCancelReset}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmReset}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Reset Changes
             </AlertDialogAction>
           </AlertDialogFooter>
