@@ -1,10 +1,7 @@
-
 import { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ImageIcon, Upload, X } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ImageIcon, Wand2 } from 'lucide-react';
 
 interface ImageEditorProps {
   data: any;
@@ -27,25 +24,19 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
     }
   }, [data]);
 
-  const handleChange = (field: string, value: string) => {
-    const newFormData = { ...formData, [field]: value };
+  const handleGenerateImage = async () => {
+    if (isLocked) return;
+
+    // TODO: Implement image generation logic here
+    // For now, we'll use a placeholder
+    const generatedImageUrl = 'https://via.placeholder.com/400x200?text=Generated+App+Image';
+    const newFormData = {
+      imageUrl: generatedImageUrl,
+      alt: 'Generated app image'
+    };
+
     setFormData(newFormData);
     onUpdate(newFormData);
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Create a temporary URL for preview
-      const url = URL.createObjectURL(file);
-      handleChange('imageUrl', url);
-      handleChange('alt', file.name);
-    }
-  };
-
-  const clearImage = () => {
-    handleChange('imageUrl', '');
-    handleChange('alt', '');
   };
 
   return (
@@ -54,93 +45,45 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ImageIcon className="w-5 h-5" />
-            App Image
+            Download App Image
           </CardTitle>
           <CardDescription>
-            Upload or specify an image URL for your app
+            Generate an image for download app
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Image Preview */}
-          {formData.imageUrl && (
-            <div className="relative">
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
-                <img
-                  src={formData.imageUrl}
-                  alt={formData.alt || 'App image'}
-                  className="max-w-full h-auto max-h-64 mx-auto rounded-lg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              </div>
-              <Button
-                variant="destructive"
-                size="sm"
-                className="absolute top-2 right-2"
-                onClick={clearImage}
-                disabled={isLocked}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-
-          {/* Upload Section */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Upload Image</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  disabled={isLocked}
-                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isLocked}
-                  onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose File
-                </Button>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="imageUrl">Image URL</Label>
-              <Input
-                id="imageUrl"
-                value={formData.imageUrl}
-                onChange={(e) => handleChange('imageUrl', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                disabled={isLocked}
-                type="url"
+          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
+            {formData.imageUrl ? (
+              <img
+                src={formData.imageUrl}
+                alt={formData.alt || 'App download image'}
+                className="max-w-full h-auto max-h-64 mx-auto rounded-lg"
+                onError={(e) => {
+                  // If image fails to load, show placeholder
+                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x200?text=Image+Preview';
+                }}
               />
-            </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center text-muted-foreground">
+                <ImageIcon className="w-16 h-16 mb-4 opacity-50" />
+                <p className="text-sm">No image generated yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Click the button below to generate an image</p>
+              </div>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="alt">Alt Text</Label>
-              <Input
-                id="alt"
-                value={formData.alt}
-                onChange={(e) => handleChange('alt', e.target.value)}
-                placeholder="Description of the image for accessibility"
-                disabled={isLocked}
-              />
-            </div>
+          {/* Generate Button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={handleGenerateImage}
+              disabled={isLocked}
+              className="flex items-center gap-2"
+              size="lg"
+            >
+              <Wand2 className="w-4 h-4" />
+              Generate Image
+            </Button>
           </div>
         </CardContent>
       </Card>
