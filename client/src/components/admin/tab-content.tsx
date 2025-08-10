@@ -1,6 +1,7 @@
 import UIEditor from "./ui-editor";
 import JsonEditor from "./json-editor";
 import AppDetailsEditor from "./app-details-editor";
+import ImageEditor from "./image-editor";
 
 interface TabContentProps {
   tabKey: string;
@@ -71,7 +72,6 @@ export default function TabContent({
 
   // Special handling for image tab
   if (tabKey === 'image') {
-    const ImageEditor = require('./image-editor').default;
     return (
       <div className="tab-content h-full flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto">
