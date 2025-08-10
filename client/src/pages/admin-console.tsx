@@ -523,8 +523,8 @@ export default function AdminConsole() {
     appName = appName || 'Demo App';
     appDescription = appDescription || 'Demo app description';
 
-    // All special tabs need app name and description for ogQuery
-    const isSpecialApiTab = ['page1_referralPromote', 'page2_referralStatus', 'page3_referralDownload', 'page4_referralRedeem'].includes(tabKey);
+    // All special tabs need app name and description for API calls
+    const isSpecialApiTab = ['page1_referralPromote', 'page2_referralStatus', 'page3_referralDownload', 'page4_referralRedeem', 'notifications'].includes(tabKey);
 
     regenerateTabMutation.mutate({
       appId: selectedApp.appId,
