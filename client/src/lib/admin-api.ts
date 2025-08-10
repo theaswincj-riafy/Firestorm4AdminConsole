@@ -739,16 +739,21 @@ class AdminApiService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout for translation
 
-      const response = await fetch("https://referral-system-o0yw.onrender.com/api/admin/translate", {
+      // Extract app details from the JSON data
+      const appName = jsonData?.appName || "App";
+      const description = jsonData?.meta?.description || jsonData?.description || "App description";
+
+      const response = await fetch("https://referral-system-o0yw.onrender.com/api/admin/create_language_referral_json", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": "HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q",
         },
         body: JSON.stringify({
+          app_name: appName,
           app_package_name: appPackageName,
-          target_language_code: targetLanguage,
-          ...jsonData
+          description: description,
+          language: targetLanguage,
         }),
         signal: controller.signal,
       });
@@ -756,16 +761,14 @@ class AdminApiService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`Translation API error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Translation API error! status: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
       
-      if (result.status === "success") {
-        return result;
-      } else {
-        throw new Error(result.message || "Translation failed");
-      }
+      console.log(`Translation to ${targetLanguage} completed:`, result);
+      return result;
     } catch (error) {
       console.error(`Error translating to ${targetLanguage}:`, error);
       throw error;

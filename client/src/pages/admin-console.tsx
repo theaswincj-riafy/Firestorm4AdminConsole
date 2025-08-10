@@ -501,11 +501,15 @@ export default function AdminConsole() {
     setTranslateStatus(prev => ({ ...prev, [lang]: 'pending' }));
     
     try {
-      // Call the new single language translation API
+      // Call the new single language translation API with app details
       await adminApi.translateToLanguage(
         selectedApp.packageName, 
         lang, 
-        currentConfig
+        {
+          appName: selectedApp.appName,
+          description: selectedApp.meta?.description || "App description",
+          ...currentConfig
+        }
       );
       
       // After successful translation, refresh the config data
