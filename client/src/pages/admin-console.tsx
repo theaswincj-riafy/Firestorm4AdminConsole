@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/auth-context";
 import Sidebar from "@/components/admin/sidebar";
@@ -21,6 +21,7 @@ import {
 export default function AdminConsole() {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const [currentConfig, setCurrentConfig] = useState<any>(null);
+  const [originalConfig, setOriginalConfig] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [editorMode, setEditorMode] = useState<'ui' | 'json'>('ui');
   const [isLocked, setIsLocked] = useState(false);
@@ -61,68 +62,68 @@ export default function AdminConsole() {
     queryFn: () => adminApi.getApps(),
   });
 
-  const configQuery = useQuery({
+  const { data: configData, isLoading: isLoadingConfig, error: configError, refetch: refetchConfig } = useQuery({
     queryKey: ['/api/apps', selectedApp?.appId, 'config'],
     queryFn: () => selectedApp ? adminApi.getAppConfig(selectedApp.appId) : null,
     enabled: !!selectedApp,
-  });
+    onSuccess: (data) => {
+      if (data) {
+        setCurrentConfig(data);
+        setOriginalConfig(JSON.parse(JSON.stringify(data))); // Deep clone for original
+        setIsDirty(false);
 
-  // Handle config changes
-  useEffect(() => {
-    if (configQuery.data) {
-      setCurrentConfig(configQuery.data);
-      setIsDirty(false);
+        // Set the first tab in the proper order
+        const tabOrder = [
+          'page1_referralPromote',
+          'page2_referralStatus',
+          'page3_referralDownload',
+          'page4_referralRedeem',
+          'notifications',
+          'image',
+          'app-details'
+        ];
 
-      // Set the first tab in the proper order
-      const tabOrder = [
-        'page1_referralPromote',
-        'page2_referralStatus',
-        'page3_referralDownload',
-        'page4_referralRedeem',
-        'notifications',
-        'image',
-        'app-details'
-      ];
+        // Always include special tabs that don't come from referral_json.en
+        const specialTabs = ['app-details', 'image'];
 
-      // Always include special tabs that don't come from referral_json.en
-      const specialTabs = ['app-details', 'image'];
-      
-      // Find available tabs from the referral_json.en structure, excluding special tabs
-      // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
-      const excludedTabs = [...specialTabs, 'appDetails'];
-      const configTabs = configQuery.data.referral_json?.en ?
-        Object.keys(configQuery.data.referral_json.en).filter(tab => !excludedTabs.includes(tab)) : [];
+        // Find available tabs from the referral_json.en structure, excluding special tabs
+        // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
+        const excludedTabs = [...specialTabs, 'appDetails'];
+        const configTabs = data.referral_json?.en ?
+          Object.keys(data.referral_json.en).filter(tab => !excludedTabs.includes(tab)) : [];
 
-      // Combine special tabs with config tabs in the desired order
-      const orderedTabs = tabOrder.filter(tab => 
-        specialTabs.includes(tab) || configTabs.includes(tab)
-      );
-      const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
-      const allTabs = [...orderedTabs, ...additionalTabs];
+        // Combine special tabs with config tabs in the desired order
+        const orderedTabs = tabOrder.filter(tab =>
+          specialTabs.includes(tab) || configTabs.includes(tab)
+        );
+        const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
+        const allTabs = [...orderedTabs, ...additionalTabs];
 
-      if (allTabs.length > 0 && !activeTab) {
-        setActiveTab(allTabs[0]);
+        if (allTabs.length > 0 && !activeTab) {
+          setActiveTab(allTabs[0]);
+        }
       }
-    }
-  }, [configQuery.data, activeTab]);
+    },
+  });
 
   const createAppMutation = useMutation({
     mutationFn: (data: AppFormData) => adminApi.createApp(data),
     onSuccess: async (newApp) => {
       // Invalidate apps query to refresh the sidebar
       queryClient.invalidateQueries({ queryKey: ['/api/apps'] });
-      
+
       // Select the new app
       setSelectedApp(newApp);
       setIsAppModalOpen(false);
-      
+
       // Reset any existing state
       setActiveTab(null);
       setCurrentConfig(null);
-      
+      setOriginalConfig(null); // Reset original config as well
+
       // Trigger config loading for the new app
-      queryClient.invalidateQueries({ queryKey: ['/api/config', newApp.appId] });
-      
+      queryClient.invalidateQueries({ queryKey: ['/api/apps', newApp.appId, 'config'] });
+
       toast({
         title: "Success",
         description: "App created successfully and loaded",
@@ -165,6 +166,7 @@ export default function AdminConsole() {
       if (selectedApp) {
         setSelectedApp(null);
         setCurrentConfig(null);
+        setOriginalConfig(null); // Reset original config
         setActiveTab(null);
       }
       toast({
@@ -186,9 +188,9 @@ export default function AdminConsole() {
       adminApi.saveAppConfig(appId, config),
     onSuccess: () => {
       setIsDirty(false);
-      // Refresh the config data after successful save
-      if (selectedApp) {
-        queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
+      // Update original config after successful save
+      if (currentConfig) {
+        setOriginalConfig(JSON.parse(JSON.stringify(currentConfig)));
       }
       toast({
         title: "Success",
@@ -292,6 +294,7 @@ export default function AdminConsole() {
     setSelectedApp(app);
     setActiveTab(null); // Reset active tab when switching apps
     setIsDirty(false);
+    setOriginalConfig(null); // Reset original config when switching apps
   };
 
   const handleConfirmAppSwitch = () => {
@@ -299,6 +302,7 @@ export default function AdminConsole() {
       setSelectedApp(pendingAppSwitch);
       setActiveTab(null);
       setIsDirty(false);
+      setOriginalConfig(null); // Reset original config
       setPendingAppSwitch(null);
     }
     setIsUnsavedChangesDialogOpen(false);
@@ -358,7 +362,7 @@ export default function AdminConsole() {
     // Store the app details changes for later saving
     setAppDetailsChanges(updatedAppData);
     setIsDirty(true);
-    
+
     // Update the selected app data for immediate UI updates
     if (selectedApp) {
       setSelectedApp({ ...selectedApp, ...updatedAppData });
@@ -415,10 +419,10 @@ export default function AdminConsole() {
     if (activeTab === 'app-details' && appDetailsChanges) {
       const playStoreLink = appDetailsChanges.meta?.playUrl || '';
       const appStoreLink = appDetailsChanges.meta?.appStoreUrl || '';
-      editAppMutation.mutate({ 
-        appId: selectedApp.appId, 
-        playStoreLink, 
-        appStoreLink 
+      editAppMutation.mutate({
+        appId: selectedApp.appId,
+        playStoreLink,
+        appStoreLink
       });
       // Clear the app details changes after saving
       setAppDetailsChanges(null);
@@ -428,20 +432,32 @@ export default function AdminConsole() {
     }
   };
 
-  const handleResetChanges = () => {
-    if (confirm('Are you sure you want to reset all changes? This will lose any unsaved modifications.')) {
-      if (selectedApp) {
-        queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
-      }
-    }
-  };
+  // Check if current config differs from original
+  const hasChanges = useMemo(() => {
+    if (!currentConfig || !originalConfig) return false;
+    return JSON.stringify(currentConfig) !== JSON.stringify(originalConfig);
+  }, [currentConfig, originalConfig]);
 
   const handleRegenerateTab = (tabKey: string) => {
-    if (selectedApp && currentConfig?.referral_json?.en?.[tabKey]) {
-      regenerateTabMutation.mutate({
-        appId: selectedApp.appId,
-        tabKey,
-        currentSubtree: currentConfig.referral_json.en[tabKey]
+    if (!selectedApp || !currentConfig) return;
+
+    const currentSubtree = currentConfig?.referral_json?.en?.[tabKey] || {};
+    regenerateTabMutation.mutate({
+      appId: selectedApp.appId,
+      tabKey,
+      currentSubtree,
+      appName: selectedApp.appName,
+      appDescription: selectedApp.appDescription
+    });
+  };
+
+  const handleResetChanges = () => {
+    if (originalConfig) {
+      setCurrentConfig(JSON.parse(JSON.stringify(originalConfig))); // Deep clone
+      setIsDirty(false);
+      toast({
+        title: "Changes Reset",
+        description: "Configuration has been reset to the original state",
       });
     }
   };
@@ -558,13 +574,15 @@ export default function AdminConsole() {
         />
 
         <MainContent
-          apps={apps}
           selectedApp={selectedApp}
+          apps={apps}
           currentConfig={currentConfig}
+          originalConfig={originalConfig}
           activeTab={activeTab}
           editorMode={editorMode}
           isLocked={isLocked}
           isDirty={isDirty}
+          hasChanges={hasChanges}
           translateStatus={translateStatus}
           onTabChange={handleTabChange}
           onConfigUpdate={handleConfigUpdate}
@@ -582,9 +600,9 @@ export default function AdminConsole() {
           isRegenerating={regenerateTabMutation.isPending}
           isSaving={saveConfigMutation.isPending || editAppMutation.isPending}
           isTranslating={translateMutation.isPending}
-          configError={configQuery.error}
-          isLoadingConfig={configQuery.isPending}
-          onRetryConfig={() => configQuery.refetch()}
+          configError={configError as Error | null}
+          isLoadingConfig={isLoadingConfig}
+          onRetryConfig={() => refetchConfig()}
         />
       </div>
 

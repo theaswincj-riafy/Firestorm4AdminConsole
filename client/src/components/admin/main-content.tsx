@@ -3,6 +3,7 @@ import { Lock, Unlock, CheckCircle, MoreHorizontal, Save, RotateCcw, Languages, 
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import TabContent from "./tab-content";
 import type { App } from "@shared/schema";
@@ -11,10 +12,12 @@ interface MainContentProps {
   selectedApp: App | null;
   apps: App[];
   currentConfig: any;
+  originalConfig: any;
   activeTab: string | null;
   editorMode: 'ui' | 'json';
   isLocked: boolean;
   isDirty: boolean;
+  hasChanges: boolean;
   translateStatus: Record<string, 'pending' | 'completed'>;
   onTabChange: (tabKey: string) => void;
   onConfigUpdate: (config: any) => void;
@@ -51,10 +54,12 @@ export default function MainContent({
   selectedApp,
   apps,
   currentConfig,
+  originalConfig,
   activeTab,
   editorMode,
   isLocked,
   isDirty,
+  hasChanges,
   translateStatus,
   onTabChange,
   onConfigUpdate,
@@ -79,6 +84,7 @@ export default function MainContent({
   const [validateResult, setValidateResult] = useState<{ valid: boolean; error?: string } | null>(null);
   const [refreshingTabs, setRefreshingTabs] = useState<Record<string, boolean>>({});
   const [refreshSuccess, setRefreshSuccess] = useState<Record<string, boolean>>({});
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleValidateJson = () => {
     if (!currentConfig || !activeTab) return;
@@ -148,6 +154,19 @@ export default function MainContent({
     } finally {
       setRefreshingTabs(prev => ({ ...prev, [tabKey]: false }));
     }
+  };
+
+  const handleResetClick = () => {
+    setShowResetConfirm(true);
+  };
+
+  const handleConfirmReset = () => {
+    onResetChanges();
+    setShowResetConfirm(false);
+  };
+
+  const handleCancelReset = () => {
+    setShowResetConfirm(false);
   };
 
   if (!selectedApp) {
@@ -512,6 +531,16 @@ export default function MainContent({
         </Button>
 
         <Button
+          variant="outline"
+          onClick={handleResetClick}
+          disabled={!hasChanges || isLocked}
+          className="flex items-center gap-2"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Reset Changes
+        </Button>
+
+        <Button
           variant="destructive"
           onClick={() => onDeleteApp(selectedApp.appId)}
           className="flex items-center gap-2"
@@ -527,6 +556,24 @@ export default function MainContent({
           <div className="text-sm mt-1">{validateResult.error}</div>
         </div>
       )}
+
+      {/* Reset Confirmation Dialog */}
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reset all changes? This will revert the configuration back to the original state and cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelReset}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Reset Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
