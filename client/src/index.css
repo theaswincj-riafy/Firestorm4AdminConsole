@@ -135,8 +135,9 @@
 /* Layout styles */
 .admin-layout {
   display: flex;
-  min-height: calc(100vh - var(--header-height));
+  height: calc(100vh - var(--header-height));
   margin-top: var(--header-height);
+  overflow: hidden;
 }
 
 .admin-main {
@@ -144,6 +145,8 @@
   display: flex;
   flex-direction: column;
   background: var(--background);
+  overflow: hidden;
+  height: 100%;
 }
 
 .admin-sidebar {
@@ -337,17 +340,7 @@
   padding-top: 64px;
 }
 
-.admin-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding-top: 110px;
-  /* Space for fixed toolbar + tabs */
-  padding-bottom: 80px;
-  /* Space for fixed footer */
-  margin-left: var(--sidebar-width);
-}
+/* Remove duplicate admin-main definition - already handled above */
 
 .content-toolbar {
   display: flex;
