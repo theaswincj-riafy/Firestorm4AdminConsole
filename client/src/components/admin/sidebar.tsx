@@ -52,12 +52,8 @@ export default function Sidebar({
             No apps yet
           </h3>
           <p className="text-sm text-muted-foreground mb-6">
-            Create your first app to get started with referral configuration.
+            No apps available for referral configuration.
           </p>
-          <Button onClick={onCreateApp} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            Create App
-          </Button>
         </div>
       </aside>
     );
@@ -93,32 +89,6 @@ export default function Sidebar({
                       {app.packageName}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditApp(app);
-                      }}
-                      title="Edit app"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteApp(app.appId);
-                      }}
-                      title="Delete app"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -126,12 +96,7 @@ export default function Sidebar({
         </div>
       </div>
       
-      <div className="border-t border-sidebar-border p-4">
-        <Button onClick={onCreateApp} className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
-          Create New App
-        </Button>
-      </div>
+      
     </aside>
   );
 }
