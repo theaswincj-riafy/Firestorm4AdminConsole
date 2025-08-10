@@ -777,12 +777,12 @@ class AdminApiService {
       console.log(`Translation to ${targetLanguage} completed:`, result);
       return result;
     } catch (error) {
-      if (error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         console.error(`Translation to ${targetLanguage} timed out`);
         throw new Error(`Translation to ${targetLanguage} timed out - please try again`);
       }
       console.error(`Error translating to ${targetLanguage}:`, error);
-      throw error;
+      throw error instanceof Error ? error : new Error("Translation failed");
     }
   }
 
@@ -798,7 +798,7 @@ class AdminApiService {
       return results;
     } catch (error) {
       console.error("Error in bulk translation:", error);
-      throw error;
+      throw error instanceof Error ? error : new Error("Unknown translation error");
     }
   }
 

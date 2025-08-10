@@ -433,10 +433,17 @@ export default function MainContent({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" disabled={isTranslating}>
                 <Languages className="w-4 h-4 mr-2" />
-                Translate
-                <ChevronDown className="w-4 h-4 ml-2" />
+                {isTranslating ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
+                    Translating...
+                  </>
+                ) : (
+                  "Translate"
+                )}
+                {!isTranslating && <ChevronDown className="w-4 h-4 ml-2" />}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">

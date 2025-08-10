@@ -29,6 +29,7 @@ export default function AdminConsole() {
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [editingApp, setEditingApp] = useState<App | null>(null);
   const [translateStatus, setTranslateStatus] = useState<Record<string, 'pending' | 'completed'>>({});
+  const [isTranslating, setIsTranslating] = useState(false);
   const [appDetailsChanges, setAppDetailsChanges] = useState<any>(null);
   const [pendingAppSwitch, setPendingAppSwitch] = useState<App | null>(null);
   const [isUnsavedChangesDialogOpen, setIsUnsavedChangesDialogOpen] = useState(false);
@@ -497,8 +498,9 @@ export default function AdminConsole() {
   const handleTranslate = async (lang: string) => {
     if (!selectedApp || !currentConfig || translateStatus[lang] === 'pending') return;
     
-    // Set language to pending status
+    // Set language to pending status and mark as translating
     setTranslateStatus(prev => ({ ...prev, [lang]: 'pending' }));
+    setIsTranslating(true);
     
     try {
       // Call the new single language translation API with app details
@@ -516,7 +518,15 @@ export default function AdminConsole() {
       queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
       
       // Mark language as completed
-      setTranslateStatus(prev => ({ ...prev, [lang]: 'completed' }));
+      setTranslateStatus(prev => {
+        const newStatus = { ...prev, [lang]: 'completed' };
+        // Check if any translations are still pending after this completion
+        const stillTranslating = Object.values(newStatus).some(status => status === 'pending');
+        if (!stillTranslating) {
+          setIsTranslating(false);
+        }
+        return newStatus;
+      });
       
       toast({
         title: "Translation Completed",
@@ -530,6 +540,11 @@ export default function AdminConsole() {
       setTranslateStatus(prev => {
         const newStatus = { ...prev };
         delete newStatus[lang];
+        // Check if any translations are still pending after this failure
+        const stillTranslating = Object.values(newStatus).some(status => status === 'pending');
+        if (!stillTranslating) {
+          setIsTranslating(false);
+        }
         return newStatus;
       });
       
