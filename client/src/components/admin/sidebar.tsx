@@ -41,8 +41,8 @@ export default function Sidebar({
   if (apps.length === 0) {
     return (
       <aside className="admin-sidebar">
-        <div className="p-6 border-b border-sidebar-border">
-          <h2 className="text-base font-semibold text-sidebar-foreground">
+        <div className="p-4 border-b border-sidebar-border">
+          <h2 className="text-lg font-semibold text-sidebar-foreground">
             Apps
           </h2>
         </div>
@@ -61,8 +61,8 @@ export default function Sidebar({
 
   return (
     <aside className="admin-sidebar">
-      <div className="p-6 border-b border-sidebar-border">
-        <h2 className="text-base font-semibold text-sidebar-foreground">
+      <div className="p-4 border-b border-sidebar-border">
+        <h2 className="text-lg font-semibold text-sidebar-foreground">
           Apps
         </h2>
       </div>
@@ -74,7 +74,7 @@ export default function Sidebar({
               key={app.appId}
               className={`group relative rounded-lg border transition-colors cursor-pointer hover:bg-accent/50 ${
                 selectedApp?.appId === app.appId 
-                  ? "bg-accent border-accent-foreground/20" 
+                  ? "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" 
                   : "border-border"
               }`}
               onClick={() => onSelectApp(app)}
