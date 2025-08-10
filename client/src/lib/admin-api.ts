@@ -22,6 +22,9 @@ class AdminApiService {
 
   async getApps(): Promise<App[]> {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch(
         "https://referral-system-o0yw.onrender.com/api/admin/listapps",
         {
@@ -30,8 +33,11 @@ class AdminApiService {
             "X-API-Key": "HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q",
             "Content-Type": "application/json",
           },
+          signal: controller.signal,
         },
       );
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,7 +62,12 @@ class AdminApiService {
       }
     } catch (error) {
       console.error("Error fetching apps:", error);
-      // Fallback to local apps if API fails
+      // If it's a timeout or network error, return fallback data immediately
+      if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch'))) {
+        console.log("Using fallback apps due to network timeout/error");
+        return [...this.apps];
+      }
+      // For other errors, also return fallback
       return [...this.apps];
     }
   }

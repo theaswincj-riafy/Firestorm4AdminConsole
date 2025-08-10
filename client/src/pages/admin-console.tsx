@@ -57,14 +57,16 @@ export default function AdminConsole() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
-  const { data: apps = [], isLoading: appsLoading } = useQuery({
+  const { data: apps = [], isLoading: appsLoading, error: appsError } = useQuery({
     queryKey: ['/api/apps'],
     queryFn: () => adminApi.getApps(),
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const { data: configData, isLoading: isLoadingConfig, error: configError, refetch: refetchConfig } = useQuery({
     queryKey: ['/api/apps', selectedApp?.appId, 'config'],
-    queryFn: () => selectedApp ? adminApi.getAppConfig(selectedApp.appId) : null,
+    queryFn: () => selectedApp ? adminApi.getAppConfig(selectedApp.appId) : Promise.resolve(null),
     enabled: !!selectedApp,
     onSuccess: (data) => {
       if (data) {
