@@ -442,82 +442,80 @@ export default function MainContent({
         </div>
       ) : (
         // UI Editor Mode - Show tabs
-        <div className="flex-1 flex flex-col">
-          <div className="tabs-container">
-            <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
-              <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-0" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col overflow-hidden">
+            <div className="tabs-container">
+              <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+                {allTabs.map((tabKey) => {
+                  const tabTitle = getTabTitle(tabKey);
+
+                  return (
+                    <div key={tabKey} className="relative group flex items-center">
+                      <TabsTrigger
+                        value={tabKey}
+                        className="flex items-center gap-2 text-sm pr-8"
+                      >
+                        <span>{tabTitle}</span>
+                      </TabsTrigger>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRefreshClick(tabKey);
+                        }}
+                        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
+                      >
+                        {refreshSuccess[tabKey] ? (
+                          <Check className="w-3 h-3 text-green-500" />
+                        ) : refreshingTabs[tabKey] ? (
+                          <div className="flex items-center gap-1">
+                            <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        ) : (
+                          <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </TabsList>
+            </div>
+
+            {/* Tab Contents */}
+            <div className="flex-1 overflow-hidden">
               {allTabs.map((tabKey) => {
-                const tabTitle = getTabTitle(tabKey);
+                let tabData;
+                const isAppDetailsTab = tabKey === 'app-details';
+                const isImageTab = tabKey === 'image';
+
+                if (isAppDetailsTab) {
+                  // For app details, pass the selected app data directly
+                  tabData = selectedApp;
+                } else if (isImageTab) {
+                  // Assuming a structure for image tab data, adjust if needed
+                  tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
+                } else {
+                  tabData = currentConfig?.referral_json?.en?.[tabKey] || {};
+                }
 
                 return (
-                  <div key={tabKey} className="relative group flex items-center">
-                    <TabsTrigger
-                      value={tabKey}
-                      className="flex items-center gap-2 text-sm pr-8"
-                    >
-                      <span>{tabTitle}</span>
-                    </TabsTrigger>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRefreshClick(tabKey);
-                      }}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
-                    >
-                      {refreshSuccess[tabKey] ? (
-                        <Check className="w-3 h-3 text-green-500" />
-                      ) : refreshingTabs[tabKey] ? (
-                        <div className="flex items-center gap-1">
-                          <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      ) : (
-                        <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
-                      )}
-                    </div>
-                  </div>
+                  <TabsContent key={tabKey} value={tabKey} className="flex-1 h-full overflow-hidden">
+                    <TabContent
+                      tabKey={tabKey}
+                      tabData={tabData}
+                      fullConfigData={currentConfig}
+                      selectedApp={selectedApp}
+                      editorMode={editorMode}
+                      isLocked={isLocked}
+                      onUpdate={onConfigUpdate}
+                      onTabDataUpdate={handleTabDataUpdate}
+                      onAppUpdate={onAppUpdate}
+                      validateResult={validateResult}
+                    />
+                  </TabsContent>
                 );
               })}
-              </TabsList>
-            </Tabs>
-          </div>
-
-          <div className="flex-1 flex flex-col">
-            <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
-              {/* Tab Contents */}
-              {allTabs.map((tabKey) => {
-              let tabData;
-              const isAppDetailsTab = tabKey === 'app-details';
-              const isImageTab = tabKey === 'image';
-
-              if (isAppDetailsTab) {
-                // For app details, pass the selected app data directly
-                tabData = selectedApp;
-              } else if (isImageTab) {
-                // Assuming a structure for image tab data, adjust if needed
-                tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
-              } else {
-                tabData = currentConfig?.referral_json?.en?.[tabKey] || {};
-              }
-
-              return (
-                <TabsContent key={tabKey} value={tabKey} className="flex-1 flex flex-col">
-                  <TabContent
-                    tabKey={tabKey}
-                    tabData={tabData}
-                    fullConfigData={currentConfig}
-                    selectedApp={selectedApp}
-                    editorMode={editorMode}
-                    isLocked={isLocked}
-                    onUpdate={onConfigUpdate}
-                    onTabDataUpdate={handleTabDataUpdate}
-                    onAppUpdate={onAppUpdate}
-                    validateResult={validateResult}
-                  />
-                </TabsContent>
-              );
-              })}
-            </Tabs>
-          </div>
+            </div>
+          </Tabs>
         </div>
       )}
 
