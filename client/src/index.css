@@ -334,6 +334,7 @@
   left: 0;
   bottom: 0;
   z-index: 20;
+  padding-top: 64px;
 }
 
 .admin-main {
