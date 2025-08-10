@@ -124,31 +124,8 @@ export default function MainContent({
   };
 
   const handleTabDataUpdate = (tabKey: string, newTabData: any) => {
-    const updatedConfig = { ...currentConfig };
-    // Ensure referral_json and en exist before updating
-    if (!updatedConfig.referral_json) {
-      updatedConfig.referral_json = {};
-    }
-    if (!updatedConfig.referral_json.en) {
-      updatedConfig.referral_json.en = {};
-    }
-
-    // Handle special tabs that don't map directly to referral_json.en
-    if (tabKey === 'app-details') {
-      // App details are not stored in referral_json.en, so we don't update it here.
-      // If you need to save app details, a different mechanism would be required.
-      console.warn("App details tab is not saved via onTabDataUpdate");
-    } else if (tabKey === 'image') {
-      // Assuming image data might be stored differently or handled separately
-      // For now, we'll just log a warning if it's not in referral_json.en
-      if (!updatedConfig.referral_json.en[tabKey]) {
-        updatedConfig.referral_json.en[tabKey] = {};
-      }
-      updatedConfig.referral_json.en[tabKey] = newTabData;
-    } else {
-      updatedConfig.referral_json.en[tabKey] = newTabData;
-    }
-    onConfigUpdate(updatedConfig);
+    // Pass through to the parent's handleTabDataUpdate function
+    onTabDataUpdate(tabKey, newTabData);
   };
 
   const handleRefreshClick = async (tabKey: string) => {
