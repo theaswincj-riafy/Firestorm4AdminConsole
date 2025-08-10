@@ -739,7 +739,7 @@ class AdminApiService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 120000); // 2 minute timeout for translation
+      }, 300000); // 5 minute timeout for translation
 
       // Extract app details from the JSON data
       const appName = jsonData?.appName || "App";
