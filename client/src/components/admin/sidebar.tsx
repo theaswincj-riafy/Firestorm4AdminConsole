@@ -1,3 +1,4 @@
+
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { App } from "@shared/schema";
@@ -21,23 +22,6 @@ export default function Sidebar({
   onEditApp,
   onDeleteApp,
 }: SidebarProps) {
-  if (isLoading) {
-    return (
-      <aside className="admin-sidebar">
-        <div className="p-6">
-          <div className="animate-pulse">
-            <div className="h-4 bg-muted rounded w-16 mb-4"></div>
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-12 bg-muted rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </aside>
-    );
-  }
-
   return (
     <aside className="admin-sidebar">
       <div className="p-4 border-b border-sidebar-border">
@@ -46,7 +30,17 @@ export default function Sidebar({
         </h2>
       </div>
 
-      {apps.length === 0 ? (
+      {isLoading ? (
+        <div className="p-6">
+          <div className="animate-pulse">
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-12 bg-muted rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : apps.length === 0 ? (
         <div className="p-6 text-center">
           <h3 className="text-base font-medium mb-2 text-sidebar-foreground">
             No apps yet
@@ -56,8 +50,7 @@ export default function Sidebar({
           </p>
         </div>
       ) : (
-
-      <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4">
           <div className="space-y-2">
             {apps.map((app) => (
               <div
@@ -86,8 +79,6 @@ export default function Sidebar({
           </div>
         </div>
       )}
-      
-      
     </aside>
   );
 }
