@@ -1,0 +1,288 @@
+{
+    "data": [
+        {
+            "add_description": "An app with full of recipies",
+            "app_name": "Recipe Maker",
+            "app_package_name": "com.recipe.maker",
+            "referral_json": {
+                "en": {
+                    "notifications": {
+                        "redeemer": [],
+                        "referrer": [
+                            {
+                                "body": "Someone just joined using your code. 4 more and you’ll unlock a month of Premium!",
+                                "cta": "Check your progress",
+                                "id": "referral_progress_4_left",
+                                "title": "🔥 First win!"
+                            },
+                            {
+                                "body": "Another friend joined! Just 3 more redemptions to score your free Premium month.",
+                                "cta": "See who’s next",
+                                "id": "referral_progress_3_left",
+                                "title": "🚀 You’re gaining momentum"
+                            },
+                            {
+                                "body": "You’ve got 3 redemptions now. Only 2 more to go for your Premium reward!",
+                                "cta": "View your status",
+                                "id": "referral_progress_2_left",
+                                "title": "⚡ Almost halfway to the finish"
+                            },
+                            {
+                                "body": "4 out of 5 done. Just 1 more friend and you’ve got your free month of Premium.",
+                                "cta": "Push for the last one",
+                                "id": "referral_progress_1_left",
+                                "title": "🏁 One step away!"
+                            },
+                            {
+                                "body": "Congratulations! You’ve unlocked 1 month of free Premium through referrals.",
+                                "cta": "Redeem now",
+                                "id": "referral_reward_unlocked",
+                                "title": "🎉 You did it!"
+                            }
+                        ]
+                    },
+                    "page1_referralPromote": {
+                        "benefits": [
+                            {
+                                "desc": "Enjoy ad-free access, pro features, and priority support for a whole month.",
+                                "title": "Free Premium"
+                            },
+                            {
+                                "desc": "Your friends get a free week of Premium when they use your code.",
+                                "title": "Mutual Benefits"
+                            },
+                            {
+                                "desc": "Share your code, they redeem, and you get rewarded!",
+                                "title": "Easy Sharing"
+                            }
+                        ],
+                        "hero": {
+                            "hero_title": "*Invite & Unlock 1 Month Premium*",
+                            "page_title": "*Invite Friends*",
+                            "quickButtonText": "*View my referrals*",
+                            "referral_code": "{{referral_code}}",
+                            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code."
+                        },
+                        "how_it_works": [
+                            {
+                                "desc": "Share your referral code with friends and family.",
+                                "step": 1
+                            },
+                            {
+                                "desc": "They redeem your code after installing Recipe Maker.",
+                                "step": 2
+                            },
+                            {
+                                "desc": "You level up with every successful redemption!",
+                                "step": 3
+                            },
+                            {
+                                "desc": "Your friend gets a week of free Premium too!",
+                                "step": 4
+                            },
+                            {
+                                "desc": "Unlock a month of free Premium when you reach 5 redemptions!",
+                                "step": 5
+                            }
+                        ],
+                        "nudges": [
+                            "Share with your closest friends and family first.",
+                            "Personalize your invite with why you love Recipe Maker.",
+                            "Share your code in relevant cooking groups or forums."
+                        ],
+                        "page_id": "referral-promote",
+                        "progress_teaser": {
+                            "subtitle": "Each friend who joins brings you closer to free Premium!",
+                            "title": "Just {{pending_redemptions}} more to go!"
+                        },
+                        "share": {
+                            "messages": {
+                                "default": "{{referrer_name}} wants you to try Recipe Maker! Get 1 week of Premium features for free using this referral: {{referral_link}}"
+                            },
+                            "primary_cta": "*Invite Friends & Family*"
+                        }
+                    },
+                    "page2_referralStatus": {
+                        "benefits": [
+                            {
+                                "desc": "Ad-free experience, pro features, and priority support for 1 month.",
+                                "title": "Premium Access"
+                            },
+                            {
+                                "desc": "Your friends get an exclusive newcomer perk when they join via your link.",
+                                "title": "Win Together"
+                            },
+                            {
+                                "desc": "Share your link; they download and redeem. You progress instantly.",
+                                "title": "Fast & Simple"
+                            }
+                        ],
+                        "faq": [
+                            {
+                                "a": "When a new redemption occurs, you will get a notification. However, the identity of the referrer won't be available.",
+                                "q": "Do I see who redeemed?"
+                            },
+                            {
+                                "a": "Instantly after {{target_redemptions}} redemptions. You’ll get an in-app confirmation.",
+                                "q": "When do I get Premium?"
+                            }
+                        ],
+                        "hero": {
+                            "hero_title": "*Invite & Unlock 1 Month Premium*",
+                            "page_title": "*My Referrals*",
+                            "quickButtonText": "*View my referrals*",
+                            "referral_code": "{{referral_code}}",
+                            "subtitle": "{{referrer_name}}, invite friends and get 1 month of Premium when 5 people redeem your code."
+                        },
+                        "milestones": [
+                            {
+                                "achievedOn": "Not Applicable",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 0,
+                                "message": "Waiting for your first referral! No redemptions yet.",
+                                "title": "Let's Start"
+                            },
+                            {
+                                "achievedOn": "Achieved on 09 August",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 1,
+                                "message": "Your first referral is in! You’ve started your Premium journey.",
+                                "title": "The Kickoff"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 2,
+                                "message": "Two friends on board! You’re warming up nicely.",
+                                "title": "Building Momentum"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 3,
+                                "message": "Three redemptions—more than halfway to your goal!",
+                                "title": "Halfway Hero"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 4,
+                                "message": "Four done! Just one more to unlock Premium.",
+                                "title": "Almost There"
+                            },
+                            {
+                                "achievedOn": "Pending",
+                                "current_level": "Level {{current_redemptions}}",
+                                "emoji": "🎉",
+                                "level": 5,
+                                "message": "Congratulations! You’ve completed your referral goal and earned 1 month of Premium.",
+                                "title": "Premium Unlocked 🎉"
+                            }
+                        ],
+                        "notifications": {
+                            "recent_event_banner": {
+                                "text": "Nice! Someone redeemed your code. Your progress just moved to {{current_redemptions}}/{{target_redemptions}}.",
+                                "visible": "{{show_recent_event}}"
+                            }
+                        },
+                        "nudges": [
+                            "Best results: share with 5–10 close contacts first.",
+                            "Add a personal note: tell them why you like the Recipe Maker app.",
+                            "Post your link in a relevant cooking group or community."
+                        ],
+                        "page_id": "referral-status",
+                        "progress_teaser": {
+                            "subtitle": "Each redemption brings you closer to Premium!",
+                            "title": "Only {{pending_redemptions}} more levels to go!"
+                        },
+                        "status": {
+                            "current": "{{current_redemptions}}",
+                            "progress_text": "{{current_redemptions}} of {{target_redemptions}} completed",
+                            "target": "{{target_redemptions}}"
+                        }
+                    },
+                    "page3_referralDownload": {
+                        "hero": {
+                            "hero_title": "*{{referrer_name}} invited you*",
+                            "page_title": "Recipe Maker",
+                            "quickButtonText": "*Copy to clipboard*",
+                            "referral_code": "{{referral_code}}",
+                            "subtitle": "Download the app to claim your invite and get 1 week of Premium features for Free!"
+                        },
+                        "how_it_works": [
+                            {
+                                "desc": "Download the app from Google Play or Apple App Store",
+                                "step": 1
+                            },
+                            {
+                                "desc": "Open the app and and click on Redeem Referral Code",
+                                "step": 2
+                            },
+                            {
+                                "desc": "Paste {{referrer_name}}’s referral code and hit redeem to unlock a week of Premium features for yourself!",
+                                "step": 3
+                            }
+                        ],
+                        "page_id": "referral-download",
+                        "store_ctas": {
+                            "app_store_button": "*Download on the App Store*",
+                            "app_store_link": "{{app_store_link}}",
+                            "play_store_button": "*Get it on Google Play*",
+                            "play_store_link": "{{play_store_link}}"
+                        }
+                    },
+                    "page4_referralRedeem": {
+                        "hero": {
+                            "hero_title": "*Redeem Referral Invite Code*",
+                            "page_title": "*Redeem Referral Code*",
+                            "quickButtonText": "*Paste from Clipboard*",
+                            "referral_code": "*Enter Code*",
+                            "subtitle": "Enter or paste the invite from your friend to continue."
+                        },
+                        "how_it_works": [
+                            {
+                                "desc": "Copy the referral invitation sent by your friends or family",
+                                "step": 1
+                            },
+                            {
+                                "desc": "Paste the referral invitation using the button above",
+                                "step": 2
+                            },
+                            {
+                                "desc": "If the code is valid, you’ll unlock a week of Premium",
+                                "step": 3
+                            }
+                        ],
+                        "page_id": "referral-redeem",
+                        "redeem": {
+                            "messages": {
+                                "default": "{{referrer_name}} invited you to try Recipe Maker. Redeem code {{referral_code}} via {{referral_link}}."
+                            },
+                            "primary_cta": "*Redeem Code*",
+                            "redemptionSuccess": {
+                                "hero_title": "You’re all set!",
+                                "nudges": [
+                                    "Your redemption also helps {{referrer_name}} progress toward a reward."
+                                ],
+                                "primary_cta": "*Unlock 1 Week Premium 🎉*",
+                                "subtitle": "You have redeemed a valid referral code from {{referrer_name}}! Enjoy 1 Week Premium features in Recipe Maker."
+                            },
+                            "validation": {
+                                "empty": "Please enter a code.",
+                                "expired": "This invite has expired. Ask {{referrer_name}} for a new one.",
+                                "invalid": "That code doesn’t look right. Check and try again.",
+                                "success": "Success! Your invite is confirmed."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "status": "success"
+}
