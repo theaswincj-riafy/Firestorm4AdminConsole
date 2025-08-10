@@ -236,6 +236,10 @@
   padding: 16px 24px;
   border-top: 1px solid var(--border);
   background: var(--card);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 /* Authentication styles */
