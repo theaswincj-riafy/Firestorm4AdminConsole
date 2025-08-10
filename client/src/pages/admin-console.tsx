@@ -7,6 +7,16 @@ import MainContent from "@/components/admin/main-content";
 import AppModal from "@/components/admin/app-modal";
 import { adminApi } from "@/lib/admin-api";
 import type { App, AppFormData } from "@shared/schema";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function AdminConsole() {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
@@ -19,6 +29,8 @@ export default function AdminConsole() {
   const [editingApp, setEditingApp] = useState<App | null>(null);
   const [translateStatus, setTranslateStatus] = useState<Record<string, 'pending' | 'completed'>>({});
   const [appDetailsChanges, setAppDetailsChanges] = useState<any>(null);
+  const [pendingAppSwitch, setPendingAppSwitch] = useState<App | null>(null);
+  const [isUnsavedChangesDialogOpen, setIsUnsavedChangesDialogOpen] = useState(false);
 
   const { toast } = useToast();
   const { logout } = useAuth();
@@ -273,12 +285,28 @@ export default function AdminConsole() {
 
   const handleSelectApp = (app: App) => {
     if (isDirty) {
-      if (!confirm('You have unsaved changes. Are you sure you want to switch apps?')) {
-        return;
-      }
+      setPendingAppSwitch(app);
+      setIsUnsavedChangesDialogOpen(true);
+      return;
     }
     setSelectedApp(app);
     setActiveTab(null); // Reset active tab when switching apps
+    setIsDirty(false);
+  };
+
+  const handleConfirmAppSwitch = () => {
+    if (pendingAppSwitch) {
+      setSelectedApp(pendingAppSwitch);
+      setActiveTab(null);
+      setIsDirty(false);
+      setPendingAppSwitch(null);
+    }
+    setIsUnsavedChangesDialogOpen(false);
+  };
+
+  const handleCancelAppSwitch = () => {
+    setPendingAppSwitch(null);
+    setIsUnsavedChangesDialogOpen(false);
   };
 
   const handleCreateApp = () => {
@@ -570,6 +598,25 @@ export default function AdminConsole() {
         onSubmit={handleAppFormSubmit}
         isSubmitting={createAppMutation.isPending || updateAppMutation.isPending}
       />
+
+      <AlertDialog open={isUnsavedChangesDialogOpen} onOpenChange={setIsUnsavedChangesDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              The changes will be discarded if you leave the page. Do you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelAppSwitch}>
+              Dismiss
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAppSwitch}>
+              Yes, Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

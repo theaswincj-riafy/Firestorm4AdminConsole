@@ -53,6 +53,20 @@ export default function TabContent({
     onUpdate(newConfigData);
   };
 
+  // Special handling for JSON editor mode - show full config
+  if (editorMode === 'json') {
+    return (
+      <div className="tab-content h-full flex flex-col p-4">
+        <JsonEditor
+          data={fullConfigData}
+          isLocked={isLocked}
+          onUpdate={handleJsonUpdate}
+          validateResult={validateResult}
+        />
+      </div>
+    );
+  }
+
   // Special handling for app-details tab
   if (tabKey === 'app-details') {
     return (
@@ -66,23 +80,15 @@ export default function TabContent({
     );
   }
 
+  // UI Editor mode - show specific tab content
   return (
     <div className="tab-content h-full flex flex-col p-4">
-      {editorMode === 'ui' ? (
-        <UIEditor
-          data={tabData}
-          isLocked={isLocked}
-          onUpdate={handleUIUpdate}
-          tabKey={tabKey}
-        />
-      ) : (
-        <JsonEditor
-          data={fullConfigData}
-          isLocked={isLocked}
-          onUpdate={handleJsonUpdate}
-          validateResult={validateResult}
-        />
-      )}
+      <UIEditor
+        data={tabData}
+        isLocked={isLocked}
+        onUpdate={handleUIUpdate}
+        tabKey={tabKey}
+      />
     </div>
   );
 }

@@ -3,6 +3,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Creative Loading Animations */
+@keyframes creative-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 0.3; 
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  50% { 
+    opacity: 0.8; 
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.creative-loading {
+  animation: creative-spin 1s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
 :root {
   --header-height: 64px;
   --sidebar-width: 280px;

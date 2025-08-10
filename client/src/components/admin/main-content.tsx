@@ -44,6 +44,7 @@ const LANGUAGES = [
   { code: 'bn', name: 'Bengali' },
   { code: 'ta', name: 'Tamil' },
   { code: 'te', name: 'Telugu' },
+  { code: 'ml', name: 'Malayalam' },
 ];
 
 export default function MainContent({
@@ -400,88 +401,116 @@ export default function MainContent({
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="tabs-container">
-        <div className="tabs-list">
-          <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
-            <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-4" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+      {/* Conditional Tabs or JSON Editor */}
+      {editorMode === 'json' ? (
+        // JSON Editor Mode - Show full JSON without tabs
+        <div className="json-editor-container flex-1 flex flex-col">
+          <TabContent
+            tabKey="json-full"
+            tabData={currentConfig}
+            fullConfigData={currentConfig}
+            selectedApp={selectedApp}
+            editorMode={editorMode}
+            isLocked={isLocked}
+            onUpdate={onConfigUpdate}
+            onTabDataUpdate={handleTabDataUpdate}
+            onAppUpdate={onAppUpdate}
+            validateResult={validateResult}
+          />
+        </div>
+      ) : (
+        // UI Editor Mode - Show tabs
+        <div className="tabs-container">
+          <div className="tabs-list">
+            <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
+              <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-4" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+                {allTabs.map((tabKey) => {
+                  const tabTitle = getTabTitle(tabKey);
+
+                  return (
+                    <div key={tabKey} className="relative group flex items-center">
+                      <TabsTrigger
+                        value={tabKey}
+                        className="flex items-center gap-2 text-sm pr-8"
+                      >
+                        <span>{tabTitle}</span>
+                      </TabsTrigger>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRefreshClick(tabKey);
+                        }}
+                        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
+                      >
+                        {refreshSuccess[tabKey] ? (
+                          <Check className="w-3 h-3 text-green-500" />
+                        ) : (
+                          <RefreshCw 
+                            className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </TabsList>
+
+              {/* Tab Contents */}
               {allTabs.map((tabKey) => {
-                const tabTitle = getTabTitle(tabKey);
+                let tabData;
+                const isAppDetailsTab = tabKey === 'app-details';
+                const isImageTab = tabKey === 'image';
+
+                if (isAppDetailsTab) {
+                  // For app details, pass the selected app data directly
+                  tabData = selectedApp;
+                } else if (isImageTab) {
+                  // Assuming a structure for image tab data, adjust if needed
+                  tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
+                } else {
+                  tabData = currentConfig?.referral_json?.en?.[tabKey] || {};
+                }
 
                 return (
-                  <div key={tabKey} className="relative group flex items-center">
-                    <TabsTrigger
-                      value={tabKey}
-                      className="flex items-center gap-2 text-sm pr-8"
-                    >
-                      <span>{tabTitle}</span>
-                    </TabsTrigger>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRefreshClick(tabKey);
-                      }}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
-                    >
-                      {refreshSuccess[tabKey] ? (
-                        <Check className="w-3 h-3 text-green-500" />
-                      ) : (
-                        <RefreshCw 
-                          className={`w-3 h-3 ${refreshingTabs[tabKey] ? 'animate-spin' : ''}`} 
-                        />
-                      )}
-                    </div>
-                  </div>
+                  <TabsContent key={tabKey} value={tabKey} className="flex-1 flex flex-col">
+                    <TabContent
+                      tabKey={tabKey}
+                      tabData={tabData}
+                      fullConfigData={currentConfig}
+                      selectedApp={selectedApp}
+                      editorMode={editorMode}
+                      isLocked={isLocked}
+                      onUpdate={onConfigUpdate}
+                      onTabDataUpdate={handleTabDataUpdate}
+                      onAppUpdate={onAppUpdate}
+                      validateResult={validateResult}
+                    />
+                  </TabsContent>
                 );
               })}
-            </TabsList>
-
-            {/* Tab Contents */}
-            {allTabs.map((tabKey) => {
-              let tabData;
-              const isAppDetailsTab = tabKey === 'app-details';
-              const isImageTab = tabKey === 'image';
-
-              if (isAppDetailsTab) {
-                // For app details, pass the selected app data directly
-                tabData = selectedApp;
-              } else if (isImageTab) {
-                // Assuming a structure for image tab data, adjust if needed
-                tabData = currentConfig?.referral_json?.en?.[tabKey] || { imageUrl: '', alt: '' }; 
-              } else {
-                tabData = currentConfig?.referral_json?.en?.[tabKey] || {};
-              }
-
-              return (
-                <TabsContent key={tabKey} value={tabKey} className="flex-1 flex flex-col">
-                  <TabContent
-                    tabKey={tabKey}
-                    tabData={tabData}
-                    fullConfigData={currentConfig}
-                    selectedApp={selectedApp}
-                    editorMode={editorMode}
-                    isLocked={isLocked}
-                    onUpdate={onConfigUpdate}
-                    onTabDataUpdate={handleTabDataUpdate}
-                    onAppUpdate={onAppUpdate}
-                    validateResult={validateResult}
-                  />
-                </TabsContent>
-              );
-            })}
-          </Tabs>
+            </Tabs>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Global Actions */}
       <div className="global-actions">
         <Button 
           onClick={onSaveConfig} 
           disabled={isLocked || isSaving}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 relative"
         >
-          <Save className="w-4 h-4" />
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSaving ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Saving...</span>
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" />
+              <span>Save</span>
+            </>
+          )}
         </Button>
 
         <Button
@@ -493,23 +522,14 @@ export default function MainContent({
           Reset Changes
         </Button>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <MoreHorizontal className="w-4 h-4 mr-2" />
-              More Actions
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => onDeleteApp(selectedApp.appId)}
-              className="text-destructive"
-            >
-              <Trash className="w-4 h-4 mr-2" />
-              Delete App
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="destructive"
+          onClick={() => onDeleteApp(selectedApp.appId)}
+          className="flex items-center gap-2"
+        >
+          <Trash className="w-4 h-4" />
+          Delete App
+        </Button>
       </div>
 
       {validateResult && !validateResult.valid && (
