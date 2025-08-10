@@ -460,6 +460,9 @@ class AdminApiService {
     
     if (apiType && appName && appDescription) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
         const response = await fetch('https://referral-system-o0yw.onrender.com/api/admin/create_specific_referral_json', {
           method: 'POST',
           headers: {
@@ -471,11 +474,26 @@ class AdminApiService {
             description: appDescription,
             language: 'en',
             type: apiType
-          })
+          }),
+          signal: controller.signal
         });
 
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.message) {
+              errorMessage = `HTTP ${response.status}: ${errorJson.message}`;
+            }
+          } catch {
+            // If not JSON, keep the default message
+          }
+
+          throw new Error(errorMessage);
         }
 
         const result = await response.json();
@@ -487,7 +505,19 @@ class AdminApiService {
         }
       } catch (error) {
         console.error(`Error regenerating ${tabKey} data:`, error);
-        throw new Error(`Failed to regenerate ${tabKey} data from API`);
+        
+        // Provide specific error messages based on error type
+        if (error instanceof Error) {
+          if (error.name === 'AbortError') {
+            throw new Error(`Request timed out while regenerating ${tabKey} data. Please try again.`);
+          } else if (error.message.includes('fetch')) {
+            throw new Error(`Network error while regenerating ${tabKey} data. Please check your connection and try again.`);
+          } else {
+            throw new Error(`Failed to regenerate ${tabKey} data: ${error.message}`);
+          }
+        } else {
+          throw new Error(`Unknown error occurred while regenerating ${tabKey} data. Please try again.`);
+        }
       }
     }
 

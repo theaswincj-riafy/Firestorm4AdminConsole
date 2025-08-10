@@ -260,11 +260,18 @@ export default function AdminConsole() {
         });
       }
     },
-    onError: (error: Error) => {
+    onError: (error: Error, variables) => {
+      const tabName = getTabTitle(variables.tabKey);
       toast({
-        title: "Error",
-        description: `Error regenerating tab: ${error.message}`,
+        title: "Regeneration Failed",
+        description: error.message,
         variant: "destructive",
+        action: {
+          altText: "Try Again",
+          onClick: () => {
+            regenerateTabMutation.mutate(variables);
+          },
+        },
       });
     },
   });
