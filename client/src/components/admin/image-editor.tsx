@@ -94,17 +94,11 @@ export default function ImageEditor({
         console.log('Full config before update:', fullConfigData);
         onTabDataUpdate('images', updatedImages);
         
-        // Force a re-render by updating the local state again
-        setTimeout(() => {
-          setFormData({
-            imageUrl: generatedImageUrl,
-            alt: 'Generated app image'
-          });
-        }, 100);
+        // Don't force additional re-renders that might interfere with JSON editor
       }
       
-      // Also call onUpdate for backward compatibility
-      onUpdate(newFormData);
+      // Don't call onUpdate here as it might interfere with the JSON editor
+      // The data is already updated through onTabDataUpdate above
 
       toast({
         title: "Image Generated",

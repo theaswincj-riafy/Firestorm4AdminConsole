@@ -39,14 +39,17 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
           const position = editorRef.current.getPosition();
           const model = editorRef.current.getModel();
           if (model && model.getValue() !== jsonString) {
-            isUpdatingFromProp.current = true;
-            editorRef.current.setValue(jsonString);
-            if (position) {
-              editorRef.current.setPosition(position);
+            // Only update if the new JSON is actually different and not empty
+            if (jsonString !== '{}' || model.getValue() === '') {
+              isUpdatingFromProp.current = true;
+              editorRef.current.setValue(jsonString);
+              if (position) {
+                editorRef.current.setPosition(position);
+              }
+              setTimeout(() => {
+                isUpdatingFromProp.current = false;
+              }, 50);
             }
-            setTimeout(() => {
-              isUpdatingFromProp.current = false;
-            }, 50);
           }
         }
       }
@@ -123,6 +126,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
             scrollBeyondLastLine: false,
             fontSize: 14,
             lineNumbers: 'on',
+            padding: { top: 8, bottom: 8 },
             folding: true,
             wordWrap: 'on',
             automaticLayout: true,
