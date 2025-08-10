@@ -135,7 +135,8 @@
 /* Layout styles */
 .admin-layout {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
+  margin-top: var(--header-height);
 }
 
 .admin-main {
@@ -143,7 +144,6 @@
   display: flex;
   flex-direction: column;
   background: var(--background);
-  margin-left: var(--sidebar-width);
 }
 
 .admin-sidebar {
@@ -151,7 +151,7 @@
   background: var(--sidebar);
   border-right: 1px solid var(--sidebar-border);
   position: fixed;
-  top: 0;
+  top: var(--header-height);
   left: 0;
   bottom: 0;
   z-index: 20;
@@ -172,9 +172,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
   background: var(--card);
-  min-height: 64px;
+  border-bottom: 1px solid var(--border);
+  position: fixed;
+  top: var(--header-height);
+  left: var(--sidebar-width);
+  right: 0;
+  z-index: 40;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
 
 .editor-mode-toggle {
@@ -334,10 +339,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-top: 110px;
-  /* Space for fixed toolbar + tabs */
-  padding-bottom: 80px;
-  /* Space for fixed footer */
+  padding-top: 110px; /* Space for fixed toolbar + tabs */
+  padding-bottom: 80px; /* Space for fixed footer */
   margin-left: var(--sidebar-width);
 }
 
