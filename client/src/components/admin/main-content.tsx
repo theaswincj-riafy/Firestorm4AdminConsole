@@ -445,23 +445,19 @@ export default function MainContent({
         <>
           {/* Fixed Tabs Container */}
           <div className="tabs-container">
-            <div className="grid grid-cols-auto gap-1 bg-muted p-1" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+            <div className="tabs-list">
               {allTabs.map((tabKey) => {
                 const tabTitle = getTabTitle(tabKey);
                 const isActive = activeTab === tabKey;
 
                 return (
-                  <div key={tabKey} className="relative group flex items-center">
-                    <button
-                      className={`flex items-center gap-2 text-sm pr-8 px-3 py-2 rounded transition-colors ${
-                        isActive 
-                          ? 'bg-white text-primary shadow-sm' 
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                  <div key={tabKey} className={`tab-item ${isActive ? 'active' : ''} relative group`}>
+                    <div
+                      className="tab-label"
                       onClick={() => onTabChange(tabKey)}
                     >
-                      <span>{tabTitle}</span>
-                    </button>
+                      {tabTitle}
+                    </div>
                     <div
                       onClick={(e) => {
                         e.stopPropagation();
