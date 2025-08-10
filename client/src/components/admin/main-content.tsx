@@ -19,7 +19,6 @@ import {
   Palette,
   Code,
   AlertTriangle,
-  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -518,39 +517,25 @@ export default function MainContent({
                     >
                       {tabTitle}
                     </div>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRefreshClick(tabKey);
-                      }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-70 hover:opacity-100 transition-opacity z-10 cursor-pointer"
-                    >
-                      {refreshSuccess[tabKey] ? (
-                        <Check className="w-3 h-3 text-green-500" />
-                      ) : refreshingTabs[tabKey] ? (
-                        <div className="flex items-center gap-1">
-                          <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      ) : (
-                        <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
-                      )}
-                    </div>
-                    {/* Regenerate Button - Conditionally rendered */}
-                    {activeTab && !['app-details', 'image'].includes(activeTab) && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onRefreshTab(activeTab)}
-                        disabled={refreshingTabs[activeTab] || isRegenerating} // Use refreshingTabs state for disabled prop
-                        className="flex items-center gap-2 ml-2" // Added margin-left for spacing
+                    {/* Only show regenerate button for API-based tabs, not for image or app-details */}
+                    {!['image', 'app-details'].includes(tabKey) && (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRefreshClick(tabKey);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-70 hover:opacity-100 transition-opacity z-10 cursor-pointer"
                       >
-                        {refreshingTabs[activeTab] || isRegenerating ? ( // Check both states for loading indicator
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                        {refreshSuccess[tabKey] ? (
+                          <Check className="w-3 h-3 text-green-500" />
+                        ) : refreshingTabs[tabKey] ? (
+                          <div className="flex items-center gap-1">
+                            <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
                         ) : (
-                          <RefreshCw className="w-4 h-4" />
+                          <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
                         )}
-                        Regenerate
-                      </Button>
+                      </div>
                     )}
                   </div>
                 );
