@@ -802,6 +802,39 @@ class AdminApiService {
     }
   }
 
+  async generateAppImage(appName: string, description: string): Promise<any> {
+    try {
+      console.log(`Starting image generation for ${appName} with description:`, description);
+
+      const requestBody = {
+        app_name: appName,
+        description: description,
+      };
+
+      const response = await fetch("https://referral-system-o0yw.onrender.com/api/admin/generate_app_image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": "HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Image generation API error:`, response.status, errorText);
+        throw new Error(`Image generation failed: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log(`Image generation completed:`, result);
+      return result;
+    } catch (error) {
+      console.error(`Error generating image:`, error);
+      throw error instanceof Error ? error : new Error("Image generation failed");
+    }
+  }
+
   async getPromoteSharingData(
     appName: string,
     appDescription: string,

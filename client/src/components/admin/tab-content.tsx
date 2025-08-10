@@ -69,6 +69,25 @@ export default function TabContent({
     );
   }
 
+  // Special handling for image tab
+  if (tabKey === 'image') {
+    const ImageEditor = require('./image-editor').default;
+    return (
+      <div className="tab-content h-full flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          <ImageEditor
+            data={tabData}
+            fullConfigData={fullConfigData}
+            selectedApp={selectedApp}
+            isLocked={isLocked}
+            onUpdate={onUpdate}
+            onTabDataUpdate={onTabDataUpdate}
+          />
+        </div>
+      </div>
+    );
+  }
+
   // UI Editor mode - show specific tab content
   return (
     <div className="tab-content h-full flex flex-col overflow-hidden">

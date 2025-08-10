@@ -1,51 +1,103 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImageIcon, Wand2, Loader2 } from 'lucide-react';
+import { ImageIcon, RefreshCw, Loader2 } from 'lucide-react';
+import { adminApi } from '@/lib/admin-api';
+import { useToast } from '@/hooks/use-toast';
 
 interface ImageEditorProps {
   data: any;
+  fullConfigData?: any;
+  selectedApp?: any;
   isLocked: boolean;
   onUpdate: (data: any) => void;
+  onTabDataUpdate?: (tabKey: string, newTabData: any) => void;
 }
 
-export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorProps) {
+export default function ImageEditor({ 
+  data, 
+  fullConfigData, 
+  selectedApp, 
+  isLocked, 
+  onUpdate, 
+  onTabDataUpdate 
+}: ImageEditorProps) {
   const [formData, setFormData] = useState({
     imageUrl: '',
     alt: ''
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    if (data) {
+    // Check if there's an existing image in en.images.image
+    const existingImage = fullConfigData?.referral_json?.en?.images?.image;
+    
+    if (existingImage) {
+      setFormData({
+        imageUrl: existingImage,
+        alt: 'App download image'
+      });
+    } else if (data) {
       setFormData({
         imageUrl: data.imageUrl || '',
         alt: data.alt || ''
       });
     }
-  }, [data]);
+  }, [data, fullConfigData]);
 
-  const handleGenerateImage = async () => {
-    if (isLocked || isGenerating) return;
+  const handleRegenerateImage = async () => {
+    if (isLocked || isGenerating || !selectedApp) return;
 
     setIsGenerating(true);
     
     try {
-      // TODO: Implement image generation logic here
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const appName = selectedApp.appName || 'Demo App';
+      const appDescription = selectedApp.meta?.description || 'App description with visual elements';
+
+      const result = await adminApi.generateAppImage(appName, appDescription);
       
-      // For now, we'll use a placeholder
-      const generatedImageUrl = 'https://via.placeholder.com/400x200?text=Generated+App+Image';
+      // Extract the image URL from the API response
+      const generatedImageUrl = result?.images?.image;
+      
+      if (!generatedImageUrl) {
+        throw new Error('No image URL returned from API');
+      }
+
       const newFormData = {
         imageUrl: generatedImageUrl,
         alt: 'Generated app image'
       };
 
       setFormData(newFormData);
+      
+      // Update the full config data structure to include the new image
+      if (onTabDataUpdate && fullConfigData) {
+        // Update the images object in the config
+        const updatedImages = {
+          ...fullConfigData.referral_json?.en?.images,
+          image: generatedImageUrl
+        };
+        
+        onTabDataUpdate('images', updatedImages);
+      }
+      
+      // Also call onUpdate for backward compatibility
       onUpdate(newFormData);
+
+      toast({
+        title: "Image Generated",
+        description: "App image has been successfully generated and updated",
+      });
     } catch (error) {
       console.error('Error generating image:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate image';
+      
+      toast({
+        title: "Image Generation Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -85,10 +137,10 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
             )}
           </div>
 
-          {/* Generate Button */}
+          {/* Regenerate Button */}
           <div className="flex justify-center">
             <Button
-              onClick={handleGenerateImage}
+              onClick={handleRegenerateImage}
               disabled={isLocked || isGenerating}
               className="flex items-center gap-2"
               size="lg"
@@ -96,9 +148,9 @@ export default function ImageEditor({ data, isLocked, onUpdate }: ImageEditorPro
               {isGenerating ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Wand2 className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4" />
               )}
-              {isGenerating ? 'Generating...' : 'Generate Image'}
+              {isGenerating ? 'Generating...' : 'Regenerate Image'}
             </Button>
           </div>
         </CardContent>
