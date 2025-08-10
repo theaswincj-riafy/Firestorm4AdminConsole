@@ -29,22 +29,9 @@ export default function TabContent({
 }: TabContentProps) {
 
   const handleUIUpdate = (newTabData: any) => {
-    // For UI editor, we need to update the specific tab data within the config structure
+    // Use onTabDataUpdate for better change detection and to avoid JSON comparison issues
     if (newTabData && typeof newTabData === 'object') {
-      // Extract the current tab data from referral_json.en structure if needed
-      let updatedConfig = { ...fullConfigData };
-      
-      if (tabKey === 'app-details' || tabKey === 'images') {
-        // For special tabs, update at root level
-        updatedConfig = { ...updatedConfig, ...newTabData };
-      } else {
-        // For regular tabs, update within referral_json.en
-        if (!updatedConfig.referral_json) updatedConfig.referral_json = {};
-        if (!updatedConfig.referral_json.en) updatedConfig.referral_json.en = {};
-        updatedConfig.referral_json.en[tabKey] = newTabData;
-      }
-      
-      onUpdate(updatedConfig);
+      onTabDataUpdate(tabKey, newTabData);
     }
   };
 
