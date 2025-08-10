@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Lock,
   Unlock,
@@ -63,7 +62,7 @@ interface MainContentProps {
   onSaveConfig: () => void;
   onResetChanges: () => void;
   onRegenerateTab: (tabKey: string) => void;
-  onTranslate: (languages: string[]) => void;
+  onTranslate: (lang: string) => void;
   onDeleteApp: (appId: string) => void;
   onRefreshTab: (tabKey: string) => Promise<void>;
   getTabTitle: (tabKey: string) => string;
@@ -136,7 +135,6 @@ export default function MainContent({
     {},
   );
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 
   const handleValidateJson = () => {
     if (!currentConfig || !activeTab) return;
@@ -441,58 +439,21 @@ export default function MainContent({
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-64">
-              <div className="p-2 border-b mb-2">
-                <Button 
-                  size="sm" 
-                  onClick={() => {
-                    if (selectedLanguages.length > 0) {
-                      onTranslate(selectedLanguages);
-                      setSelectedLanguages([]);
-                    }
-                  }}
-                  disabled={selectedLanguages.length === 0 || isTranslating}
-                  className="w-full"
-                >
-                  {isTranslating ? (
-                    <>
-                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Translating...
-                    </>
-                  ) : (
-                    `Translate Selected (${selectedLanguages.length})`
-                  )}
-                </Button>
-              </div>
+            <DropdownMenuContent align="end" className="min-w-48">
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
                   onClick={(e) => {
                     e.preventDefault();
-                    const isCurrentlySelected = selectedLanguages.includes(lang.code);
-                    let newSelectedLanguages;
-                    
-                    if (isCurrentlySelected) {
-                      newSelectedLanguages = selectedLanguages.filter(l => l !== lang.code);
-                    } else {
-                      newSelectedLanguages = [...selectedLanguages, lang.code];
-                    }
-                    
-                    setSelectedLanguages(newSelectedLanguages);
+                    onTranslate(lang.code);
                   }}
                   onSelect={(e) => e.preventDefault()}
                   disabled={translateStatus[lang.code] === "pending"}
                   className="flex items-center justify-between cursor-pointer"
                 >
-                  <div className="flex items-center">
-                    <Checkbox 
-                      checked={selectedLanguages.includes(lang.code)}
-                      className="mr-2"
-                    />
-                    <span>
-                      {lang.name} ({lang.code})
-                    </span>
-                  </div>
+                  <span>
+                    {lang.name} ({lang.code})
+                  </span>
                   <div className="flex items-center ml-4">
                     {translateStatus[lang.code] === "pending" ? (
                       <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

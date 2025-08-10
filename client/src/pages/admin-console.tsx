@@ -494,51 +494,40 @@ export default function AdminConsole() {
     }
   };
 
-  const handleTranslate = async (languages: string[]) => {
-    if (!selectedApp || !currentConfig || languages.length === 0) return;
+  const handleTranslate = async (lang: string) => {
+    if (!selectedApp || !currentConfig || translateStatus[lang] === 'pending') return;
     
-    // Set all selected languages to pending status
-    const pendingStatus = languages.reduce((acc, lang) => {
-      acc[lang] = 'pending';
-      return acc;
-    }, {} as Record<string, 'pending'>);
-    
-    setTranslateStatus(prev => ({ ...prev, ...pendingStatus }));
+    // Set language to pending status
+    setTranslateStatus(prev => ({ ...prev, [lang]: 'pending' }));
     
     try {
-      // Call the new multiple language translation API
-      await adminApi.translateMultipleLanguages(
+      // Call the new single language translation API
+      await adminApi.translateToLanguage(
         selectedApp.packageName, 
-        languages, 
+        lang, 
         currentConfig
       );
       
-      // After successful translations, refresh the config data
+      // After successful translation, refresh the config data
       queryClient.invalidateQueries({ queryKey: ['/api/apps', selectedApp.appId, 'config'] });
       
-      // Mark all languages as completed
-      const completedStatus = languages.reduce((acc, lang) => {
-        acc[lang] = 'completed';
-        return acc;
-      }, {} as Record<string, 'completed'>);
-      
-      setTranslateStatus(prev => ({ ...prev, ...completedStatus }));
+      // Mark language as completed
+      setTranslateStatus(prev => ({ ...prev, [lang]: 'completed' }));
       
       toast({
         title: "Translation Completed",
-        description: `Successfully translated to ${languages.length} language(s)`,
+        description: `Successfully translated to ${lang}`,
       });
       
     } catch (error) {
       console.error('Translation failed:', error);
       
-      // Reset status for failed translations
-      const resetStatus = languages.reduce((acc, lang) => {
-        delete acc[lang];
-        return acc;
-      }, { ...translateStatus });
-      
-      setTranslateStatus(resetStatus);
+      // Reset status for failed translation
+      setTranslateStatus(prev => {
+        const newStatus = { ...prev };
+        delete newStatus[lang];
+        return newStatus;
+      });
       
       toast({
         title: "Translation Failed",
