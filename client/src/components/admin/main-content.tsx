@@ -332,29 +332,29 @@ export default function MainContent({
   return (
     <main className="admin-main">
       {/* Toolbar */}
-      <div className="toolbar">
-        <div className="editor-mode-toggle">
-          <Button
-            variant={editorMode === 'ui' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onEditorModeChange('ui')}
-            className="rounded-r-none"
-          >
-            <Palette className="w-4 h-4 mr-2" />
-            UI Editor
-          </Button>
-          <Button
-            variant={editorMode === 'json' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onEditorModeChange('json')}
-            className="rounded-l-none"
-          >
-            <Code className="w-4 h-4 mr-2" />
-            JSON Editor
-          </Button>
-        </div>
-
+      <div className="content-toolbar">
         <div className="flex items-center gap-3">
+          <div className="editor-mode-toggle">
+            <Button
+              variant={editorMode === 'ui' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onEditorModeChange('ui')}
+              className="rounded-r-none"
+            >
+              <Palette className="w-4 h-4 mr-2" />
+              UI Editor
+            </Button>
+            <Button
+              variant={editorMode === 'json' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onEditorModeChange('json')}
+              className="rounded-l-none"
+            >
+              <Code className="w-4 h-4 mr-2" />
+              JSON Editor
+            </Button>
+          </div>
+
           <Button
             variant="outline"
             size="sm"
@@ -421,6 +421,8 @@ export default function MainContent({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        <div className="flex items-center gap-3"></div>
       </div>
 
       {/* Conditional Tabs or JSON Editor */}
