@@ -304,6 +304,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-top: 122px; /* Space for fixed toolbar + tabs */
   padding-bottom: 80px; /* Space for fixed footer */
 }
 
@@ -314,8 +315,10 @@
   padding: 16px 24px;
   background: var(--card);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 60px; /* Below header */
+  left: var(--sidebar-width);
+  right: 0;
   z-index: 40;
   box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
@@ -355,8 +358,10 @@
 .tabs-container {
   background: var(--card);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 73px; /* Height of content-toolbar */
+  position: fixed;
+  top: 133px; /* Below header + content-toolbar */
+  left: var(--sidebar-width);
+  right: 0;
   z-index: 30;
   box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
