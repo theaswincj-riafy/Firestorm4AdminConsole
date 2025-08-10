@@ -63,10 +63,11 @@ export default function ImageEditor({
 
       const result = await adminApi.generateAppImage(appName, appDescription);
       
-      // Extract the image URL from the API response
-      const generatedImageUrl = result?.images?.image;
+      // Extract the image URL from the API response (check multiple possible locations)
+      const generatedImageUrl = result?.data?.image1 || result?.data?.image || result?.images?.image || result?.image;
       
       if (!generatedImageUrl) {
+        console.error('API Response structure:', result);
         throw new Error('No image URL returned from API');
       }
 
