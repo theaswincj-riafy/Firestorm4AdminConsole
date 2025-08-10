@@ -499,7 +499,7 @@ export default function AdminConsole() {
     if (!selectedApp || !currentConfig || translateStatus[lang] === 'pending') return;
     
     // Set language to pending status and mark as translating
-    setTranslateStatus(prev => ({ ...prev, [lang]: 'pending' }));
+    setTranslateStatus(prev => ({ ...prev, [lang]: 'pending' as const }));
     setIsTranslating(true);
     
     try {
@@ -519,7 +519,7 @@ export default function AdminConsole() {
       
       // Mark language as completed
       setTranslateStatus(prev => {
-        const newStatus = { ...prev, [lang]: 'completed' };
+        const newStatus = { ...prev, [lang]: 'completed' as const };
         // Check if any translations are still pending after this completion
         const stillTranslating = Object.values(newStatus).some(status => status === 'pending');
         if (!stillTranslating) {
@@ -687,7 +687,7 @@ export default function AdminConsole() {
           getTabTitle={getTabTitle}
           isRegenerating={regenerateTabMutation.isPending}
           isSaving={saveConfigMutation.isPending || editAppMutation.isPending}
-          isTranslating={translateMutation.isPending}
+          isTranslating={isTranslating}
           configError={configQuery.error as Error | null}
           isLoadingConfig={configQuery.isPending}
           onRetryConfig={() => configQuery.refetch()}
