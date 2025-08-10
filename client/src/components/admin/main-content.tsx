@@ -442,9 +442,10 @@ export default function MainContent({
         </div>
       ) : (
         // UI Editor Mode - Show tabs
-        <div className="tabs-container">
-          <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
-            <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-4" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
+        <div className="flex-1 flex flex-col">
+          <div className="tabs-container">
+            <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
+              <TabsList className="grid grid-cols-auto gap-1 bg-muted p-1 mb-0" style={{ gridTemplateColumns: `repeat(${allTabs.length}, minmax(0, auto))` }}>
               {allTabs.map((tabKey) => {
                 const tabTitle = getTabTitle(tabKey);
 
@@ -476,10 +477,14 @@ export default function MainContent({
                   </div>
                 );
               })}
-            </TabsList>
+              </TabsList>
+            </Tabs>
+          </div>
 
-            {/* Tab Contents */}
-            {allTabs.map((tabKey) => {
+          <div className="flex-1 flex flex-col">
+            <Tabs value={activeTab || (allTabs.length > 0 ? allTabs[0] : '')} onValueChange={onTabChange} className="flex-1 flex flex-col">
+              {/* Tab Contents */}
+              {allTabs.map((tabKey) => {
               let tabData;
               const isAppDetailsTab = tabKey === 'app-details';
               const isImageTab = tabKey === 'image';
@@ -510,8 +515,9 @@ export default function MainContent({
                   />
                 </TabsContent>
               );
-            })}
-          </Tabs>
+              })}
+            </Tabs>
+          </div>
         </div>
       )}
 

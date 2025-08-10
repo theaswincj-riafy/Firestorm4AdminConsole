@@ -314,6 +314,10 @@
   padding: 16px 24px;
   background: var(--card);
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
 
 .editor-toggle {
@@ -351,6 +355,10 @@
 .tabs-container {
   background: var(--card);
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 73px; /* Height of content-toolbar */
+  z-index: 30;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
 
 .tabs-list {
