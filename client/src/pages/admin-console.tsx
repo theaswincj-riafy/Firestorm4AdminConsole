@@ -581,12 +581,22 @@ export default function AdminConsole() {
     // All special tabs need app name and description for API calls
     const isSpecialApiTab = ['page1_referralPromote', 'page2_referralStatus', 'page3_referralDownload', 'page4_referralRedeem', 'notifications'].includes(tabKey);
 
-    regenerateTabMutation.mutate({
-      appId: selectedApp.appId,
-      tabKey,
-      currentSubtree,
-      appName: isSpecialApiTab ? appName : undefined,
-      appDescription: isSpecialApiTab ? appDescription : undefined
+    // Return a promise that resolves when the mutation completes
+    return new Promise<void>((resolve, reject) => {
+      regenerateTabMutation.mutate({
+        appId: selectedApp.appId,
+        tabKey,
+        currentSubtree,
+        appName: isSpecialApiTab ? appName : undefined,
+        appDescription: isSpecialApiTab ? appDescription : undefined
+      }, {
+        onSuccess: () => {
+          resolve();
+        },
+        onError: (error) => {
+          reject(error);
+        }
+      });
     });
   };
 
