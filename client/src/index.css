@@ -235,6 +235,10 @@
   border-bottom-color: var(--primary);
 }
 
+.tab-item.active .tab-label {
+  color: var(--primary);
+}
+
 .tab-label {
   font-size: 14px;
   font-weight: 500;
@@ -242,16 +246,10 @@
   transition: color 0.2s ease;
 }
 
-.tab-item.active .tab-label {
-  color: var(--primary);
-}
-
 .work-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   overflow: hidden;
   width: 100%;
   max-width: 1200px;
@@ -394,8 +392,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   overflow: hidden;
   width: 100%;
   max-width: 1200px;
