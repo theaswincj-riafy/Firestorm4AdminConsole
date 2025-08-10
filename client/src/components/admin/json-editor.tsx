@@ -113,7 +113,7 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-1 border rounded-md overflow-hidden">
+      <div className="flex-1 border rounded-md overflow-hidden relative">
         <Editor
           height="100%"
           defaultLanguage="json"
@@ -126,7 +126,10 @@ export default function JsonEditor({ data, isLocked, onUpdate, validateResult }:
             scrollBeyondLastLine: false,
             fontSize: 14,
             lineNumbers: 'on',
-            padding: { top: 8, bottom: 8 },
+            padding: { top: 16, bottom: 16 },
+            lineHeight: 20,
+            lineDecorationsWidth: 10,
+            lineNumbersMinChars: 3,
             folding: true,
             wordWrap: 'on',
             automaticLayout: true,
