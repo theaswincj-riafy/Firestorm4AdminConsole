@@ -26,9 +26,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -68,9 +66,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const value = {
+    user,
+    loading,
+    logout: handleLogout
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, logout: handleLogout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
