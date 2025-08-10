@@ -737,11 +737,22 @@ class AdminApiService {
   async translateToLanguage(appPackageName: string, targetLanguage: string, jsonData: any): Promise<any> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout for translation
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 120000); // 2 minute timeout for translation
 
       // Extract app details from the JSON data
       const appName = jsonData?.appName || "App";
       const description = jsonData?.meta?.description || jsonData?.description || "App description";
+
+      const requestBody = {
+        app_name: appName,
+        app_package_name: appPackageName,
+        description: description,
+        language: targetLanguage,
+      };
+
+      console.log(`Starting translation for ${targetLanguage} with data:`, requestBody);
 
       const response = await fetch("https://referral-system-o0yw.onrender.com/api/admin/create_language_referral_json", {
         method: "POST",
@@ -749,12 +760,7 @@ class AdminApiService {
           "Content-Type": "application/json",
           "X-API-Key": "HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q",
         },
-        body: JSON.stringify({
-          app_name: appName,
-          app_package_name: appPackageName,
-          description: description,
-          language: targetLanguage,
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
 
@@ -762,7 +768,8 @@ class AdminApiService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Translation API error! status: ${response.status} - ${errorText}`);
+        console.error(`Translation API error for ${targetLanguage}:`, response.status, errorText);
+        throw new Error(`Translation failed: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
@@ -770,6 +777,10 @@ class AdminApiService {
       console.log(`Translation to ${targetLanguage} completed:`, result);
       return result;
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.error(`Translation to ${targetLanguage} timed out`);
+        throw new Error(`Translation to ${targetLanguage} timed out - please try again`);
+      }
       console.error(`Error translating to ${targetLanguage}:`, error);
       throw error;
     }

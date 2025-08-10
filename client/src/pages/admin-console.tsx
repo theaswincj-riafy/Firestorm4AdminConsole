@@ -533,9 +533,13 @@ export default function AdminConsole() {
         return newStatus;
       });
       
+      const errorMessage = error instanceof Error ? error.message : "An error occurred during translation";
+      
       toast({
         title: "Translation Failed",
-        description: error instanceof Error ? error.message : "An error occurred during translation",
+        description: errorMessage.includes('timed out') ? 
+          `Translation to ${lang} timed out. The API might be slow - please try again.` : 
+          errorMessage,
         variant: "destructive",
       });
     }
