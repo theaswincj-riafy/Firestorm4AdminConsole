@@ -74,7 +74,7 @@ export default function Sidebar({
               key={app.appId}
               className={`group relative rounded-lg border transition-colors cursor-pointer hover:bg-accent/50 ${
                 selectedApp?.appId === app.appId 
-                  ? "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" 
+                  ? "bg-blue-100 border-blue-400 shadow-md ring-1 ring-blue-300 dark:bg-blue-900 dark:border-blue-500 dark:ring-blue-600" 
                   : "border-border"
               }`}
               onClick={() => onSelectApp(app)}

@@ -154,7 +154,7 @@
   top: var(--header-height);
   left: 0;
   bottom: 0;
-  z-index: 20;
+  z-index: 25; /* Higher than main content but lower than toolbars */
   display: flex;
   flex-direction: column;
   overflow: hidden;
