@@ -424,10 +424,8 @@ export default function AdminConsole() {
       updatedConfig.app_package_name = newTabData.packageName;
       updatedConfig.app_name = newTabData.appName;
       updatedConfig.meta = newTabData.meta;
-    } else if (tabKey === 'images') {
-      updatedConfig.images = newTabData;
     } else {
-      // Update the specific tab data in referral_json.en
+      // Update the specific tab data in referral_json.en (including images)
       if (!updatedConfig.referral_json) updatedConfig.referral_json = {};
       if (!updatedConfig.referral_json.en) updatedConfig.referral_json.en = {};
       updatedConfig.referral_json.en[tabKey] = newTabData;

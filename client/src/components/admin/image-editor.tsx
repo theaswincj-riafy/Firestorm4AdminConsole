@@ -78,6 +78,8 @@ export default function ImageEditor({
 
       setFormData(newFormData);
       
+      console.log('Updating image with URL:', generatedImageUrl);
+      
       // Update the full config data structure to include the new image
       if (onTabDataUpdate && fullConfigData) {
         // Update the images object in the config - use 'image' as the standard key
@@ -91,6 +93,7 @@ export default function ImageEditor({
         delete updatedImages.image1;
         delete updatedImages.imageUrl;
         
+        console.log('Calling onTabDataUpdate with images:', updatedImages);
         onTabDataUpdate('images', updatedImages);
       }
       
