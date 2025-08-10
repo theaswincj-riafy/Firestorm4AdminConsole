@@ -64,49 +64,52 @@ export default function AdminConsole() {
     retryDelay: 1000,
   });
 
-  const { data: configData, isLoading: isLoadingConfig, error: configError, refetch: refetchConfig } = useQuery({
+  const configQuery = useQuery({
     queryKey: ['/api/apps', selectedApp?.appId, 'config'],
     queryFn: () => selectedApp ? adminApi.getAppConfig(selectedApp.appId) : Promise.resolve(null),
     enabled: !!selectedApp,
-    onSuccess: (data) => {
-      if (data) {
-        setCurrentConfig(data);
-        setOriginalConfig(JSON.parse(JSON.stringify(data))); // Deep clone for original
-        setIsDirty(false);
-
-        // Set the first tab in the proper order
-        const tabOrder = [
-          'page1_referralPromote',
-          'page2_referralStatus',
-          'page3_referralDownload',
-          'page4_referralRedeem',
-          'notifications',
-          'image',
-          'app-details'
-        ];
-
-        // Always include special tabs that don't come from referral_json.en
-        const specialTabs = ['app-details', 'image'];
-
-        // Find available tabs from the referral_json.en structure, excluding special tabs
-        // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
-        const excludedTabs = [...specialTabs, 'appDetails'];
-        const configTabs = data.referral_json?.en ?
-          Object.keys(data.referral_json.en).filter(tab => !excludedTabs.includes(tab)) : [];
-
-        // Combine special tabs with config tabs in the desired order
-        const orderedTabs = tabOrder.filter(tab =>
-          specialTabs.includes(tab) || configTabs.includes(tab)
-        );
-        const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
-        const allTabs = [...orderedTabs, ...additionalTabs];
-
-        if (allTabs.length > 0 && !activeTab) {
-          setActiveTab(allTabs[0]);
-        }
-      }
-    },
   });
+
+  // Handle config data changes using useEffect instead of deprecated onSuccess
+  useEffect(() => {
+    if (configQuery.data) {
+      const data = configQuery.data;
+      setCurrentConfig(data);
+      setOriginalConfig(JSON.parse(JSON.stringify(data))); // Deep clone for original
+      setIsDirty(false);
+
+      // Set the first tab in the proper order
+      const tabOrder = [
+        'page1_referralPromote',
+        'page2_referralStatus',
+        'page3_referralDownload',
+        'page4_referralRedeem',
+        'notifications',
+        'image',
+        'app-details'
+      ];
+
+      // Always include special tabs that don't come from referral_json.en
+      const specialTabs = ['app-details', 'image'];
+
+      // Find available tabs from the referral_json.en structure, excluding special tabs
+      // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
+      const excludedTabs = [...specialTabs, 'appDetails'];
+      const configTabs = data.referral_json?.en ?
+        Object.keys(data.referral_json.en).filter(tab => !excludedTabs.includes(tab)) : [];
+
+      // Combine special tabs with config tabs in the desired order
+      const orderedTabs = tabOrder.filter(tab =>
+        specialTabs.includes(tab) || configTabs.includes(tab)
+      );
+      const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
+      const allTabs = [...orderedTabs, ...additionalTabs];
+
+      if (allTabs.length > 0 && !activeTab) {
+        setActiveTab(allTabs[0]);
+      }
+    }
+  }, [configQuery.data, activeTab]);
 
   const createAppMutation = useMutation({
     mutationFn: (data: AppFormData) => adminApi.createApp(data),
@@ -449,7 +452,7 @@ export default function AdminConsole() {
       tabKey,
       currentSubtree,
       appName: selectedApp.appName,
-      appDescription: selectedApp.appDescription
+      appDescription: selectedApp.meta?.description || ''
     });
   };
 
@@ -602,9 +605,9 @@ export default function AdminConsole() {
           isRegenerating={regenerateTabMutation.isPending}
           isSaving={saveConfigMutation.isPending || editAppMutation.isPending}
           isTranslating={translateMutation.isPending}
-          configError={configError as Error | null}
-          isLoadingConfig={isLoadingConfig}
-          onRetryConfig={() => refetchConfig()}
+          configError={configQuery.error as Error | null}
+          isLoadingConfig={configQuery.isPending}
+          onRetryConfig={() => configQuery.refetch()}
           onCreateApp={handleCreateApp}
         />
       </div>
