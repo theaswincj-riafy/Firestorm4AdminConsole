@@ -30,8 +30,14 @@ export default function ImageEditor({
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if there's an existing image in en.images.image
-    const existingImage = fullConfigData?.referral_json?.en?.images?.image;
+    // Check if there's an existing image in en.images (could be image, image1, or other variants)
+    const imagesData = fullConfigData?.referral_json?.en?.images;
+    let existingImage = null;
+    
+    if (imagesData) {
+      // Check for various image key patterns
+      existingImage = imagesData.image || imagesData.image1 || imagesData.imageUrl;
+    }
     
     if (existingImage) {
       setFormData({
@@ -73,11 +79,16 @@ export default function ImageEditor({
       
       // Update the full config data structure to include the new image
       if (onTabDataUpdate && fullConfigData) {
-        // Update the images object in the config
+        // Update the images object in the config - use 'image' as the standard key
+        const currentImages = fullConfigData.referral_json?.en?.images || {};
         const updatedImages = {
-          ...fullConfigData.referral_json?.en?.images,
+          ...currentImages,
           image: generatedImageUrl
         };
+        
+        // Remove any old image keys to standardize on 'image'
+        delete updatedImages.image1;
+        delete updatedImages.imageUrl;
         
         onTabDataUpdate('images', updatedImages);
       }
