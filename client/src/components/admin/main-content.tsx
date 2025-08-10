@@ -171,20 +171,6 @@ export default function MainContent({
     setShowResetConfirm(false);
   };
 
-  // Show loading state when apps are being fetched
-  if (isLoadingConfig) {
-    return (
-      <main className="admin-main">
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading configuration...</p>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   if (!selectedApp) {
     return (
       <main className="admin-main">
@@ -286,7 +272,7 @@ export default function MainContent({
     );
   }
 
-  // Handle loading state
+  // Show loading state when config is being fetched for selected app
   if (isLoadingConfig || !currentConfig) {
     return (
       <main className="admin-main">
@@ -295,7 +281,7 @@ export default function MainContent({
             <div className="h-4 bg-muted rounded w-48 mx-auto mb-2"></div>
             <div className="h-3 bg-muted rounded w-32 mx-auto"></div>
             <div className="text-sm text-muted-foreground mt-4">
-              {selectedApp ? `Loading configuration for ${selectedApp.appName}...` : 'Loading...'}
+              Loading configuration for {selectedApp.appName}...
             </div>
           </div>
         </div>
