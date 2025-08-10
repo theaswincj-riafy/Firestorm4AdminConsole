@@ -438,7 +438,7 @@ export default function AdminConsole() {
     return JSON.stringify(currentConfig) !== JSON.stringify(originalConfig);
   }, [currentConfig, originalConfig]);
 
-  const handleRegenerateTab = (tabKey: string) => {
+  const handleRegenerateConfig = (tabKey: string) => {
     if (!selectedApp || !currentConfig) return;
 
     const currentSubtree = currentConfig?.referral_json?.en?.[tabKey] || {};
@@ -574,8 +574,8 @@ export default function AdminConsole() {
         />
 
         <MainContent
-          selectedApp={selectedApp}
           apps={apps}
+          selectedApp={selectedApp}
           currentConfig={currentConfig}
           originalConfig={originalConfig}
           activeTab={activeTab}
@@ -592,7 +592,7 @@ export default function AdminConsole() {
           onLockToggle={handleLockToggle}
           onSaveConfig={handleSaveConfig}
           onResetChanges={handleResetChanges}
-          onRegenerateTab={handleRegenerateTab}
+          onRegenerateTab={handleRegenerateConfig}
           onTranslate={handleTranslate}
           onDeleteApp={handleDeleteApp}
           onRefreshTab={handleRefreshTab}
@@ -603,6 +603,7 @@ export default function AdminConsole() {
           configError={configError as Error | null}
           isLoadingConfig={isLoadingConfig}
           onRetryConfig={() => refetchConfig()}
+          onCreateApp={handleCreateApp}
         />
       </div>
 

@@ -38,6 +38,7 @@ interface MainContentProps {
   configError: Error | null;
   isLoadingConfig: boolean;
   onRetryConfig: () => void;
+  onCreateApp: () => void; // Added onCreateApp prop
 }
 
 const LANGUAGES = [
@@ -79,7 +80,8 @@ export default function MainContent({
   isTranslating,
   configError,
   isLoadingConfig,
-  onRetryConfig
+  onRetryConfig,
+  onCreateApp, // Added onCreateApp to function parameters
 }: MainContentProps) {
   const [validateResult, setValidateResult] = useState<{ valid: boolean; error?: string } | null>(null);
   const [refreshingTabs, setRefreshingTabs] = useState<Record<string, boolean>>({});
@@ -222,18 +224,12 @@ export default function MainContent({
               </p>
               <div className="flex items-center justify-center gap-4">
                 <Button 
-                  onClick={() => window.location.href = '#create-app'}
+                  onClick={onCreateApp} // Use the onCreateApp prop
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create New App
                 </Button>
-                {apps.length > 0 && (
-                  <Button variant="outline">
-                    <FileText className="w-4 h-4 mr-2" />
-                    View Documentation
-                  </Button>
-                )}
               </div>
             </div>
           </div>
