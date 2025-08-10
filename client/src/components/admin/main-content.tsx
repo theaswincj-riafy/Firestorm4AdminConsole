@@ -19,6 +19,7 @@ import {
   Palette,
   Code,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -534,6 +535,23 @@ export default function MainContent({
                         <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
                       )}
                     </div>
+                    {/* Regenerate Button - Conditionally rendered */}
+                    {activeTab && !['app-details', 'image'].includes(activeTab) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onRefreshTab(activeTab)}
+                        disabled={refreshingTabs[activeTab] || isRegenerating} // Use refreshingTabs state for disabled prop
+                        className="flex items-center gap-2 ml-2" // Added margin-left for spacing
+                      >
+                        {refreshingTabs[activeTab] || isRegenerating ? ( // Check both states for loading indicator
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <RefreshCw className="w-4 h-4" />
+                        )}
+                        Regenerate
+                      </Button>
+                    )}
                   </div>
                 );
               })}
