@@ -352,7 +352,8 @@ export default function MainContent({
 
   // Get tabs from referral_json.en, excluding special tabs to avoid duplicates
   // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
-  const excludedTabs = [...specialTabs, "appDetails"];
+  // Also exclude 'images' as it conflicts with our special 'image' tab
+  const excludedTabs = [...specialTabs, "appDetails", "images"];
   const configTabs = Object.keys(currentConfig.referral_json?.en || {}).filter(
     (tab) => !excludedTabs.includes(tab),
   );
@@ -367,6 +368,8 @@ export default function MainContent({
 
   const additionalTabs = configTabs.filter((tab) => !tabOrder.includes(tab));
   const allTabs = [...orderedTabs, ...additionalTabs];
+  
+  // Remove debug logs
 
   return (
     <main className="admin-main">

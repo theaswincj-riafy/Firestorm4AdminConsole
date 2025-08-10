@@ -95,7 +95,8 @@ export default function AdminConsole() {
 
       // Find available tabs from the referral_json.en structure, excluding special tabs
       // Also exclude 'appDetails' as it conflicts with our special 'app-details' tab
-      const excludedTabs = [...specialTabs, 'appDetails'];
+      // Also exclude 'images' as it conflicts with our special 'image' tab
+      const excludedTabs = [...specialTabs, 'appDetails', 'images'];
       const configTabs = data.referral_json?.en ?
         Object.keys(data.referral_json.en).filter(tab => !excludedTabs.includes(tab)) : [];
 
@@ -105,6 +106,8 @@ export default function AdminConsole() {
       );
       const additionalTabs = configTabs.filter(tab => !tabOrder.includes(tab));
       const allTabs = [...orderedTabs, ...additionalTabs];
+      
+      // Remove debug logs
 
       if (allTabs.length > 0 && !activeTab) {
         setActiveTab(allTabs[0]);
