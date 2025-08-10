@@ -291,24 +291,33 @@ export default function AdminConsole() {
   });
 
   const handleSelectApp = (app: App) => {
-    if (isDirty) {
+    // Check if there are unsaved changes before switching apps
+    if (hasChanges && selectedApp && selectedApp.appId !== app.appId) {
       setPendingAppSwitch(app);
       setIsUnsavedChangesDialogOpen(true);
       return;
     }
+
+    // Switch app immediately if no changes or same app
     setSelectedApp(app);
-    setActiveTab(null); // Reset active tab when switching apps
+    setActiveTab(null);
+    setCurrentConfig(null);
+    setOriginalConfig(null);
+    setAppDetailsChanges(null);
     setIsDirty(false);
-    setOriginalConfig(null); // Reset original config when switching apps
+    queryClient.invalidateQueries({ queryKey: ['/api/apps', app.appId, 'config'] });
   };
 
   const handleConfirmAppSwitch = () => {
     if (pendingAppSwitch) {
       setSelectedApp(pendingAppSwitch);
       setActiveTab(null);
+      setCurrentConfig(null);
+      setOriginalConfig(null);
+      setAppDetailsChanges(null);
       setIsDirty(false);
-      setOriginalConfig(null); // Reset original config
       setPendingAppSwitch(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/apps', pendingAppSwitch.appId, 'config'] });
     }
     setIsUnsavedChangesDialogOpen(false);
   };
@@ -440,13 +449,23 @@ export default function AdminConsole() {
   // Check if current config differs from original
   const hasChanges = useMemo(() => {
     if (!currentConfig || !originalConfig) return false;
-    return JSON.stringify(currentConfig) !== JSON.stringify(originalConfig);
-  }, [currentConfig, originalConfig]);
+    // Also check if there are app details changes
+    const configChanged = JSON.stringify(currentConfig) !== JSON.stringify(originalConfig);
+    const appDetailsChanged = appDetailsChanges !== null;
+    return configChanged || appDetailsChanged || isDirty;
+  }, [currentConfig, originalConfig, appDetailsChanges, isDirty]);
 
   const handleRegenerateConfig = (tabKey: string) => {
     if (!selectedApp || !currentConfig) return;
 
-    const currentSubtree = currentConfig?.referral_json?.en?.[tabKey] || {};
+    // For notifications tab, get the data from notifications field instead of referral_json.en
+    let currentSubtree;
+    if (tabKey === 'notifications') {
+      currentSubtree = currentConfig?.referral_json?.en?.notifications || {};
+    } else {
+      currentSubtree = currentConfig?.referral_json?.en?.[tabKey] || {};
+    }
+
     regenerateTabMutation.mutate({
       appId: selectedApp.appId,
       tabKey,
@@ -459,6 +478,7 @@ export default function AdminConsole() {
   const handleResetChanges = () => {
     if (originalConfig) {
       setCurrentConfig(JSON.parse(JSON.stringify(originalConfig))); // Deep clone
+      setAppDetailsChanges(null); // Reset app details changes
       setIsDirty(false);
       toast({
         title: "Changes Reset",
