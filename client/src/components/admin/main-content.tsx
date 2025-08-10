@@ -482,7 +482,7 @@ export default function MainContent({
           </div>
 
           {/* Tab Contents - with proper spacing for fixed elements */}
-          <div className="flex-1 overflow-y-auto" style={{ paddingTop: '60px' }}>
+          <div className="flex-1 overflow-y-auto">
             {allTabs.map((tabKey) => {
               let tabData;
               const isAppDetailsTab = tabKey === 'app-details';
