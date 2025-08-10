@@ -426,10 +426,21 @@ export default function AdminConsole() {
       updatedConfig.app_name = newTabData.appName;
       updatedConfig.meta = newTabData.meta;
     } else {
-      // Update the specific tab data in referral_json.en (including images)
+      // Ensure the referral_json.en structure exists
       if (!updatedConfig.referral_json) updatedConfig.referral_json = {};
       if (!updatedConfig.referral_json.en) updatedConfig.referral_json.en = {};
-      updatedConfig.referral_json.en[tabKey] = newTabData;
+      
+      // Special handling for images to ensure it's always added to the structure
+      if (tabKey === 'images') {
+        // Make sure images object exists and merge with new data
+        if (!updatedConfig.referral_json.en.images) {
+          updatedConfig.referral_json.en.images = {};
+        }
+        updatedConfig.referral_json.en.images = { ...updatedConfig.referral_json.en.images, ...newTabData };
+      } else {
+        // Update other tab data normally
+        updatedConfig.referral_json.en[tabKey] = newTabData;
+      }
     }
 
     console.log('Updated config:', updatedConfig);
