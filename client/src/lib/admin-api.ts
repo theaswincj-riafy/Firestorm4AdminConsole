@@ -1034,6 +1034,31 @@ class AdminApiService {
       throw error;
     }
   }
+
+  async getReferralImages(appPackageName: string): Promise<{ images: { [key: string]: string }, status: string }> {
+    try {
+      const response = await fetch(`https://referral-system-o0yw.onrender.com/api/admin/get_referral_images?app_package_name=${encodeURIComponent(appPackageName)}`, {
+        method: 'GET',
+        headers: {
+          'X-API-Key': 'HJVV4XapPZVVfPSiQThYGZdAXkRLUWvRfpNE5ITMfbC3A4Q',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to fetch referral images');
+      }
+
+      const result = await response.json();
+      console.log('Referral images API response:', result);
+      
+      return result;
+    } catch (error) {
+      console.error('Error fetching referral images:', error);
+      throw error;
+    }
+  }
 }
 
 export const adminApi = new AdminApiService();

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ImageIcon, RefreshCw, Loader2 } from 'lucide-react';
@@ -29,7 +30,23 @@ export default function ImageEditor({
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
+  // Fetch referral images when the component loads
+  const { data: referralImagesData, isLoading: isFetchingImages, error: fetchError } = useQuery({
+    queryKey: ['referral-images', selectedApp?.packageName],
+    queryFn: () => adminApi.getReferralImages(selectedApp!.packageName),
+    enabled: !!selectedApp?.packageName,
+  });
+
   useEffect(() => {
+    // Prioritize fetched referral images from API over local config
+    if (referralImagesData?.images?.image1) {
+      setFormData({
+        imageUrl: referralImagesData.images.image1,
+        alt: 'App referral image'
+      });
+      return;
+    }
+    
     // Check if there's an existing image in en.images (prioritize image1 to match the structure)
     const imagesData = fullConfigData?.referral_json?.en?.images;
     let existingImage = null;
@@ -50,7 +67,7 @@ export default function ImageEditor({
         alt: data.alt || ''
       });
     }
-  }, [data, fullConfigData]);
+  }, [data, fullConfigData, referralImagesData]);
 
   const handleRegenerateImage = async () => {
     if (isLocked || isGenerating || !selectedApp) return;
@@ -133,7 +150,13 @@ export default function ImageEditor({
         <CardContent className="space-y-6">
           {/* Image Preview */}
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
-            {formData.imageUrl ? (
+            {isFetchingImages ? (
+              <div className="flex flex-col items-center justify-center text-muted-foreground">
+                <Loader2 className="w-16 h-16 mb-4 animate-spin opacity-50" />
+                <p className="text-sm">Fetching image...</p>
+                <p className="text-xs text-muted-foreground mt-1">Loading referral image data</p>
+              </div>
+            ) : formData.imageUrl ? (
               <img
                 src={formData.imageUrl}
                 alt={formData.alt || 'App download image'}
@@ -146,7 +169,7 @@ export default function ImageEditor({
             ) : (
               <div className="flex flex-col items-center justify-center text-muted-foreground">
                 <ImageIcon className="w-16 h-16 mb-4 opacity-50" />
-                <p className="text-sm">No image generated yet</p>
+                <p className="text-sm">No image available</p>
                 <p className="text-xs text-muted-foreground mt-1">Click the button below to generate an image</p>
               </div>
             )}
