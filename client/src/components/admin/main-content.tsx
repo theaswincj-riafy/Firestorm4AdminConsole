@@ -605,18 +605,18 @@ export default function MainContent({
       <div className="global-actions">
         <Button
           onClick={onSaveConfig}
-          disabled={isLocked || isSaving}
+          disabled={isLocked || isSaving || !hasChanges}
           className="flex items-center gap-2 relative"
         >
           {isSaving ? (
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Saving...</span>
+              <span>Updating...</span>
             </>
           ) : (
             <>
               <Save className="w-4 h-4" />
-              <span>Save</span>
+              <span>Update</span>
             </>
           )}
         </Button>
