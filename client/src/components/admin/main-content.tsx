@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import TabContent from "./tab-content";
+import RegenerateModal from "./regenerate-modal";
 import type { App } from "@shared/schema";
 
 interface MainContentProps {
@@ -61,7 +62,7 @@ interface MainContentProps {
   onLockToggle: () => void;
   onSaveConfig: () => void;
   onResetChanges: () => void;
-  onRegenerateTab: (tabKey: string) => void;
+  onRegenerateTab: (tabKey: string, description: string) => void;
   onTranslate: (lang: string) => void;
   onDeleteApp: (appId: string) => void;
   onRefreshTab: (tabKey: string) => Promise<void>;
@@ -135,6 +136,15 @@ export default function MainContent({
     {},
   );
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [regenerateModal, setRegenerateModal] = useState<{
+    isOpen: boolean;
+    tabKey: string;
+    tabTitle: string;
+  }>({
+    isOpen: false,
+    tabKey: '',
+    tabTitle: '',
+  });
 
   const handleValidateJson = () => {
     if (!currentConfig || !activeTab) return;
@@ -170,18 +180,32 @@ export default function MainContent({
     onTabDataUpdate(tabKey, newTabData);
   };
 
-  const handleRefreshClick = async (tabKey: string) => {
+  const handleRefreshClick = (tabKey: string) => {
+    const tabTitle = getTabTitle(tabKey);
+    setRegenerateModal({
+      isOpen: true,
+      tabKey,
+      tabTitle,
+    });
+  };
+
+  const handleRegenerateSubmit = async (tabKey: string, description: string) => {
     setRefreshingTabs((prev) => ({ ...prev, [tabKey]: true }));
 
     try {
-      await onRefreshTab(tabKey);
+      await onRegenerateTab(tabKey, description);
       setRefreshSuccess((prev) => ({ ...prev, [tabKey]: true }));
+      setRegenerateModal({ isOpen: false, tabKey: '', tabTitle: '' });
       setTimeout(() => {
         setRefreshSuccess((prev) => ({ ...prev, [tabKey]: false }));
       }, 2000);
     } finally {
       setRefreshingTabs((prev) => ({ ...prev, [tabKey]: false }));
     }
+  };
+
+  const handleRegenerateClose = () => {
+    setRegenerateModal({ isOpen: false, tabKey: '', tabTitle: '' });
   };
 
   const handleResetClick = () => {
@@ -671,6 +695,17 @@ export default function MainContent({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Regenerate Modal */}
+      <RegenerateModal
+        isOpen={regenerateModal.isOpen}
+        tabKey={regenerateModal.tabKey}
+        tabTitle={regenerateModal.tabTitle}
+        currentDescription={selectedApp?.meta?.description || ''}
+        isRegenerating={refreshingTabs[regenerateModal.tabKey] || false}
+        onClose={handleRegenerateClose}
+        onRegenerate={handleRegenerateSubmit}
+      />
     </main>
   );
 }

@@ -482,7 +482,7 @@ export default function AdminConsole() {
     return configChanged || appDetailsChanged || isDirty;
   }, [currentConfig, originalConfig, appDetailsChanges, isDirty]);
 
-  const handleRegenerateConfig = (tabKey: string) => {
+  const handleRegenerateConfig = (tabKey: string, description: string) => {
     if (!selectedApp || !currentConfig) return;
 
     // For notifications tab, get the data from notifications field instead of referral_json.en
@@ -498,7 +498,7 @@ export default function AdminConsole() {
       tabKey,
       currentSubtree,
       appName: selectedApp.appName,
-      appDescription: selectedApp.meta?.description || ''
+      appDescription: description || selectedApp.meta?.description || ''
     });
   };
 
