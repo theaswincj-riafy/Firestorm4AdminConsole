@@ -548,7 +548,9 @@ export default function MainContent({
                 return (
                   <div
                     key={tabKey}
-                    className={`tab-item ${isActive ? "active" : ""} relative group`}
+                    className={`tab-item ${isActive ? "active" : ""} relative group ${
+                      refreshingTabs[tabKey] ? "opacity-75" : ""
+                    }`}
                   >
                     <div
                       className="tab-label"
@@ -561,9 +563,13 @@ export default function MainContent({
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleRefreshClick(tabKey);
+                          if (!refreshingTabs[tabKey]) {
+                            handleRefreshClick(tabKey);
+                          }
                         }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-70 hover:opacity-100 transition-opacity z-10 cursor-pointer"
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-background/20 opacity-70 hover:opacity-100 transition-opacity z-10 ${
+                          refreshingTabs[tabKey] ? 'cursor-not-allowed' : 'cursor-pointer'
+                        }`}
                       >
                         {refreshSuccess[tabKey] ? (
                           <Check className="w-3 h-3 text-green-500" />
@@ -574,6 +580,16 @@ export default function MainContent({
                         ) : (
                           <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
                         )}
+                      </div>
+                    )}
+                    
+                    {/* Show loading overlay on tab when regenerating */}
+                    {refreshingTabs[tabKey] && (
+                      <div className="absolute inset-0 bg-background/50 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                        <div className="flex items-center gap-2 text-sm text-foreground">
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                          <span>Regenerating...</span>
+                        </div>
                       </div>
                     )}
                   </div>
