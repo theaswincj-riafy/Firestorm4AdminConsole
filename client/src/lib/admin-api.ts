@@ -81,6 +81,8 @@ class AdminApiService {
         app_store_link: appData.appStoreUrl || "",
         play_store_link: appData.playUrl || "",
       };
+      
+      console.log('Creating app with request body:', requestBody);
 
       const response = await fetch(
         "https://referral-system-o0yw.onrender.com/api/admin/createapp",
@@ -126,6 +128,9 @@ class AdminApiService {
             appStoreUrl: apiApp.app_store_link || "",
           },
         };
+        
+        console.log('API response data:', apiApp);
+        console.log('Created app object:', newApp);
 
         // Add to local apps array for immediate UI update
         this.apps.push(newApp);

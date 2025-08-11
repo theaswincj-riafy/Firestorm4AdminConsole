@@ -118,6 +118,8 @@ export default function AdminConsole() {
   const createAppMutation = useMutation({
     mutationFn: (data: AppFormData) => adminApi.createApp(data),
     onSuccess: async (newApp) => {
+      console.log('App created successfully:', newApp);
+      
       // Invalidate apps query to refresh the sidebar
       queryClient.invalidateQueries({ queryKey: ['/api/apps'] });
 
@@ -395,15 +397,18 @@ export default function AdminConsole() {
   };
 
   const getTabData = (tabKey: string) => {
-    if (!currentConfig) return null;
-
     if (tabKey === 'app-details') {
+      // For app details, use selectedApp data which contains the complete app information
+      if (!selectedApp) return null;
+      
       return {
-        packageName: currentConfig.app_package_name || '',
-        appName: currentConfig.app_name || '',
-        meta: currentConfig.meta || {}
+        packageName: selectedApp.packageName || '',
+        appName: selectedApp.appName || '',
+        meta: selectedApp.meta || {}
       };
     }
+    
+    if (!currentConfig) return null;
 
     if (tabKey === 'images') {
       return currentConfig.images || {};
