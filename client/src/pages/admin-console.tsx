@@ -482,7 +482,7 @@ export default function AdminConsole() {
     return configChanged || appDetailsChanged || isDirty;
   }, [currentConfig, originalConfig, appDetailsChanges, isDirty]);
 
-  const handleRegenerateConfig = (tabKey: string, description: string) => {
+  const handleRegenerateConfig = async (tabKey: string, description: string) => {
     if (!selectedApp || !currentConfig) return;
 
     // For notifications tab, get the data from notifications field instead of referral_json.en
@@ -493,12 +493,21 @@ export default function AdminConsole() {
       currentSubtree = currentConfig?.referral_json?.en?.[tabKey] || {};
     }
 
-    regenerateTabMutation.mutate({
-      appId: selectedApp.appId,
-      tabKey,
-      currentSubtree,
-      appName: selectedApp.appName,
-      appDescription: description || selectedApp.meta?.description || ''
+    return new Promise((resolve, reject) => {
+      regenerateTabMutation.mutate({
+        appId: selectedApp.appId,
+        tabKey,
+        currentSubtree,
+        appName: selectedApp.appName,
+        appDescription: description || selectedApp.meta?.description || ''
+      }, {
+        onSuccess: () => {
+          resolve();
+        },
+        onError: (error) => {
+          reject(error);
+        }
+      });
     });
   };
 

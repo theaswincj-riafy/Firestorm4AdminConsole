@@ -62,7 +62,7 @@ interface MainContentProps {
   onLockToggle: () => void;
   onSaveConfig: () => void;
   onResetChanges: () => void;
-  onRegenerateTab: (tabKey: string, description: string) => void;
+  onRegenerateTab: (tabKey: string, description: string) => Promise<void>;
   onTranslate: (lang: string) => void;
   onDeleteApp: (appId: string) => void;
   onRefreshTab: (tabKey: string) => Promise<void>;
@@ -194,11 +194,14 @@ export default function MainContent({
 
     try {
       await onRegenerateTab(tabKey, description);
-      setRefreshSuccess((prev) => ({ ...prev, [tabKey]: true }));
       setRegenerateModal({ isOpen: false, tabKey: '', tabTitle: '' });
+      // Only show success after API completes
+      setRefreshSuccess((prev) => ({ ...prev, [tabKey]: true }));
       setTimeout(() => {
         setRefreshSuccess((prev) => ({ ...prev, [tabKey]: false }));
       }, 2000);
+    } catch (error) {
+      console.error('Regeneration failed:', error);
     } finally {
       setRefreshingTabs((prev) => ({ ...prev, [tabKey]: false }));
     }
@@ -571,12 +574,12 @@ export default function MainContent({
                           refreshingTabs[tabKey] ? 'cursor-not-allowed' : 'cursor-pointer'
                         }`}
                       >
-                        {refreshSuccess[tabKey] ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : refreshingTabs[tabKey] ? (
+                        {refreshingTabs[tabKey] ? (
                           <div className="flex items-center gap-1">
                             <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                           </div>
+                        ) : refreshSuccess[tabKey] ? (
+                          <Check className="w-3 h-3 text-green-500" />
                         ) : (
                           <RefreshCw className="w-3 h-3 hover:text-blue-500 transition-colors" />
                         )}
