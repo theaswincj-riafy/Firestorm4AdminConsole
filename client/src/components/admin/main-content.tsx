@@ -474,11 +474,6 @@ export default function MainContent({
                   >
                     <span>
                       {lang.name} ({lang.code})
-                      {languageExists && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          - Already exists
-                        </span>
-                      )}
                     </span>
                     <div className="flex items-center ml-4">
                       {translateStatus[lang.code] === "pending" ? (
