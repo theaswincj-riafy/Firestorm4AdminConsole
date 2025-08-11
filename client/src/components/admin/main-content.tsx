@@ -585,16 +585,7 @@ export default function MainContent({
                         )}
                       </div>
                     )}
-                    
-                    {/* Show loading overlay on tab when regenerating */}
-                    {refreshingTabs[tabKey] && (
-                      <div className="absolute inset-0 bg-background/50 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                        <div className="flex items-center gap-2 text-sm text-foreground">
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                          <span>Regenerating...</span>
-                        </div>
-                      </div>
-                    )}
+
                   </div>
                 );
               })}

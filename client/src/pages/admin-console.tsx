@@ -493,7 +493,7 @@ export default function AdminConsole() {
       currentSubtree = currentConfig?.referral_json?.en?.[tabKey] || {};
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       regenerateTabMutation.mutate({
         appId: selectedApp.appId,
         tabKey,
