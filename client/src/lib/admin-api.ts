@@ -2,19 +2,7 @@ import { REFERRAL_DATA } from "./referral-data";
 import type { App, AppFormData } from "@shared/schema";
 
 class AdminApiService {
-  private apps: App[] = [
-    {
-      appId: "demo-1",
-      appName: "Demo Referral App",
-      packageName: "com.demo.referral",
-      meta: {
-        description: "A sample referral application",
-        playUrl:
-          "https://play.google.com/store/apps/details?id=com.demo.referral",
-        appStoreUrl: "https://apps.apple.com/app/demo-referral-app/id123456789",
-      },
-    },
-  ];
+  private apps: App[] = [];
 
   private delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -62,13 +50,8 @@ class AdminApiService {
       }
     } catch (error) {
       console.error("Error fetching apps:", error);
-      // If it's a timeout or network error, return fallback data immediately
-      if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch'))) {
-        console.log("Using fallback apps due to network timeout/error");
-        return [...this.apps];
-      }
-      // For other errors, also return fallback
-      return [...this.apps];
+      // Return empty array instead of fallback data to show proper no apps state
+      return [];
     }
   }
 
