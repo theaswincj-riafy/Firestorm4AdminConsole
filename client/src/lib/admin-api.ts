@@ -113,10 +113,14 @@ class AdminApiService {
       }
 
       const result = await response.json();
+      console.log('Full API result:', result);
 
       if (result.status === "success" && result.data) {
         // Transform API response to match our App interface
         const apiApp = result.data;
+        console.log('API response data:', apiApp);
+        console.log('Store links from API - app_store_link:', apiApp.app_store_link);
+        console.log('Store links from API - play_store_link:', apiApp.play_store_link);
 
         const newApp: App = {
           appId: apiApp.app_package_name, // Using package name as unique ID
@@ -129,7 +133,6 @@ class AdminApiService {
           },
         };
         
-        console.log('API response data:', apiApp);
         console.log('Created app object:', newApp);
 
         // Add to local apps array for immediate UI update
