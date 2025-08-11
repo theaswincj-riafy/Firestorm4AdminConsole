@@ -152,7 +152,7 @@ export default function ImageEditor({
             )}
           </div>
 
-          {/* Regenerate Button */}
+          {/* Generate/Regenerate Button */}
           <div className="flex justify-center">
             <Button
               onClick={handleRegenerateImage}
@@ -165,7 +165,12 @@ export default function ImageEditor({
               ) : (
                 <RefreshCw className="w-4 h-4" />
               )}
-              {isGenerating ? 'Generating...' : 'Regenerate Image'}
+              {isGenerating 
+                ? 'Generating...' 
+                : formData.imageUrl 
+                  ? 'Regenerate Image' 
+                  : 'Generate Image'
+              }
             </Button>
           </div>
         </CardContent>
