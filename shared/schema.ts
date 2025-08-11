@@ -4,8 +4,8 @@ export const appFormSchema = z.object({
   packageName: z.string().min(1, "Package name is required"),
   appName: z.string().min(1, "App name is required"),
   appDescription: z.string().min(1, "App description is required"),
-  playUrl: z.string().url().optional().or(z.literal("")),
-  appStoreUrl: z.string().url().optional().or(z.literal(""))
+  playUrl: z.string().min(1, "Play Store URL is required").url("Please enter a valid URL"),
+  appStoreUrl: z.string().min(1, "App Store URL is required").url("Please enter a valid URL")
 });
 
 export type AppFormData = z.infer<typeof appFormSchema>;

@@ -120,7 +120,7 @@ export default function AppModal({
           </div>
 
           <div>
-            <Label htmlFor="playUrl">Google Play Link</Label>
+            <Label htmlFor="playUrl">Google Play Link *</Label>
             <Input
               id="playUrl"
               type="url"
@@ -136,7 +136,7 @@ export default function AppModal({
           </div>
 
           <div>
-            <Label htmlFor="appStoreUrl">iOS App Store Link</Label>
+            <Label htmlFor="appStoreUrl">iOS App Store Link *</Label>
             <Input
               id="appStoreUrl"
               type="url"
