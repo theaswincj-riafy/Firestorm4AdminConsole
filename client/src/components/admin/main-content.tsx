@@ -450,33 +450,50 @@ export default function MainContent({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
-              {LANGUAGES.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onTranslate(lang.code);
-                  }}
-                  onSelect={(e) => e.preventDefault()}
-                  disabled={translateStatus[lang.code] === "pending"}
-                  className="flex items-center justify-between cursor-pointer"
-                >
-                  <span>
-                    {lang.name} ({lang.code})
-                  </span>
-                  <div className="flex items-center ml-4">
-                    {translateStatus[lang.code] === "pending" ? (
-                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    ) : translateStatus[lang.code] === "completed" ? (
-                      <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                    ) : (
-                      <div className="w-4 h-4 border-2 border-gray-300 rounded-sm"></div>
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              ))}
+              {LANGUAGES.map((lang) => {
+                // Check if this language already exists in referral_json
+                const languageExists = currentConfig?.referral_json && 
+                  Object.keys(currentConfig.referral_json).includes(lang.code);
+                
+                const isDisabled = translateStatus[lang.code] === "pending" || languageExists;
+                
+                return (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!isDisabled) {
+                        onTranslate(lang.code);
+                      }
+                    }}
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={isDisabled}
+                    className={`flex items-center justify-between ${
+                      isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                    }`}
+                  >
+                    <span>
+                      {lang.name} ({lang.code})
+                      {languageExists && (
+                        <span className="text-xs text-muted-foreground ml-2">
+                          - Already exists
+                        </span>
+                      )}
+                    </span>
+                    <div className="flex items-center ml-4">
+                      {translateStatus[lang.code] === "pending" ? (
+                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      ) : translateStatus[lang.code] === "completed" || languageExists ? (
+                        <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-300 rounded-sm"></div>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
